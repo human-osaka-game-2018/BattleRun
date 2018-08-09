@@ -1,0 +1,17 @@
+#ifndef GAME_RENDER_
+
+enum PLAYER_MODE1P {
+	RIGHT_DIRECTION1P,
+	LEFT_DIRECTION1P,
+};
+
+enum PLAYER_MODE2P {
+	RIGHT_DIRECTION2P,
+	LEFT_DIRECTION2P
+};
+
+
+
+void GameRender();
+
+#endif // !GAME_RENDER_
