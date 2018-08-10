@@ -69,14 +69,6 @@ void GameRender(void)
 	{ 0.f,                DISPLAY_HIGHT * 2, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
-CUSTOMVERTEX vertexGameBKG[4]
-{
-	{ 0.f,                              0.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-	{ DISPLAY_WIDTH * 2,                0.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-	{ DISPLAY_WIDTH * 2,  DISPLAY_HIGHT * 2, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-	{ 0.f,                DISPLAY_HIGHT * 2, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
-};
-
 	CUSTOMVERTEX  PLAYER[4]
 	{
 		{ g_Player.x,                                       g_Player.y, 1.f, 1.f, 0xFFFFFFFF, MoveImage / 980.f, 0.f },

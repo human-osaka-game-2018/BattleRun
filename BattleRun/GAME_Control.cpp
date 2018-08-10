@@ -22,6 +22,7 @@ void CheckWhetherPlayerIsJamping();//ƒvƒŒƒCƒ„[‚ªƒWƒƒƒ“ƒv‚µ‚Ä‚¢‚é‚©‚ğŠm”F‚·‚éŠÖ
 void CheckKey();//ƒL[“ü—Í‚³‚ê‚Ä‚¢‚é‚©Šm”F‚·‚éŠÖ”
 void CheckWheterTheHit();//ƒLƒƒƒ‰‚ª“–‚½‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©Šm”F‚·‚éŠÖ”
 void GiveGravity();//d—Í‚ğ—^‚¦‚éŠÖ”
+void CreatePerDecision();
 
 static int prevKey[256];//ƒL[“ü—Í‚Ìó•t‚Ì§ŒÀ‚ğs‚¤‚½‚ß‚Ì•Ï”
 static int framecount;//ƒL[“ü—Í‚ªs‚í‚ê‚ÄAƒvƒŒƒCƒ„[‚ÌƒAƒjƒ[ƒVƒ‡ƒ“‚ğ‹N‚±‚·‚½‚ß‚Ì•Ï”
