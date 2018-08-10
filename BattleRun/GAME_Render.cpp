@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include"main.h"
 #include"GAME_Control.h"
 #include"GAME_Render.h"
@@ -67,6 +68,14 @@ void GameRender(void)
 	{ DISPLAY_WIDTH * 2,  DISPLAY_HIGHT * 2, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
 	{ 0.f,                DISPLAY_HIGHT * 2, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
+
+CUSTOMVERTEX vertexGameBKG[4]
+{
+	{ 0.f,                              0.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+	{ DISPLAY_WIDTH * 2,                0.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+	{ DISPLAY_WIDTH * 2,  DISPLAY_HIGHT * 2, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+	{ 0.f,                DISPLAY_HIGHT * 2, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+};
 
 	CUSTOMVERTEX  PLAYER[4]
 	{
@@ -181,6 +190,37 @@ void GameRender(void)
 			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, CELL, sizeof(CUSTOMVERTEX));
 		}
 	}
+	
+	//画面に文字を表示(towerが何階か）
+debugFont.left = 1000;			//左上のX座標
+debugFont.top = 20;			//左上のY座標
+debugFont.right = 1300;		//右下のX座標
+debugFont.bottom = 800;		//右下のY座標
+
+char s[50];
+sprintf(s, "%f", g_Player.x);
+g_pFont[DEBUG_FONT]->DrawText(NULL, s, -1, &debugFont, DT_LEFT, 0xFF000000);
+
+RECT debugFont2;
+debugFont2.left = 1000;			//左上のX座標
+debugFont2.top = 100;			//左上のY座標
+debugFont2.right = 1300;		//右下のX座標
+debugFont2.bottom = 800;		//右下のY座標
+
+char s1[50];
+sprintf(s1, "%f", g_Player.y);
+g_pFont[DEBUG_FONT]->DrawText(NULL, s1, -1, &debugFont2, DT_LEFT, 0xFF000000);
+
+RECT debugFont3;
+debugFont3.left = 1000;			//左上のX座標
+debugFont3.top = 200;			//左上のY座標
+debugFont3.right = 1300;		//右下のX座標
+debugFont3.bottom = 800;		//右下のY座標
+
+char s2[50];
+sprintf(s2, "%f", gravity1P);
+g_pFont[DEBUG_FONT]->DrawText(NULL, s2, -1, &debugFont3, DT_LEFT, 0xFF000000);
+
 
 	//描画の終了
 	g_pD3Device->EndScene();

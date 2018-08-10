@@ -2,9 +2,9 @@
 #include"GAME_Render.h"
 #include"main.h"
 
-#define MOVE_SPEED 10.f
+#define MOVE_SPEED 15.f
 #define SYOSOKUDO 30
-#define KASOKUDO 2
+#define KASOKUDO 3
 
 //enum PLAYER_MODE1P {
 //	RIGHT_DIRECTION1P,
@@ -21,7 +21,7 @@ void InitState();//値を初期化する関数
 void CheckWhetherPlayerIsJamping();//プレイヤーがジャンプしているかを確認する関数
 void CheckKey();//キー入力されているか確認する関数
 void CheckWheterTheHit();//キャラが当たっているかどうか確認する関数
-void CreatePerDecision();
+void GiveGravity();//重力を与える関数
 
 static int prevKey[256];//キー入力の受付の制限を行うための変数
 static int framecount;//キー入力が行われて、プレイヤーのアニメーションを起こすための変数
@@ -41,6 +41,8 @@ static int syosokudo2P = 0;
 static bool first1P = true;
 static bool first2P = true;
 bool isSuccess;
+float gravity1P = 0;
+static float gravity2P = 0;
 
 OBJECT_STATE g_Player = { 30.f,500.f,90.f,120.f };
 OBJECT_STATE g_Player2P = { 30.f,500.f,90.f,120.f };
@@ -56,6 +58,7 @@ void GameControl(void)
 	InitState();
 	CheckKey();
 	CheckWhetherPlayerIsJamping();
+	GiveGravity();
 	CheckWheterTheHit();
 	CreatePerDecision();
 
@@ -107,11 +110,27 @@ void CheckWhetherPlayerIsJamping() {
 
 	}
 
+	
+}
+
+//重力の仕組みの処理の関数
+void GiveGravity() {
 	//重力の仕組みの処理
+	/*static float gravity1P = 0;
+	static float gravity2P = 0;*/
+
 	time1P += 1;
 	time2P += 1;
-	g_Player.y -= (syosokudo1P - KASOKUDO * time1P);
-	g_Player2P.y -= (syosokudo2P - KASOKUDO * time2P);
+	gravity1P = (syosokudo1P - KASOKUDO * time1P);
+	gravity2P = (syosokudo2P - KASOKUDO * time2P);
+	if (gravity1P < -31) {
+		gravity1P = -31;
+	}
+	if (gravity2P < -31) {
+		gravity2P = -31;
+	}
+	g_Player.y -= gravity1P;
+	g_Player2P.y -= gravity2P;
 }
 
 //キー入力を受け付け、キーに応じた処理を行う関数
@@ -144,12 +163,12 @@ void CheckKey() {
 
 		if (diks[DIK_S] & 0x80)
 		{
-			g_Player.y += MOVE_SPEED;
+			//g_Player.y += MOVE_SPEED;
 		}
 
 		if (diks[DIK_DOWN] & 0x80)
 		{
-			g_Player2P.y += MOVE_SPEED;
+			//g_Player2P.y += MOVE_SPEED;
 		}
 
 		if (diks[DIK_A] & 0x80)
@@ -287,7 +306,7 @@ void CheckWheterTheHit()
 	sabun1P.y = g_Player.y - oldPlayer1P.y;
 	//プレイヤーが下からぶつかった時の当たり判定
 	if (sabun1P.y < 0) {
-		if (MapData02[((int)g_Player.y + (int)sabun1P.y) / CELL_SIZE][(int)g_Player.x / CELL_SIZE] == 1 || MapData02[((int)g_Player.y + (int)sabun1P.y) / CELL_SIZE][((int)g_Player.x + (int)sabun1P.x) / CELL_SIZE] == 1 && sabun1P.y < 0) {
+		if (MapData02[((int)g_Player.y + (int)sabun1P.y) / CELL_SIZE][(int)g_Player.x / CELL_SIZE] == 1 || MapData02[((int)g_Player.y + (int)sabun1P.y) / CELL_SIZE][((int)g_Player.x + (int)sabun1P.x) / CELL_SIZE] == 1) {
 			g_Player.y = (((int)g_Player.y + (int)sabun1P.y) / CELL_SIZE) * CELL_SIZE + CELL_SIZE;
 			syosokudo1P = 0;
 			time1P = 0;
@@ -295,7 +314,7 @@ void CheckWheterTheHit()
 	}
 	//プレイヤーが上からぶつかった時の当たり判定
 	if (MapData02[((int)g_Player.y + (int)g_Player.scale_y + (int)sabun1P.y) / CELL_SIZE][(int)g_Player.x / CELL_SIZE] == 1 || MapData02[((int)g_Player.y + (int)g_Player.scale_y + (int)sabun1P.y) / CELL_SIZE][((int)g_Player.x + (int)g_Player.scale_x/* + (int)sabun1P.x*/) / CELL_SIZE] == 1) {
-		g_Player.y = (((int)g_Player.y + (int)g_Player.scale_y + (int)sabun1P.y) / CELL_SIZE) * CELL_SIZE - g_Player.scale_y + 25;
+		g_Player.y = (((int)g_Player.y + (int)g_Player.scale_y + (int)sabun1P.y) / CELL_SIZE) * CELL_SIZE - g_Player.scale_y + 25 ;
 		JFlag = false;
 		time1P = 0;
 		Jcount = 0;
@@ -306,38 +325,41 @@ void CheckWheterTheHit()
 	if (MapData02[(int)g_Player.y / CELL_SIZE][((int)g_Player.x + (int)sabun1P.x) / CELL_SIZE] == 1 || MapData02[((int)g_Player.y + (int)sabun1P.y) / CELL_SIZE][((int)g_Player.x + (int)sabun1P.x) / CELL_SIZE] == 1) {
 		g_Player.x = (((int)g_Player.x + (int)sabun1P.x) / CELL_SIZE) * CELL_SIZE + CELL_SIZE;
 	}
-	//プレイヤーが左からぶつかった時の当たり判定
-	if (MapData02[(int)g_Player.y / CELL_SIZE][((int)g_Player.x + (int)g_Player.scale_x + (int)sabun1P.x + (CELL_SIZE)) / CELL_SIZE] == 1 || MapData02[((int)g_Player.y + (int)sabun1P.y) / 32][((int)g_Player.x + (int)g_Player.scale_x + (int)sabun1P.x + (CELL_SIZE)) / CELL_SIZE] == 1) {
-		g_Player.x = (((int)g_Player.x + (int)g_Player.scale_x + (int)sabun1P.x + CELL_SIZE) / CELL_SIZE) * CELL_SIZE - g_Player.scale_x;
+	else {
+		//プレイヤーが左からぶつかった時の当たり判定
+		if (MapData02[(int)g_Player.y / CELL_SIZE][((int)g_Player.x + (int)g_Player.scale_x + (int)sabun1P.x) / CELL_SIZE] == 1 || MapData02[((int)g_Player.y + (int)g_Player.scale_y/* + (int)sabun1P.y*/) / 32][((int)g_Player.x + (int)g_Player.scale_x + (int)sabun1P.x) / CELL_SIZE] == 1) {
+			g_Player.x = (((int)g_Player.x + (int)g_Player.scale_x + (int)sabun1P.x + CELL_SIZE) / CELL_SIZE) * CELL_SIZE - g_Player.scale_x;
+		}
 	}
 
 
 	////２Pの当たり判定
 	sabun2P.x = g_Player2P.x - oldPlayer2P.x;
 	sabun2P.y = g_Player2P.y - oldPlayer2P.y;
-	//プレイヤーが右からぶつかった時の当たり判定
-	if (MapData02[(int)g_Player2P.y / CELL_SIZE][((int)g_Player2P.x + (int)sabun2P.x) / CELL_SIZE] == 1 || MapData02[((int)g_Player2P.y + (int)sabun2P.y) / CELL_SIZE][((int)g_Player2P.x + (int)sabun2P.x) / CELL_SIZE] == 1) {
-		g_Player2P.x = (((int)g_Player2P.x + (int)sabun2P.x) / CELL_SIZE) * CELL_SIZE + CELL_SIZE;
-	}
-	//プレイヤーが左からぶつかった時の当たり判定
-	if (MapData02[(int)g_Player2P.y / CELL_SIZE][((int)g_Player2P.x + (int)sabun2P.x + (CELL_SIZE)) / CELL_SIZE] == 1 || MapData02[((int)g_Player2P.y + (int)sabun2P.y) / 32][((int)g_Player2P.x + (int)sabun2P.x + (CELL_SIZE)) / CELL_SIZE] == 1) {
-		g_Player2P.x = (((int)g_Player2P.x + (int)sabun2P.x + CELL_SIZE) / CELL_SIZE) * CELL_SIZE;
-	}
 	//プレイヤーが下からぶつかった時の当たり判定
 	if (sabun2P.y < 0) {
-		if (MapData02[((int)g_Player2P.y + (int)sabun2P.y) / CELL_SIZE][(int)g_Player2P.x / CELL_SIZE] == 1 || MapData02[((int)g_Player2P.y + (int)sabun2P.y) / CELL_SIZE][((int)g_Player2P.x + (int)sabun2P.x) / CELL_SIZE] == 1 && sabun2P.y < 0) {
+		if (MapData02[((int)g_Player2P.y + (int)sabun2P.y) / CELL_SIZE][(int)g_Player2P.x / CELL_SIZE] == 1 || MapData02[((int)g_Player2P.y + (int)sabun2P.y) / CELL_SIZE][((int)g_Player2P.x + (int)sabun2P.x) / CELL_SIZE] == 1) {
 			g_Player2P.y = (((int)g_Player2P.y + (int)sabun2P.y) / CELL_SIZE) * CELL_SIZE + CELL_SIZE;
 			syosokudo2P = 0;
 			time2P = 0;
 		}
 	}
 	//プレイヤーが上からぶつかった時の当たり判定
-	if (MapData02[((int)g_Player2P.y + (int)g_Player2P.scale_y + (int)sabun2P.y) / CELL_SIZE][(int)g_Player2P.x / CELL_SIZE] == 1 || MapData02[((int)g_Player2P.y + (int)g_Player2P.scale_y + (int)sabun2P.y) / CELL_SIZE][((int)g_Player2P.x + (int)sabun2P.x) / CELL_SIZE] == 1) {
-		g_Player2P.y = (((int)g_Player2P.y + (int)sabun2P.y) / CELL_SIZE) * CELL_SIZE;
+	if (MapData02[((int)g_Player2P.y + (int)g_Player2P.scale_y + (int)sabun2P.y) / CELL_SIZE][(int)g_Player2P.x / CELL_SIZE] == 1 || MapData02[((int)g_Player2P.y + (int)g_Player2P.scale_y + (int)sabun2P.y) / CELL_SIZE][((int)g_Player2P.x + (int)g_Player2P.scale_x) / CELL_SIZE] == 1) {
+		g_Player2P.y = (((int)g_Player2P.y + (int)g_Player2P.scale_y +(int)sabun2P.y) / CELL_SIZE) * CELL_SIZE - g_Player.scale_y + 25;
 		JFlag2P = false;
 		time2P = 0;
 		Jcount2P = 0;
 		first2P = true;
 		syosokudo2P = 0;
+}
+	//プレイヤーが右からぶつかった時の当たり判定
+	if (MapData02[(int)g_Player2P.y / CELL_SIZE][((int)g_Player2P.x + (int)sabun2P.x) / CELL_SIZE] == 1 || MapData02[((int)g_Player2P.y + (int)sabun2P.y) / CELL_SIZE][((int)g_Player2P.x + (int)sabun2P.x) / CELL_SIZE] == 1) {
+		g_Player2P.x = (((int)g_Player2P.x + (int)sabun2P.x) / CELL_SIZE) * CELL_SIZE + CELL_SIZE;
 	}
+	//プレイヤーが左からぶつかった時の当たり判定
+	if (MapData02[(int)g_Player2P.y / CELL_SIZE][((int)g_Player2P.x + (int)g_Player2P.scale_x + (int)sabun2P.x + (CELL_SIZE)) / CELL_SIZE] == 1 || MapData02[((int)g_Player2P.y + (int)sabun2P.y) / 32][((int)g_Player2P.x + (int)g_Player2P.scale_x + (int)sabun2P.x + (CELL_SIZE)) / CELL_SIZE] == 1) {
+		g_Player2P.x = (((int)g_Player2P.x + (int)g_Player2P.scale_x + (int)sabun2P.x + CELL_SIZE) / CELL_SIZE) * CELL_SIZE - g_Player2P.scale_x;
+	}
+	
 }

@@ -64,6 +64,12 @@ enum BLOCKTYPE//CSVのブロックの番号
 	TRAMPOLINEBLOCK
 };
 
+enum FONT
+{
+	DEBUG_FONT,
+	FONTMAX
+};
+
 struct CUSTOMVERTEX
 {
 	FLOAT	x, y, z, rhw;
@@ -74,6 +80,8 @@ struct CUSTOMVERTEX
 extern LPDIRECT3DTEXTURE9	  g_pTexture[TEXMAX];//描画に必要
 extern IDirect3DDevice9*	  g_pD3Device;//描画に必要
 extern LPDIRECTINPUTDEVICE8 pKeyDevice;//キー入力に必要
+extern LPD3DXFONT g_pFont[FONTMAX];//フォントに必要
+extern RECT debugFont;
 extern int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];
 extern int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];
 

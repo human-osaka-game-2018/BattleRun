@@ -16,10 +16,11 @@ D3DDISPLAYMODE		  g_D3DdisplayMode;
 IDirect3D9*			  g_pDirect3D;		//	Direct3Dのインターフェイス
 LPDIRECTINPUT8 pDinput = NULL;//キー入力のための変数
 LPDIRECTINPUTDEVICE8 pKeyDevice = NULL;
-LPD3DXFONT m_pFont;
 HRESULT InitDinput(HWND hWnd);
+LPD3DXFONT g_pFont[FONTMAX];//DXフォント
 //---------------------------------------
 
+RECT debugFont;
 int scene = TEAMLOGO_SCENE;
 int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];
 int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];
@@ -276,6 +277,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		hWnd,
 		D3DCREATE_SOFTWARE_VERTEXPROCESSING,
 		&g_D3dPresentParameters, &g_pD3Device);
+
+	//フォントの設定
+	D3DXCreateFont(
+		g_pD3Device,
+		20,					//文字の高さを指定
+		20,					//文字の幅を指定
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		"VENUS RISING",	//フォントの種類を指定
+		&g_pFont[DEBUG_FONT]//
+
+	);
 
 	//描画設定
 	g_pD3Device->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
