@@ -7,17 +7,17 @@ void TeamlogoRender(void)
 	CUSTOMVERTEX vertexTeamLogoBKG[4]
 	{
 		{ 0.f,                      0.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ DISPLAY_WIDTH,            0.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ DISPLAY_WIDTH,  DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 0.f,            DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	{ DISPLAY_WIDTH,            0.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+	{ DISPLAY_WIDTH,  DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+	{ 0.f,            DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX vertexTeamLogo[4]
 	{
 		{ 200.f,    200.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 1200.f,   200.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 1200.f,   700.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 200.f,    700.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	{ 1200.f,   200.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+	{ 1200.f,   700.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+	{ 200.f,    700.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	//âÊñ ÇÃè¡ãé

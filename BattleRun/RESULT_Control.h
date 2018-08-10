@@ -3,3 +3,4 @@
 void ResultControl();
 
 #endif // !RESULT_CONTROL_
+

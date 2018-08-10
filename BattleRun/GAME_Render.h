@@ -10,7 +10,10 @@ enum PLAYER_MODE2P {
 	LEFT_DIRECTION2P
 };
 
-
+extern int trampolinecount;
+extern int manholecount;
+extern OBJECT_POSITION trampoline[10];
+extern OBJECT_POSITION manhole[10];
 
 void GameRender();
 

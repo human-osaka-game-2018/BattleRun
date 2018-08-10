@@ -8,14 +8,14 @@ void ResultRender(void)
 	CUSTOMVERTEX vertexResultBKG[4]
 	{
 		{ 0.f,       0.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 1400.f,    0.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 1400.f,  1000.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 0.f,     1000.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	{ 1400.f,    0.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+	{ 1400.f,  1000.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+	{ 0.f,     1000.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	/*CUSTOMVERTEX vertexResult[4]
 	{
-		{ g_Player.x - g_Player.scale, g_Player.y - g_Player.scale, 1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
+	{ g_Player.x - g_Player.scale, g_Player.y - g_Player.scale, 1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
 	{ g_Player.x + g_Player.scale, g_Player.y - g_Player.scale, 1.f, 1.f, 0xFFFFFFFF, 0.25f, 0.f },
 	{ g_Player.x + g_Player.scale, g_Player.y + g_Player.scale, 1.f, 1.f, 0xFFFFFFFF, 0.25f, 0.25f },
 	{ g_Player.x - g_Player.scale, g_Player.y + g_Player.scale, 1.f, 1.f, 0xFFFFFFFF, 0.f, 0.25f }

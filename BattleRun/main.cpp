@@ -23,6 +23,7 @@ HRESULT InitDinput(HWND hWnd);
 int scene = TEAMLOGO_SCENE;
 int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];
 int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];
+SoundLib::SoundsManager soundsManager;
 
 //マップデータを読み込む関数
 void ReadMapData(const char* FileName, int* MapData, int MapWidth)
@@ -196,6 +197,19 @@ void FreeDx()
 	SAFE_RELEASE(pKeyDevice);
 }
 
+void SoundConfiguration(void) {
+
+	// 初期化
+	// SoundsManagerインスタンス生成後に1度のみ行う。
+	bool isSuccess = soundsManager.Initialize();
+
+	// 音声ファイルオープン
+	// 第2引数は音声ファイルを識別するための任意の文字列をキーとして指定する。
+	// この後の操作関数の呼び出し時には、ここで設定したキーを指定して音声を識別する。
+	const TCHAR* filePath = _T("title.wav");
+	isSuccess = soundsManager.AddFile(filePath, _T("bgm"));
+}
+
 //メインルーチン
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	PSTR lpCmdLine, int nCmdShow)
@@ -236,6 +250,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if (FAILED(InitDinput(hWnd))) {
 		return 0;
 	}
+	//音声の初期化
+	SoundConfiguration();
 
 	//DirectX オブジェクトの生成
 	g_pDirect3D = Direct3DCreate9(
@@ -280,7 +296,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	ReadTexture();
 	ReadMapData("BigField.csv", &MapData01[0][0], MAP_01_WIDTH);
 	ReadMapData("Book2.csv", &MapData02[0][0], MAP_02_WIDTH);
-	
+
 
 	DWORD SyncOld = timeGetTime();	//	システム時間を取得
 	DWORD SyncNow;
@@ -309,7 +325,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 					TitleControl();
 					TitleRender();
 					break;
-				/*case TUTORIAL_SCENE:
+					/*case TUTORIAL_SCENE:
 					ControlTutorial();
 					RenderTutorial();
 					break;*/
@@ -321,7 +337,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 					ResultControl();
 					ResultRender();
 					break;
-				/*case THANKYOU_SCENE:
+					/*case THANKYOU_SCENE:
 					ControlThankYou();
 					RenderThankYou();*/
 				}

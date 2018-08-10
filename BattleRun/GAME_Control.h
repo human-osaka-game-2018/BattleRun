@@ -2,7 +2,7 @@
 
 struct OBJECT_STATE
 {
-	float x, y, scale_x,scale_y;
+	float x, y, scale_x, scale_y;
 };
 
 struct OBJECT_POSITION

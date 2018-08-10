@@ -4,6 +4,7 @@
 #include <d3dx9.h>
 #include <dinput.h>
 #include <stdio.h>
+#include"SoundsManager.h"
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "d3dx9.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -77,6 +78,9 @@ extern int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];
 extern int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];
 
 extern int scene;//ƒV[ƒ“Ø‚è‘Ö‚¦‚Ì‚½‚ß‚Ì•Ï”
+
+extern SoundLib::SoundsManager soundsManager;
+
 
 #endif // !MAIN_
 
