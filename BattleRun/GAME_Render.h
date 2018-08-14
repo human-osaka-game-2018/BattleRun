@@ -12,8 +12,10 @@ enum PLAYER_MODE2P {
 
 extern int trampolinecount;
 extern int manholecount;
+extern int goalCount;
 extern OBJECT_POSITION trampoline[10];
 extern OBJECT_POSITION manhole[10];
+extern OBJECT_POSITION goal[10];
 
 void GameRender();
 

@@ -7,25 +7,25 @@ void TitleRender(void)
 	CUSTOMVERTEX vertexTitleBKG[4]
 	{
 		{ 0.f,                      0.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-	{ DISPLAY_WIDTH,            0.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-	{ DISPLAY_WIDTH,  DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-	{ 0.f,            DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ DISPLAY_WIDTH,            0.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ DISPLAY_WIDTH,  DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 0.f,            DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX vertexTitleLogo[4]
 	{
 		{ 200.f,    200.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-	{ 1200.f,   200.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-	{ 1200.f,   500.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-	{ 200.f,    500.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 1250.f,   200.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 1250.f,   500.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 200.f,    500.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX vertexTitleBotton[4]
 	{
-		{ 400.f,    550.f, 1.f,1.f, 0xFF50FFFF, 0.f, 0.f },
-	{ 1000.f,   550.f, 1.f,1.f, 0xFFFF50FF, 1.f, 0.f },
-	{ 1000.f,   700.f, 1.f,1.f, 0xFFFFFF50, 1.f, 1.f },
-	{ 400.f,    700.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 400.f,    550.f, 1.f,1.f, titleBottonsColor1, 0.f, 0.f },
+		{ 1000.f,   550.f, 1.f,1.f, titleBottonsColor2, 1.f, 0.f },
+		{ 1000.f,   700.f, 1.f,1.f, titleBottonsColor3, 1.f, 1.f },
+		{ 400.f,    700.f, 1.f,1.f, titleBottonsColor4, 0.f, 1.f }
 	};
 
 	//âÊñ ÇÃè¡ãé

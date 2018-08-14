@@ -69,7 +69,7 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"title_BKG.png",
+		"title_BKG.jpg",
 		&g_pTexture[TITLE_BKG_TEX]);
 
 	D3DXCreateTextureFromFile(
@@ -91,6 +91,11 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"game_player.png",
 		&g_pTexture[GAME_PLAYER_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"result_BKG.png",
+		&g_pTexture[RESULT_BKG_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
@@ -120,12 +125,27 @@ void ReadTexture(void) {
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"blackBlock.png",
-		&g_pTexture[GROUNDBLOCK_TEX]);
+		&g_pTexture[GROUND_BLOCK_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"trampoline.png",
 		&g_pTexture[TRAMPOLINE_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"goal.png",
+		&g_pTexture[GOAL_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"1P_win.png",
+		&g_pTexture[WIN_1P_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"2P_win.png",
+		&g_pTexture[WIN_2P_TEX]);
 }
 
 
@@ -196,6 +216,7 @@ void FreeDx()
 	SAFE_RELEASE(g_pD3Device);
 	SAFE_RELEASE(g_pDirect3D);
 	SAFE_RELEASE(pKeyDevice);
+	SoundLibCWrapper_Free();
 }
 
 void SoundConfiguration(void) {
@@ -207,8 +228,29 @@ void SoundConfiguration(void) {
 	// 音声ファイルオープン
 	// 第2引数は音声ファイルを識別するための任意の文字列をキーとして指定する。
 	// この後の操作関数の呼び出し時には、ここで設定したキーを指定して音声を識別する。
-	const TCHAR* filePath = _T("title.wav");
-	isSuccess = soundsManager.AddFile(filePath, _T("bgm"));
+	const TCHAR* filePath = _T("game_BGM.mp3");
+	isSuccess = soundsManager.AddFile(filePath, _T("gameBGM"));
+	const TCHAR* filePath2 = _T("titleBGM2.mp3");
+	isSuccess = soundsManager.AddFile(filePath2, _T("titleBGM"));
+	const TCHAR* filePath3 = _T("attack03.mp3");
+	isSuccess = soundsManager.AddFile(filePath3, _T("titleBotton"));
+	const TCHAR* filePath4 = _T("jump01.mp3");
+	isSuccess = soundsManager.AddFile(filePath4, _T("gamePlayerJump"));
+	const TCHAR* filePath5 = _T("jump02.mp3");
+	isSuccess = soundsManager.AddFile(filePath5, _T("gamePlayerJump2"));
+	const TCHAR* filePath6 = _T("jump03.mp3");
+	isSuccess = soundsManager.AddFile(filePath6, _T("gamePlayerJump3"));
+	const TCHAR* filePath7 = _T("jump04.mp3");
+	isSuccess = soundsManager.AddFile(filePath7, _T("gamePlayerJump4"));
+	const TCHAR* filePath8 = _T("jump09.mp3");
+	isSuccess = soundsManager.AddFile(filePath8, _T("gameTrampoline"));
+	const TCHAR* filePath9 = _T("jump09_2.mp3");
+	isSuccess = soundsManager.AddFile(filePath9, _T("gameTrampoline2"));
+	const TCHAR* filePath10 = _T("clapping1.mp3");
+	isSuccess = soundsManager.AddFile(filePath10, _T("clappingSE"));
+	const TCHAR* filePath11 = _T("cheers2.mp3");
+	isSuccess = soundsManager.AddFile(filePath11, _T("cheersSE"));
+
 }
 
 //メインルーチン
@@ -281,8 +323,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	//フォントの設定
 	D3DXCreateFont(
 		g_pD3Device,
-		20,					//文字の高さを指定
-		20,					//文字の幅を指定
+		40,					//文字の高さを指定
+		40,					//文字の幅を指定
 		0,
 		0,
 		0,

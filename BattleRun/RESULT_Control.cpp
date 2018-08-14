@@ -1,6 +1,7 @@
 #include"main.h"
 #include"RESULT_Control.h"
 #include"RESULT_Render.h"
+#include"GAME_Control.h"
 
 void ResultControl() {
 	HRESULT hr = pKeyDevice->Acquire();
@@ -8,10 +9,11 @@ void ResultControl() {
 	{
 		BYTE diks[256];
 		pKeyDevice->GetDeviceState(sizeof(diks), &diks);
-		if (diks[DIK_RETURN] & 0x80) {
+		if (diks[DIK_RETURN] & 0x80 && !prevKey[DIK_RETURN]) {
 			Sleep(0.5 * 1000);
-			//scene = THANKYOU_SCENE;
-			PostQuitMessage(0);
+			scene = TITLE_SCENE;
+			//PostQuitMessage(0);
 		}
+		prevKey[DIK_RETURN] = diks[DIK_RETURN];
 	}
 }

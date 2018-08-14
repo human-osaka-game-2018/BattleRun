@@ -7,10 +7,10 @@ void ResultRender(void)
 {
 	CUSTOMVERTEX vertexResultBKG[4]
 	{
-		{ 0.f,       0.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-	{ 1400.f,    0.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-	{ 1400.f,  1000.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-	{ 0.f,     1000.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 0.f,                      0.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ DISPLAY_WIDTH,            0.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ DISPLAY_WIDTH,  DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 0.f,            DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	/*CUSTOMVERTEX vertexResult[4]
