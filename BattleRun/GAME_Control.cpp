@@ -4,6 +4,7 @@
 
 	/*DEFINE*/
 #define MOVE_SPEED 15.f
+#define ACCELERATION 3.f
 #define SYOSOKUDO 30
 #define KASOKUDO 3
 #define MOVEMENT_STAGE_X 15
@@ -24,7 +25,16 @@ void finishGameOperation();//勝敗がついてからキー入力でシーン遷移を行う関数
 int prevKey[256];//キー入力の受付の制限を行うための変数
 static int framecount;//キー入力が行われて、プレイヤーのアニメーションを起こすための変数
 static int framecount2P;//キー入力が行われて、プレイヤーのアニメーションを起こすための変数
-static bool JFlag = false;//プレイヤー1のジャンプのフラグ
+static int accelerationcount1PRight = 0;
+static int accelerationcount1PLeft = 0;
+static int accelerationcount2PRight = 0;
+static int accelerationcount2PLeft = 0;
+static int acceleration1PLeft = 0;
+static int acceleration1PRight = 0;
+static int acceleration2PLeft = 0;
+static int acceleration2PRight = 0;
+static int acceleration2P = 0;
+static bool JFlag = false;//プレイヤーa1のジャンプのフラグ
 static bool JFlag2P = false;//プレイヤー２のジャンプのフラグ
 static int Jcount = 0;//多段ジャンプを可能にする変数
 static int Jcount2P = 0;//多段ジャンプを可能にする変数
@@ -224,17 +234,31 @@ void CheckKey() {
 		if (diks[DIK_A] & 0x80)
 		{
 			if (g_Player.x >= 200) {
-				g_Player.x -= MOVE_SPEED;
+				g_Player.x -= acceleration1PLeft + MOVE_SPEED;
 				PlayerMode1P = LEFT_DIRECTION1P;
 
 				if (prevKey[DIK_A]) {
 
 					framecount++;
+					accelerationcount1PLeft++;
 					if (framecount == 3) {
 
 						MoveImage -= 140;
 						framecount = 0;
 					}
+
+					if (10 == accelerationcount1PLeft) {
+						acceleration1PLeft = ACCELERATION;
+					}
+
+					if (20 == accelerationcount1PLeft) {
+						acceleration1PLeft = ACCELERATION * 5;
+					}
+				}
+
+				if (!prevKey[DIK_A]) {
+					acceleration1PLeft = 0;
+					accelerationcount1PLeft = 0;
 				}
 			}
 			else if (g_Player.x < 200) {
@@ -261,17 +285,31 @@ void CheckKey() {
 		if (diks[DIK_LEFT] & 0x80)
 		{
 			if(g_Player2P.x >= 200) {
-				g_Player2P.x -= MOVE_SPEED;
+				g_Player2P.x -= acceleration2PLeft + MOVE_SPEED;
 				PlayerMode2P = LEFT_DIRECTION2P;
 
 				if (prevKey[DIK_LEFT]) {
 
 					framecount2P++;
+					accelerationcount2PLeft++;
 					if (framecount2P == 3) {
 
 						MoveImage2P -= 140;
 						framecount2P = 0;
 					}
+
+					if (5 == accelerationcount2PLeft) {
+						acceleration2PLeft = ACCELERATION;
+					}
+
+					if (10 == accelerationcount2PLeft) {
+						acceleration2PLeft = ACCELERATION * 5;
+					}
+				}
+
+				if (!prevKey[DIK_LEFT]) {
+					acceleration2PLeft = 0;
+					accelerationcount2PLeft = 0;
 				}
 			}
 			else if (g_Player2P.x < 200) {
@@ -298,20 +336,35 @@ void CheckKey() {
 		if (diks[DIK_D] & 0x80)
 		{
 			if (g_Player.x < 1200) {
-				g_Player.x += MOVE_SPEED;
+				g_Player.x += acceleration1PRight + MOVE_SPEED;
 				PlayerMode1P = RIGHT_DIRECTION1P;
 
 				if (prevKey[DIK_D]) {
 
 					framecount++;
+					accelerationcount1PRight++;
 					if (framecount == 3) {
 
 						MoveImage += 140;
 						framecount = 0;
 					}
+
+					if (5 == accelerationcount1PRight) {
+						acceleration1PRight = ACCELERATION;
+					}
+
+					if (10 == accelerationcount1PRight) {
+						acceleration1PRight = ACCELERATION * 5;
+					}
 				}
+
+				if (!prevKey[DIK_D]) {
+					acceleration1PRight = 0;
+					accelerationcount1PRight = 0;
+				}
+			
 			}
-			if(g_Player.x >= 1200){
+			if (g_Player.x >= 1200) {
 				movementStageX += MOVEMENT_STAGE_X;
 				g_Player2P.x -= MOVEMENT_STAGE_X;
 				PlayerMode1P = RIGHT_DIRECTION1P;
@@ -325,27 +378,40 @@ void CheckKey() {
 					}
 				}
 			}
-
-
 		}
 
 		if (diks[DIK_RIGHT] & 0x80)
 		{
 			if (g_Player2P.x < 1200) {
-				g_Player2P.x += MOVE_SPEED;
+				g_Player2P.x += acceleration2PRight + MOVE_SPEED;
 				PlayerMode2P = RIGHT_DIRECTION2P;
 
 				if (prevKey[DIK_RIGHT]) {
 
 					framecount2P++;
+					accelerationcount2PRight++;
 					if (framecount2P == 3) {
 
 						MoveImage2P += 140;
 						framecount2P = 0;
 					}
+
+					if (10 == accelerationcount2PRight) {
+						acceleration2PRight = ACCELERATION;
+					}
+
+					if (20 == accelerationcount2PRight) {
+						acceleration2PRight = ACCELERATION * 5;
+					}
+					
+				}
+
+				if (!prevKey[DIK_RIGHT]) {
+					acceleration2P = 0;
+					accelerationcount2PRight = 0;
 				}
 			}
-			if(g_Player2P.x >= 1200){
+			if(g_Player2P.x >= 1200) {
 				PlayerMode2P = RIGHT_DIRECTION2P;
 				if (prevKey[DIK_RIGHT]) {
 
