@@ -4,7 +4,7 @@
 #include <d3dx9.h>
 #include <dinput.h>
 #include <stdio.h>
-#include"SoundsManager.h"
+#include "SoundsManager.h"
 #include "SoundLibCWrapper.h"
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "d3dx9.lib")
