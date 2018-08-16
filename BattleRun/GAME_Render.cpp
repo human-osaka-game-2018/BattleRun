@@ -35,18 +35,18 @@ void GameRender(void)
 
 	CUSTOMVERTEX  PLAYER[4]
 	{
-		{ g_Player.x,                                       g_Player.y, 1.f, 1.f, 0xFFFF0000, MoveImage / 980.f, 0.f },
-		{ g_Player.x + g_Player.scale_x,                    g_Player.y, 1.f, 1.f, 0xFFFF0000, (MoveImage + 120) / 980.f, 0.f },
+		{ g_Player.x,                                       g_Player.y, 1.f, 1.f, 0xFFFF0000, MoveImage / 980.f,                   0.f },
+		{ g_Player.x + g_Player.scale_x,                    g_Player.y, 1.f, 1.f, 0xFFFF0000, (MoveImage + 120) / 980.f,           0.f },
 		{ g_Player.x + g_Player.scale_x, g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFF0000, (MoveImage + 120) / 980.f, 140.f / 630.f },
-		{ g_Player.x,                    g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFF0000, MoveImage / 980.f, 140.f / 630.f }
+		{ g_Player.x,                    g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFF0000, MoveImage / 980.f,         140.f / 630.f }
 	};
 
 	CUSTOMVERTEX  PLAYER2P[4]
 	{
-		{ g_Player2P.x,                                           g_Player2P.y, 1.f, 1.f, 0xFF0000FF, MoveImage2P / 980.f, 0.f },
-		{ g_Player2P.x + g_Player2P.scale_x,                      g_Player2P.y, 1.f, 1.f, 0xFF0000FF, (MoveImage2P + 120) / 980.f, 0.f },
+		{ g_Player2P.x,                                           g_Player2P.y, 1.f, 1.f, 0xFF0000FF, MoveImage2P / 980.f,                   0.f },
+		{ g_Player2P.x + g_Player2P.scale_x,                      g_Player2P.y, 1.f, 1.f, 0xFF0000FF, (MoveImage2P + 120) / 980.f,           0.f },
 		{ g_Player2P.x + g_Player2P.scale_x, g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFF0000FF, (MoveImage2P + 120) / 980.f, 140.f / 630.f },
-		{ g_Player2P.x,                      g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFF0000FF, MoveImage2P / 980.f, 140.f / 630.f }
+		{ g_Player2P.x,                      g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFF0000FF, MoveImage2P / 980.f,         140.f / 630.f }
 	};
 
 	CUSTOMVERTEX  CELL[4]
@@ -202,8 +202,8 @@ void GameRender(void)
 	player1P.right = 800;		//右下のX座標
 	player1P.bottom = 900;		//右下のY座標
 
-	char s1[3] = "1P";
-	g_pFont[DEBUG_FONT]->DrawText(NULL, s1, -1, &player1P, DT_LEFT, 0xFF000000);
+	char textArray[3] = "1P";
+	g_pFont[DEBUG_FONT]->DrawText(NULL, textArray, -1, &player1P, DT_LEFT, 0xFF000000);
 
 	RECT player2P;
 	player2P.left = 800;			//左上のX座標
@@ -211,38 +211,59 @@ void GameRender(void)
 	player2P.right = 1300;		//右下のX座標
 	player2P.bottom = 900;		//右下のY座標
 
-	char s2[3] = "2P";
-	g_pFont[DEBUG_FONT]->DrawText(NULL, s2, -1, &player2P, DT_LEFT, 0xFF000000);
+	char textArray2[3] = "2P";
+	g_pFont[DEBUG_FONT]->DrawText(NULL, textArray2, -1, &player2P, DT_LEFT, 0xFF000000);
 
-//	//画面に文字を表示(towerが何階か）
-//debugFont.left = 1000;			//左上のX座標
-//debugFont.top = 20;			//左上のY座標
-//debugFont.right = 1300;		//右下のX座標
-//debugFont.bottom = 800;		//右下のY座標
-//
-//char s[50];
-//sprintf(s, "%f", g_Player.x);
-//g_pFont[DEBUG_FONT]->DrawText(NULL, s, -1, &debugFont, DT_LEFT, 0xFF000000);
-//
-//RECT debugFont2;
-//debugFont2.left = 1000;			//左上のX座標
-//debugFont2.top = 100;			//左上のY座標
-//debugFont2.right = 1300;		//右下のX座標
-//debugFont2.bottom = 800;		//右下のY座標
-//
-//char s1[50];
-//sprintf(s1, "%f", g_Player.y);
-//g_pFont[DEBUG_FONT]->DrawText(NULL, s1, -1, &debugFont2, DT_LEFT, 0xFF000000);
-//
-//RECT debugFont3;
-//debugFont3.left = 1000;			//左上のX座標
-//debugFont3.top = 200;			//左上のY座標
-//debugFont3.right = 1300;		//右下のX座標
-//debugFont3.bottom = 800;		//右下のY座標
-//
-//char s2[50];
-//sprintf(s2, "%f", gravity1P);
-//g_pFont[DEBUG_FONT]->DrawText(NULL, s2, -1, &debugFont3, DT_LEFT, 0xFF000000);
+	//画面に文字を表示
+debugFont.left = 1000;			//左上のX座標
+debugFont.top = 20;			//左上のY座標
+debugFont.right = 1300;		//右下のX座標
+debugFont.bottom = 800;		//右下のY座標
+
+char textDebugArray[50];
+sprintf(textDebugArray, "%f", g_Player.x);
+g_pFont[DEBUG_FONT]->DrawText(NULL, textDebugArray, -1, &debugFont, DT_LEFT, 0xFF000000);
+
+RECT debugFont2;
+debugFont2.left = 1000;			//左上のX座標
+debugFont2.top = 100;			//左上のY座標
+debugFont2.right = 1300;		//右下のX座標
+debugFont2.bottom = 800;		//右下のY座標
+
+char textDebugArray2[50];
+sprintf(textDebugArray2, "%f", g_Player.y);
+g_pFont[DEBUG_FONT]->DrawText(NULL, textDebugArray2, -1, &debugFont2, DT_LEFT, 0xFF000000);
+
+RECT debugFont3;
+debugFont3.left = 1000;			//左上のX座標
+debugFont3.top = 200;			//左上のY座標
+debugFont3.right = 1300;		//右下のX座標
+debugFont3.bottom = 800;		//右下のY座標
+
+char textDebugArray3[50];
+sprintf(textDebugArray3, "%f", gravity1P);
+g_pFont[DEBUG_FONT]->DrawText(NULL, textDebugArray3, -1, &debugFont3, DT_LEFT, 0xFF000000);
+
+RECT debugFont4;
+debugFont4.left = 1000;			//左上のX座標
+debugFont4.top = 300;			//左上のY座標
+debugFont4.right = 1300;		//右下のX座標
+debugFont4.bottom = 800;		//右下のY座標
+
+char textDebugArray4[50];
+sprintf(textDebugArray4, "%f", sabun1P.x);
+g_pFont[DEBUG_FONT]->DrawText(NULL, textDebugArray4, -1, &debugFont4, DT_LEFT, 0xFF000000);
+
+RECT debugFont5;
+debugFont5.left = 1000;			//左上のX座標
+debugFont5.top = 400;			//左上のY座標
+debugFont5.right = 1300;		//右下のX座標
+debugFont5.bottom = 800;		//右下のY座標
+
+char textDebugArray5[50];
+sprintf(textDebugArray5, "%f", gravity1P);
+g_pFont[DEBUG_FONT]->DrawText(NULL, textDebugArray5, -1, &debugFont5, DT_LEFT, 0xFF000000);
+
 
 
 	//描画の終了

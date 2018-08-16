@@ -3,7 +3,7 @@
 #include"main.h"
 
 	/*DEFINE*/
-#define MOVE_SPEED 15.f
+#define MOVE_SPEED 8
 #define SYOSOKUDO 30
 #define KASOKUDO 3
 #define MOVEMENT_STAGE_X 15
@@ -44,13 +44,17 @@ static float gravity2P = 0;//重力を保存する変数
 float movementStageX = 0;//ステージのXを移動させるための変数
 int win = 0;//どっちが勝ったか判定する変数
 bool gameFinish = false;//勝敗が決まったかどうかのフラグ
-OBJECT_STATE g_Player = { 30.f,500.f,90.f,120.f };
+static float movementPlayer1PXByKey = 0;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
+static float movementPlayer2PXByKey = 0;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
+OBJECT_STATE g_Player = { 30.f,500.f,90.f,120.f};
 OBJECT_STATE g_Player2P = { 30.f,500.f,90.f,120.f };
 OBJECT_STATE g_Trampoline = { 0.f,0.f,32.f,32.f };
 OBJECT_STATE g_Manhole = { 0.f,0.f,32.f,32.f };
 OBJECT_STATE g_Goal = { 0.f,0.f,32.f,32.f };
 OBJECT_POSITION oldPlayer1P = { 0,0 };//プレイヤー1の前の座標を保存し、差分を出すために使う
 OBJECT_POSITION oldPlayer2P = { 0,0 };//プレイヤー2の前の座標を保存し、さ分を出すために使う
+OBJECT_POSITION sabun1P = { 0,0 };
+OBJECT_POSITION sabun2P = { 0,0 };
 
 	/*制御処理*/
 void GameControl(void)
@@ -108,14 +112,13 @@ void InitState() {
 		gravity2P = 0;
 		movementStageX = 0;
 
-		g_Player = { 30.f,500.f,90.f,120.f };
-		g_Player2P = { 30.f,500.f,90.f,120.f };
+		g_Player = { 100.f,400.f,30.f,40.f };
+		g_Player2P = { 100.f,400.f,30.f,40.f };
 		g_Trampoline = { 0.f,0.f,32.f,32.f };
 		g_Manhole = { 0.f,0.f,32.f,32.f };
 		g_Goal = { 0.f,0.f,32.f,32.f };
 		oldPlayer1P = { 0,0 };//プレイヤー1の前の座標を保存し、差分を出すために使う
-		oldPlayer2P = { 0,0 };//プレイヤー2の前の座標を保存し、さ分を出すために使う
-
+		oldPlayer2P = { 0,0 };//プレイヤー2の前の座標を保存し、差分を出すために使う
 
 		//二回目以降に初期化関数に入らないようにする
 		firstTime = false;
@@ -124,6 +127,8 @@ void InitState() {
 	oldPlayer1P.y = g_Player.y;
 	oldPlayer2P.x = g_Player2P.x;
 	oldPlayer2P.y = g_Player2P.y;
+	movementPlayer1PXByKey = 0;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
+	movementPlayer2PXByKey = 0;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
 }
 
 //ジャンプの処理を行う関数
@@ -142,7 +147,6 @@ void CheckWhetherPlayerIsJamping() {
 			}
 		}
 	}
-
 
 	//２Pのジャンプ処理
 	if (JFlag2P) {
@@ -164,10 +168,6 @@ void CheckWhetherPlayerIsJamping() {
 
 //重力の仕組みの処理の関数
 void GiveGravity() {
-	//重力の仕組みの処理
-	/*static float gravity1P = 0;
-	static float gravity2P = 0;*/
-
 	time1P += 1;
 	time2P += 1;
 	gravity1P = (syosokudo1P - KASOKUDO * time1P);
@@ -400,6 +400,7 @@ BOOL PlayerDecision(int count, OBJECT_POSITION* pposition, OBJECT_STATE gstate, 
 	return false;
 }
 
+//ギミックの当たり判定、動きの処理を行う関数
 void CreatePerDecision(void) {
 
 	//トランポリンの処理
@@ -446,71 +447,101 @@ void CreatePerDecision(void) {
 	goalCount = 0;
 }
 
+//プレイヤーとマップの当たり判定を行う関数
 void CheckWheterTheHit()
 {
-	OBJECT_POSITION sabun1P = { 0,0 };
-	OBJECT_POSITION sabun2P = { 0,0 };
+	//１Pの当たり判定
+	float arrayToCheckRightCollision1P[6] = { oldPlayer1P.y, oldPlayer1P.y + ((g_Player.scale_y) / 4) * 1, oldPlayer1P.y + ((g_Player.scale_y) / 4) * 2, oldPlayer1P.y + ((g_Player.scale_y) / 4) * 3, oldPlayer1P.y + g_Player.scale_y,oldPlayer1P.x + g_Player.scale_x };
+	float arrayToCheckLeftCollision1P[6] = { oldPlayer1P.y, oldPlayer1P.y + ((g_Player.scale_y) / 4) * 1, oldPlayer1P.y + ((g_Player.scale_y) / 4) * 2, oldPlayer1P.y + ((g_Player.scale_y) / 4) * 3, oldPlayer1P.y + g_Player.scale_y, oldPlayer1P.x};	
+	sabun1P.x = g_Player.x - oldPlayer1P.x;//sabun1P.xがプラスの値ならプラスの方向に進んだということ
+	sabun1P.y = g_Player.y - oldPlayer1P.y;//sabun1P.yがプラスの値ならプラスの方向に進んだということ
+	//プレイヤーの左の方向にブロックがあるとき
+	if (sabun1P.x < 0) {
+		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+			if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint]) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] != 0) {
+				g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+			}
+		}
+	}//プレイヤーの右の方向にブロックがあるとき
+	else if (sabun1P.x > 0) {
+		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+			if (MapData02[(int)arrayToCheckRightCollision1P[collisionPoint] / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] != 0) {
+				g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + +(int)movementStageX) / CELL_SIZE) * CELL_SIZE -1 - g_Player.scale_x - (int)movementStageX;
 
-	////１Pの当たり判定
-	sabun1P.x = g_Player.x - oldPlayer1P.x;
-	sabun1P.y = g_Player.y - oldPlayer1P.y;
-	//プレイヤーが下からぶつかった時の当たり判定
-	if (sabun1P.y < 0) {
-		if (MapData02[((int)g_Player.y + (int)sabun1P.y) / CELL_SIZE][(int)g_Player.x / CELL_SIZE] == 1 || MapData02[((int)g_Player.y + (int)sabun1P.y) / CELL_SIZE][((int)g_Player.x + (int)sabun1P.x) / CELL_SIZE] == 1) {
-			g_Player.y = (((int)g_Player.y + (int)sabun1P.y) / CELL_SIZE) * CELL_SIZE + CELL_SIZE;
-			syosokudo1P = 0;
-			time1P = 0;
+			}
 		}
 	}
-	//プレイヤーが上からぶつかった時の当たり判定
-	if (MapData02[((int)g_Player.y + (int)g_Player.scale_y + (int)sabun1P.y) / CELL_SIZE][(int)g_Player.x / CELL_SIZE] == 1 || MapData02[((int)g_Player.y + (int)g_Player.scale_y + (int)sabun1P.y) / CELL_SIZE][((int)g_Player.x + (int)g_Player.scale_x/* + (int)sabun1P.x*/) / CELL_SIZE] == 1) {
-		g_Player.y = (((int)g_Player.y + (int)g_Player.scale_y + (int)sabun1P.y) / CELL_SIZE) * CELL_SIZE - g_Player.scale_y + 25 ;
-		JFlag = false;
-		time1P = 0;
-		Jcount = 0;
-		first1P = true;
-		syosokudo1P = 0;
-	}
-	//プレイヤーが右からぶつかった時の当たり判定
-	if (MapData02[(int)g_Player.y / CELL_SIZE][((int)g_Player.x + (int)sabun1P.x) / CELL_SIZE] == 1 || MapData02[((int)g_Player.y + (int)sabun1P.y) / CELL_SIZE][((int)g_Player.x + (int)sabun1P.x) / CELL_SIZE] == 1) {
-		g_Player.x = (((int)g_Player.x + (int)sabun1P.x) / CELL_SIZE) * CELL_SIZE + CELL_SIZE;
-	}
-		//プレイヤーが左からぶつかった時の当たり判定
-	if (MapData02[(int)g_Player.y / CELL_SIZE][((int)g_Player.x + (int)g_Player.scale_x + (int)sabun1P.x + CELL_SIZE) / CELL_SIZE] == 1 || MapData02[((int)g_Player.y + (int)sabun1P.y) / 32][((int)g_Player.x + (int)g_Player.scale_x + (int)sabun1P.x + CELL_SIZE) / CELL_SIZE] == 1) {
-		g_Player.x = (((int)g_Player.x + (int)g_Player.scale_x + (int)sabun1P.x + CELL_SIZE) / CELL_SIZE) * CELL_SIZE - g_Player.scale_x;
+	float arrayToCheckTopCollision1P[6] = { g_Player.x, g_Player.x + ((g_Player.scale_x) / 4) * 1, g_Player.x + ((g_Player.scale_x) / 4) * 2, g_Player.x + ((g_Player.scale_x) / 4) * 3, g_Player.x + g_Player.scale_x, oldPlayer1P.y };
+	float arrayToCheckBottomCollision1P[6] = { g_Player.x, g_Player.x + ((g_Player.scale_x) / 4) * 1, g_Player.x + ((g_Player.scale_x) / 4) * 2, g_Player.x + ((g_Player.scale_x) / 4) * 3, g_Player.x + g_Player.scale_x, oldPlayer1P.y + g_Player.scale_y };
+	//プレイヤーの上の方向にブロックがあるとき
+	if (gravity1P > 0) {
+		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+			if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] != 0) {
+				g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y) / CELL_SIZE) * CELL_SIZE + CELL_SIZE;
+				syosokudo1P = 0;
+				time1P = 0;
+			}
+		}
+	}//プレイヤーの下の方向にブロックがあるとき
+	else if (gravity1P < 0) {
+		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+			if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] != 0) {
+				g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y) / CELL_SIZE ) * CELL_SIZE -1 - g_Player.scale_y;
+				JFlag = false;
+				time1P = 0;
+				Jcount = 0;
+				first1P = true;
+				syosokudo1P = 0;
+			}
+		}
 	}
 	
+	//2Pの当たり判定
+	float arrayToCheckRightCollision2P[6] = { oldPlayer2P.y, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 1, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 2, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 3, oldPlayer2P.y + g_Player2P.scale_y,oldPlayer2P.x + g_Player2P.scale_x };
+	float arrayToCheckLeftCollision2P[6] = { oldPlayer2P.y, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 1, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 2, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 3, oldPlayer2P.y + g_Player2P.scale_y, oldPlayer2P.x };
+	sabun2P.x = g_Player2P.x - oldPlayer2P.x;//sabun2P.xがプラスの値ならプラスの方向に進んだということ
+	sabun2P.y = g_Player2P.y - oldPlayer2P.y;//sabun2P.yがプラスの値ならプラスの方向に進んだということ
+										   //プレイヤーの左の方向にブロックがあるとき
+	if (sabun2P.x < 0) {
+		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+			if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint]) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] != 0) {
+				g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+			}
+		}
+	}//プレイヤーの右の方向にブロックがあるとき
+	else if (sabun2P.x > 0) {
+		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+			if (MapData02[(int)arrayToCheckRightCollision2P[collisionPoint] / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] != 0) {
+				g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 
-
-	////２Pの当たり判定
-	sabun2P.x = g_Player2P.x - oldPlayer2P.x;
-	sabun2P.y = g_Player2P.y - oldPlayer2P.y;
-	//プレイヤーが下からぶつかった時の当たり判定
-	if (sabun2P.y < 0) {
-		if (MapData02[((int)g_Player2P.y + (int)sabun2P.y) / CELL_SIZE][(int)g_Player2P.x / CELL_SIZE] == 1 || MapData02[((int)g_Player2P.y + (int)sabun2P.y) / CELL_SIZE][((int)g_Player2P.x + (int)sabun2P.x) / CELL_SIZE] == 1) {
-			g_Player2P.y = (((int)g_Player2P.y + (int)sabun2P.y) / CELL_SIZE) * CELL_SIZE + CELL_SIZE;
-			syosokudo2P = 0;
-			time2P = 0;
-
+			}
 		}
 	}
-	//プレイヤーが上からぶつかった時の当たり判定
-	if (MapData02[((int)g_Player2P.y + (int)g_Player2P.scale_y + (int)sabun2P.y) / CELL_SIZE][(int)g_Player2P.x / CELL_SIZE] == 1 || MapData02[((int)g_Player2P.y + (int)g_Player2P.scale_y + (int)sabun2P.y) / CELL_SIZE][((int)g_Player2P.x + (int)g_Player2P.scale_x) / CELL_SIZE] == 1) {
-		g_Player2P.y = (((int)g_Player2P.y + (int)g_Player2P.scale_y +(int)sabun2P.y) / CELL_SIZE) * CELL_SIZE - g_Player.scale_y + 25;
-		JFlag2P = false;
-		time2P = 0;
-		Jcount2P = 0;
-		first2P = true;
-		syosokudo2P = 0;
-}
-	//プレイヤーが右からぶつかった時の当たり判定
-	if (MapData02[(int)g_Player2P.y / CELL_SIZE][((int)g_Player2P.x + (int)sabun2P.x) / CELL_SIZE] == 1 || MapData02[((int)g_Player2P.y + (int)sabun2P.y) / CELL_SIZE][((int)g_Player2P.x + (int)sabun2P.x) / CELL_SIZE] == 1) {
-		g_Player2P.x = (((int)g_Player2P.x + (int)sabun2P.x) / CELL_SIZE) * CELL_SIZE + CELL_SIZE;
+	float arrayToCheckTopCollision2P[6] = { g_Player2P.x, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 1, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 2, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 3, g_Player2P.x + g_Player2P.scale_x, oldPlayer2P.y };
+	float arrayToCheckBottomCollision2P[6] = { g_Player2P.x, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 1, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 2, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 3, g_Player2P.x + g_Player2P.scale_x, oldPlayer2P.y + g_Player2P.scale_y };
+	//プレイヤーの上の方向にブロックがあるとき
+	if (sabun2P.y < 0) {
+		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+			if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] != 0) {
+				g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y) / CELL_SIZE) * CELL_SIZE + CELL_SIZE;
+				syosokudo2P = 0;
+				time2P = 0;
+			}
+		}
+	}//プレイヤーの下の方向にブロックがあるとき
+	else if (sabun2P.y > 0) {
+		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+			if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] != 0) {
+				g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y;
+				JFlag2P = false;
+				time2P = 0;
+				Jcount2P = 0;
+				first2P = true;
+				syosokudo2P = 0;
+			}
+		}
 	}
-	//プレイヤーが左からぶつかった時の当たり判定
-	if (MapData02[(int)g_Player2P.y / CELL_SIZE][((int)g_Player2P.x + (int)g_Player2P.scale_x + (int)sabun2P.x + (CELL_SIZE)) / CELL_SIZE] == 1 || MapData02[((int)g_Player2P.y + (int)sabun2P.y) / 32][((int)g_Player2P.x + (int)g_Player2P.scale_x + (int)sabun2P.x + (CELL_SIZE)) / CELL_SIZE] == 1) {
-		g_Player2P.x = (((int)g_Player2P.x + (int)g_Player2P.scale_x + (int)sabun2P.x + CELL_SIZE) / CELL_SIZE) * CELL_SIZE - g_Player2P.scale_x;
-	}
+
 	
 }
 
