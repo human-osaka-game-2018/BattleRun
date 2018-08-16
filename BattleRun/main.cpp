@@ -134,6 +134,11 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
+		"hole.png",
+		&g_pTexture[MANHOLE_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
 		"goal.png",
 		&g_pTexture[GOAL_TEX]);
 
@@ -157,17 +162,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	case WM_KEYDOWN:
 
 		switch (wp)
-
 		{
-
 		case VK_ESCAPE:
-
 			PostQuitMessage(0);
-
 			break;
-
 		}
-
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);

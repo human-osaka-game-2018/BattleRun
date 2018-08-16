@@ -146,6 +146,15 @@ void GameRender(void)
 				break;
 			case MANHOLE_BLOCK:
 				TextureID = MANHOLE_TEX;
+				CELL[0].x = manhole[manholecount].x = left - g_Manhole.scale_x;
+				CELL[0].y = manhole[manholecount].y = top - g_Manhole.scale_y;
+				CELL[1].x = left + CELL_SIZE + g_Manhole.scale_x;
+				CELL[1].y = top - g_Manhole.scale_y;
+				CELL[2].x = left + CELL_SIZE + g_Manhole.scale_x;
+				CELL[2].y = top + CELL_SIZE;
+				CELL[3].x = left - g_Manhole.scale_x;
+				CELL[3].y = top + CELL_SIZE;
+				manholecount++;
 				break;
 			case GOAL_BLOCK:
 				TextureID = GOAL_TEX;
