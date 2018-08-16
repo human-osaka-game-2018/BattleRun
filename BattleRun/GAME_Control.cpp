@@ -56,15 +56,13 @@ int win = 0;//どっちが勝ったか判定する変数
 bool gameFinish = false;//勝敗が決まったかどうかのフラグ
 static float movementPlayer1PXByKey = 0;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
 static float movementPlayer2PXByKey = 0;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
-OBJECT_STATE g_Player = { 30.f,500.f,90.f,120.f};
-OBJECT_STATE g_Player2P = { 30.f,500.f,90.f,120.f };
+OBJECT_STATE g_Player = { 30.f,500.f,30.f,40.f };
+OBJECT_STATE g_Player2P = { 30.f,500.f,30.f,40.f };
 OBJECT_STATE g_Trampoline = { 0.f,0.f,32.f,32.f };
 OBJECT_STATE g_Manhole = { 0.f,0.f,32.f,32.f };
 OBJECT_STATE g_Goal = { 0.f,0.f,32.f,32.f };
 OBJECT_POSITION oldPlayer1P = { 0,0 };//プレイヤー1の前の座標を保存し、差分を出すために使う
 OBJECT_POSITION oldPlayer2P = { 0,0 };//プレイヤー2の前の座標を保存し、さ分を出すために使う
-OBJECT_POSITION sabun1P = { 0,0 };
-OBJECT_POSITION sabun2P = { 0,0 };
 
 	/*制御処理*/
 void GameControl(void)
@@ -128,7 +126,7 @@ void InitState() {
 		g_Manhole = { 0.f,0.f,32.f,32.f };
 		g_Goal = { 0.f,0.f,32.f,32.f };
 		oldPlayer1P = { 0,0 };//プレイヤー1の前の座標を保存し、差分を出すために使う
-		oldPlayer2P = { 0,0 };//プレイヤー2の前の座標を保存し、差分を出すために使う
+		oldPlayer2P = { 0,0 };//プレイヤー2の前の座標を保存し、さ分を出すために使う
 
 		//二回目以降に初期化関数に入らないようにする
 		firstTime = false;
@@ -137,7 +135,7 @@ void InitState() {
 	oldPlayer1P.y = g_Player.y;
 	oldPlayer2P.x = g_Player2P.x;
 	oldPlayer2P.y = g_Player2P.y;
-	movementPlayer1PXByKey = 0;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
+    movementPlayer1PXByKey = 0;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
 	movementPlayer2PXByKey = 0;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
 }
 
@@ -158,6 +156,7 @@ void CheckWhetherPlayerIsJamping() {
 		}
 	}
 
+
 	//２Pのジャンプ処理
 	if (JFlag2P) {
 
@@ -177,7 +176,8 @@ void CheckWhetherPlayerIsJamping() {
 }
 
 //重力の仕組みの処理の関数
-void GiveGravity() {
+void GiveGravity() 
+{
 	time1P += 1;
 	time2P += 1;
 	gravity1P = (syosokudo1P - KASOKUDO * time1P);
