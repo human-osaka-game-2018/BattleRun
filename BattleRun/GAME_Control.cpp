@@ -4,7 +4,7 @@
 #include"main.h"
 
 	/*DEFINE*/
-#define MOVE_SPEED 5.f
+#define MOVE_SPEED 10.f
 #define ACCELERATION 3.f
 #define SYOSOKUDO 30
 #define KASOKUDO 3

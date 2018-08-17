@@ -3,6 +3,8 @@
 #include"TEAMLOGO_Render.h"
 #include"TITLE_Control.h"
 #include"TITLE_Render.h"
+#include"STAGESELECT_Control.h"
+#include"STAGESELECT_Render.h"
 #include"GAME_Control.h"
 #include"GAME_Render.h"
 #include"RESULT_Control.h"
@@ -86,17 +88,18 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"game_BKG.png",
 		&g_pTexture[GAME_BKG_TEX]);
-
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"game_player.png",
 		&g_pTexture[GAME_PLAYER_TEX]);
-
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"StageSelectBKG.png",
+		&g_pTexture[StageSelect_BKG_TEX]);
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"result_BKG.png",
 		&g_pTexture[RESULT_BKG_TEX]);
-
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"Player_Move_Right2.png",
@@ -383,6 +386,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				case TITLE_SCENE:
 					TitleControl();
 					TitleRender();
+					break;
+				case STAGESELECT_SCENE:
+					StageselectControl();
+					StageselectRender();
 					break;
 					/*case TUTORIAL_SCENE:
 					ControlTutorial();

@@ -15,11 +15,11 @@
 
 #define TITLE 	TEXT("BATTLE RUN")
 #define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
-#define DISPLAY_WIDTH 1480//ウィンドウの縦幅
-#define DISPLAY_HIGHT 1000//ウィンドウの横幅
+#define DISPLAY_WIDTH 1920//ウィンドウの縦幅
+#define DISPLAY_HIGHT 1080//ウィンドウの横幅
 #define SAFE_RELEASE(p) {if(p){(p)->Release(); (p)=NULL;}}
 
-#define FRAME 30 //一秒間何フレームか
+#define FRAME 60 //一秒間何フレームか
 #define MAP_01_HEIGHT	150 
 #define MAP_01_WIDTH	300
 #define MAP_02_HEIGHT	25
@@ -33,6 +33,7 @@ enum SCENE//シーンの遷移に使う
 {
 	TEAMLOGO_SCENE,
 	TITLE_SCENE,
+	STAGESELECT_SCENE,
 	//TUTORIAL_SCENE,
 	GAME_SCENE,
 	RESULT_SCENE
@@ -45,6 +46,7 @@ enum TEXTURE//テクスチャの選別に使う
 	TITLE_BKG_TEX,
 	TITLE_LOGO_TEX,
 	TITLE_BOTTON_TEX,
+	StageSelect_BKG_TEX,
 	GAME_BKG_TEX,
 	GAME_PLAYER_TEX,
 	GAME_PLAYER_STATE_SPACE_TEX,
