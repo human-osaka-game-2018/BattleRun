@@ -22,6 +22,7 @@ extern OBJECT_STATE g_Player;
 extern OBJECT_STATE g_Player2P;
 extern OBJECT_STATE g_Trampoline;
 extern OBJECT_STATE g_Manhole;
+extern OBJECT_STATE g_Itembox;
 extern OBJECT_STATE g_Goal;
 extern float MoveImage;//プレイヤー1のTU,TVをいじるための変数
 extern float MoveImage2P;//プレイヤー２のTU,TVをいじるための変数

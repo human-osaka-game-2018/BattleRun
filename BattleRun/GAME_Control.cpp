@@ -27,6 +27,7 @@ void ShowDebugFont();//デバッグのためにフォントを表示させる関数
 
 	/*グローバル変数*/
 int prevKey[256];//キー入力の受付の制限を行うための変数
+int prevPad[PADMAX];
 static int framecount;//キー入力が行われて、プレイヤーのアニメーションを起こすための変数
 static int framecount2P;//キー入力が行われて、プレイヤーのアニメーションを起こすための変数
 static int accelerationcount1PRight = 0;
@@ -63,6 +64,7 @@ OBJECT_STATE g_Player = { 30.f,500.f,30.f,40.f };
 OBJECT_STATE g_Player2P = { 30.f,500.f,30.f,40.f };
 OBJECT_STATE g_Trampoline = { 0.f,0.f,32.f,32.f };
 OBJECT_STATE g_Manhole = { 0.f,0.f,32.f,32.f };
+OBJECT_STATE g_Itembox = { 0.f,0.f,32.f,64.f };
 OBJECT_STATE g_Goal = { 0.f,0.f,32.f,32.f };
 OBJECT_POSITION oldPlayer1P = { 0,0 };//プレイヤー1の前の座標を保存し、差分を出すために使う
 OBJECT_POSITION oldPlayer2P = { 0,0 };//プレイヤー2の前の座標を保存し、さ分を出すために使う
@@ -125,10 +127,11 @@ void InitState() {
 		gravity2P = 0;
 		movementStageX = 0;
 
-		g_Player = { 100.f,400.f,30.f,40.f };
-		g_Player2P = { 100.f,400.f,30.f,40.f };
+		g_Player = { 30.f,500.f,90.f,120.f };
+		g_Player2P = { 30.f,500.f,90.f,120.f };
 		g_Trampoline = { 0.f,0.f,32.f,32.f };
 		g_Manhole = { 0.f,0.f,32.f,32.f };
+		g_Itembox = { 0.f,0.f,32.f,64.f };
 		g_Goal = { 0.f,0.f,32.f,32.f };
 		oldPlayer1P = { 0,0 };//プレイヤー1の前の座標を保存し、差分を出すために使う
 		oldPlayer2P = { 0,0 };//プレイヤー2の前の座標を保存し、さ分を出すために使う
@@ -201,6 +204,9 @@ void GiveGravity()
 
 //キー入力を受け付け、キーに応じた処理を行う関数
 void CheckKey() {
+
+	GetPadState();
+
 	HRESULT hr = pKeyDevice->Acquire();
 	if ((hr == DI_OK) || (hr == S_FALSE))
 	{
@@ -290,11 +296,11 @@ void CheckKey() {
 		}
 
 
-		if (diks[DIK_LEFT] & 0x80)
+		if (diks[DIK_LEFT] & 0x80|| g_Pad2P.left)
 		{
 			PlayerMode2P = LEFT_DIRECTION2P;
 			//前のフレームでもLEFTが押されていた時の処理
-			if (prevKey[DIK_LEFT]) {
+			if (prevKey[DIK_LEFT]|| prevPad[PadLEFT2P]) {
 
 				framecount2P++;
 				accelerationcount2PLeft++;
@@ -313,7 +319,7 @@ void CheckKey() {
 				}
 			}
 			//LEFTが離された時の処理
-			if (!prevKey[DIK_LEFT]) {
+			if (!prevKey[DIK_LEFT]&& !prevPad[PadLEFT2P]) {
 				acceleration2PLeft = 0;
 				accelerationcount2PLeft = 0;
 			}
@@ -339,11 +345,11 @@ void CheckKey() {
 		}
 
 
-		if (diks[DIK_D] & 0x80)
+		if (diks[DIK_D] & 0x80|| g_Pad1P.right)
 		{
 			PlayerMode1P = RIGHT_DIRECTION1P;
 			//Dが前フレームに押されているときの処理
-			if (prevKey[DIK_D]) {
+			if (prevKey[DIK_D]|| prevPad[PadRIGHT1P]) {
 
 				framecount++;
 				accelerationcount1PRight++;
@@ -362,7 +368,7 @@ void CheckKey() {
 				}
 			}
 			//Dが離された時の処理
-			if (!prevKey[DIK_D]) {
+			if (!prevKey[DIK_D]&& !prevPad[PadRIGHT1P]) {
 				acceleration1PRight = 0;
 				accelerationcount1PRight = 0;
 			}
@@ -382,11 +388,11 @@ void CheckKey() {
 		}
 
 
-		if (diks[DIK_RIGHT] & 0x80)
+		if (diks[DIK_RIGHT] & 0x80|| g_Pad2P.right)
 		{
 			PlayerMode2P = RIGHT_DIRECTION2P;
 			//RIGHTが前フレームに押されているときの処理
-			if (prevKey[DIK_RIGHT]) {
+			if (prevKey[DIK_RIGHT] || prevPad[PadRIGHT2P]) {
 
 				framecount2P++;
 				accelerationcount2PRight++;
@@ -406,7 +412,7 @@ void CheckKey() {
 
 			}
 			//RIGHTが離された時の処理
-			if (!prevKey[DIK_RIGHT]) {
+			if (!prevKey[DIK_RIGHT]&& !prevPad[PadRIGHT2P]) {
 				acceleration2PRight = 0;
 				accelerationcount2PRight = 0;
 			}
@@ -426,16 +432,16 @@ void CheckKey() {
 		}
 
 		//両方向の移動キーを同時に入力されている時、同時に入力されていない時、アニメーションしない
-		if (diks[DIK_A] && diks[DIK_D]) {
+		if ((diks[DIK_A] && diks[DIK_D]) && (prevPad[PadLEFT1P] && prevPad[PadRIGHT1P])) {
 			MoveImage = 0;
 		}
-		if (!diks[DIK_A] && !diks[DIK_D]) {
+		if ((!diks[DIK_A] && !diks[DIK_D])&& (!prevPad[PadLEFT1P] && !prevPad[PadRIGHT1P])) {
 			MoveImage = 0;
 		}
-		if (diks[DIK_LEFT] && diks[DIK_RIGHT]) {
+		if ((diks[DIK_LEFT] && diks[DIK_RIGHT])&& (!prevPad[PadLEFT2P] && !prevPad[PadRIGHT2P])) {
 			MoveImage2P = 0;
 		}
-		if (!diks[DIK_LEFT] && !diks[DIK_RIGHT]) {
+		if ((!diks[DIK_LEFT] && !diks[DIK_RIGHT]) && (!prevPad[PadLEFT2P] && !prevPad[PadRIGHT2P])) {
 			MoveImage2P = 0;
 		}
 
@@ -446,6 +452,12 @@ void CheckKey() {
 		prevKey[DIK_A] = diks[DIK_A];
 		prevKey[DIK_D] = diks[DIK_D];
 		prevKey[DIK_W] = diks[DIK_W];
+		prevPad[PadRIGHT1P] = g_Pad1P.right;
+		prevPad[PadRIGHT2P] = g_Pad2P.right;
+		prevPad[PadLEFT1P] = g_Pad1P.left;
+		prevPad[PadLEFT2P] = g_Pad2P.left;
+		prevPad[PadUP1P] = g_Pad1P.up;
+		prevPad[PadUP2P] = g_Pad2P.up;
 	}
 }
 
@@ -486,6 +498,14 @@ void CreatePerDecision(void) {
 		g_Player2P.y = 100;
 	}
 
+	//アイテムボックスの処理
+	if (PlayerDecision(itemboxcount, itembox, g_Itembox, g_Player)) {
+		g_Player.y = 100;
+	}
+	if (PlayerDecision(itemboxcount, itembox, g_Itembox, g_Player2P)) {
+		g_Player2P.y = 100;
+	}
+
 	//ゴールの処理
 	if (PlayerDecision(goalCount, goal, g_Goal, g_Player)) {
 		//プレイヤー1の勝利
@@ -507,6 +527,7 @@ void CreatePerDecision(void) {
 
 	trampolinecount = 0;
 	manholecount = 0;
+	itemboxcount = 0;
 	goalCount = 0;
 }
 
@@ -648,6 +669,7 @@ void finishGameOperation() {
 	//この初期化をしないと、不正アクセスでエラーを起こしてしまう
 	trampolinecount = 0;
 	manholecount = 0;
+	itemboxcount = 0;
 	goalCount = 0;
 }
 

@@ -26,6 +26,8 @@ int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];
 int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];
 SoundLib::SoundsManager soundsManager;
 
+PadState g_Pad1P, g_Pad2P;
+
 //マップデータを読み込む関数
 void ReadMapData(const char* FileName, int* MapData, int MapWidth)
 {
@@ -144,6 +146,11 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
+		"itembox.png",
+		&g_pTexture[ITEMBOX_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
 		"1P_win.png",
 		&g_pTexture[WIN_1P_TEX]);
 
@@ -216,6 +223,47 @@ void FreeDx()
 	SAFE_RELEASE(g_pDirect3D);
 	SAFE_RELEASE(pKeyDevice);
 	SoundLibCWrapper_Free();
+}
+
+void GetPadState() {
+	static XINPUT_STATE pad1PPrev;
+	static XINPUT_STATE pad2PPrev;
+
+	XINPUT_STATE xInput;
+
+	if (XInputGetState(0, &xInput)) {
+		return;
+	}
+
+	WORD wButtons = xInput.Gamepad.wButtons;
+
+	g_Pad1P.up = (wButtons & XINPUT_GAMEPAD_DPAD_UP);
+	g_Pad1P.down = (wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
+	g_Pad1P.left = (wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
+	g_Pad1P.right = (wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
+	g_Pad1P.a = wButtons & XINPUT_GAMEPAD_A;
+	g_Pad1P.b = (wButtons & XINPUT_GAMEPAD_B);
+	g_Pad1P.x = wButtons & XINPUT_GAMEPAD_X;
+	g_Pad1P.lb = (wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
+	g_Pad1P.rb = (wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
+	g_Pad1P.lTrigger = (xInput.Gamepad.bLeftTrigger > 0);
+	g_Pad1P.rTrigger = (xInput.Gamepad.bRightTrigger > 0);
+	pad1PPrev = xInput;
+
+	XInputGetState(1, &xInput);
+	wButtons = xInput.Gamepad.wButtons;
+	g_Pad2P.up = (wButtons & XINPUT_GAMEPAD_DPAD_UP);
+	g_Pad2P.down = (wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
+	g_Pad2P.left = (wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
+	g_Pad2P.right = (wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
+	g_Pad2P.a = wButtons & XINPUT_GAMEPAD_A;
+	g_Pad2P.b = (wButtons & XINPUT_GAMEPAD_B);
+	g_Pad2P.x = wButtons & XINPUT_GAMEPAD_X;
+	g_Pad2P.lb = (wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
+	g_Pad2P.rb = (wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
+	g_Pad2P.lTrigger = (xInput.Gamepad.bLeftTrigger > 0);
+	g_Pad2P.rTrigger = (xInput.Gamepad.bRightTrigger > 0);
+	pad2PPrev = xInput;
 }
 
 void SoundConfiguration(void) {
@@ -357,6 +405,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	ReadMapData("Book2.csv", &MapData02[0][0], MAP_02_WIDTH);
 
 
+
 	DWORD SyncOld = timeGetTime();	//	システム時間を取得
 	DWORD SyncNow;
 
@@ -389,6 +438,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 					RenderTutorial();
 					break;*/
 				case GAME_SCENE:
+
 					GameControl();
 					GameRender();
 					break;
