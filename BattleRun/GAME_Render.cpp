@@ -6,8 +6,10 @@
 int trampolinecount = 0;//マップに何個のトランポリンがあるか数える変数
 int manholecount = 0;//マップに何個のマンホールがあるか数える変数
 int goalCount = 0;//マップに何個のゴールがあるかを数える変数
+int itemboxcount = 0;
 OBJECT_POSITION trampoline[10];//トランポリンの座標を保存する構造体配列、10個まで
 OBJECT_POSITION manhole[10];//マンホールの座標を保存する構造体配列
+OBJECT_POSITION itembox[10];
 OBJECT_POSITION goal[10];//ゴールの座標を保存する構造体配列、10個まで
 
 //描画処理
@@ -156,6 +158,18 @@ void GameRender(void)
 				CELL[3].y = top + CELL_SIZE;
 				manholecount++;
 				break;
+			case ITEMBOX_BLOCK:
+				TextureID = ITEMBOX_TEX;
+				CELL[0].x = itembox[itemboxcount].x = left - g_Itembox.scale_x;
+				CELL[0].y = itembox[itemboxcount].y = top - g_Itembox.scale_y;
+				CELL[1].x = left + CELL_SIZE + g_Itembox.scale_x;
+				CELL[1].y = top - g_Itembox.scale_y;
+				CELL[2].x = left + CELL_SIZE + g_Itembox.scale_x;
+				CELL[2].y = top + CELL_SIZE;
+				CELL[3].x = left - g_Itembox.scale_x;
+				CELL[3].y = top + CELL_SIZE;
+				itemboxcount++;
+				break;
 			case GOAL_BLOCK:
 				TextureID = GOAL_TEX;
 				CELL[0].x = goal[goalCount].x = left;
@@ -167,7 +181,7 @@ void GameRender(void)
 				CELL[3].x = left;
 				CELL[3].y = top + CELL_SIZE;
 				goalCount++;
-
+				break;
 			}
 			g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
 			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, CELL, sizeof(CUSTOMVERTEX));

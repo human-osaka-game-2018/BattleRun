@@ -10,6 +10,8 @@ static int prevKey[256];//キー入力の受付の制限を行うための変数
 
 void TitleControl() {
 
+	GetPadState();
+
 	bool isSuccess = soundsManager.Start(_T("titleBGM"), true);
 
 	static int frameCount = 0;
@@ -47,7 +49,7 @@ void TitleControl() {
 	{
 		BYTE diks[256];
 		pKeyDevice->GetDeviceState(sizeof(diks), &diks);
-		if (diks[DIK_RETURN] & 0x80) {
+		if (diks[DIK_RETURN] & 0x80 || g_Pad1P.a) {
 			bool isSuccess = soundsManager.Stop(_T("titleBGM"));
 			bool isSuccess2 = soundsManager.Start(_T("titleBotton"));
 			Sleep(1 * 1000);
