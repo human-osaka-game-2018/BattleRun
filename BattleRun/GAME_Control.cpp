@@ -215,7 +215,7 @@ void CheckKey() {
 		pKeyDevice->GetDeviceState(sizeof(diks), &diks);
 
 		//Wを入力した直後だけジャンプのフラグをオンにする処理
-		if (diks[DIK_W] & 0x80 && !prevKey[DIK_W]) {
+		if ((diks[DIK_W] & 0x80 && !prevKey[DIK_W]) || g_Pad1P.up && !prevPad[PadUP1P]) {
 
 			Jcount++;
 			if (Jcount < 3) {
@@ -223,8 +223,8 @@ void CheckKey() {
 				first1P = true;
 			}
 		}
-		//UPをにゅうりょくした直後だけジャンプのフラグをオンにする処理
-		if (diks[DIK_UP] & 0x80 && !prevKey[DIK_UP])
+		//UPを入力した直後だけジャンプのフラグをオンにする処理
+		if (diks[DIK_UP] & 0x80 && !prevKey[DIK_UP] || g_Pad2P.up && !prevPad[PadUP2P])
 		{
 			Jcount2P++;
 			if (Jcount2P < 3)
@@ -232,7 +232,6 @@ void CheckKey() {
 				JFlag2P = true;
 				first2P = true;
 			}
-			
 		}
 
 		/*if (diks[DIK_S] & 0x80)
@@ -246,11 +245,11 @@ void CheckKey() {
 		}*/
 
 
-		if (diks[DIK_A] & 0x80)
+		if (diks[DIK_A] & 0x80 || g_Pad1P.left)
 		{
 			PlayerMode1P = LEFT_DIRECTION1P;
 			//前のフレームでもAが押されていた時の処理
-			if (prevKey[DIK_A]) {
+			if (prevKey[DIK_A] || prevPad[PadLEFT1P]) {
 
 				framecount++;
 				accelerationcount1PLeft++;
@@ -269,7 +268,7 @@ void CheckKey() {
 				}
 			}
 			//Aが入力されなくなった時の処理
-			if (!prevKey[DIK_A]) {
+			if (!prevKey[DIK_A] && !prevPad[g_Pad1P.left]) {
 				acceleration1PLeft = 0;
 				accelerationcount1PLeft = 0;
 			}
