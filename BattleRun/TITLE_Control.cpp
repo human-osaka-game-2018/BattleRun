@@ -6,7 +6,6 @@ DWORD titleBottonsColor1 = 0xFFFFFFFF;
 DWORD titleBottonsColor2 = 0xFFFFFFFF;
 DWORD titleBottonsColor3 = 0xFFFFFFFF;
 DWORD titleBottonsColor4 = 0xFFFFFFFF;
-static int prevKey[256];//キー入力の受付の制限を行うための変数
 
 void TitleControl() {
 

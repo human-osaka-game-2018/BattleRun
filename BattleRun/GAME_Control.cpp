@@ -4,14 +4,17 @@
 #include"main.h"
 
 	/*DEFINE*/
-#define MOVE_SPEED 10.f
+#define MOVE_SPEED 5.f
 #define ACCELERATION 3.f
-#define SYOSOKUDO 30
-#define KASOKUDO 3
+#define SYOSOKUDO 20
+#define KASOKUDO 2
 #define MOVEMENT_STAGE_X 15
 #define TRAMPOLINE_SYOSOKUDO 50
 #define PLAYER_RUN_TIPE2_FRAME 30
 #define PLAYER_RUN_TIPE3_FRAME 60
+#define WALL_JUMP_SPEED 15
+#define WALL_JUMP_FORSED_FRAME 10
+#define PREVENTION_PASS_BLOCK (-CELL_SIZE + 10)
 
 	/*関数のプロトタイプ宣言*/
 //void OperatePlayer();//プレイヤーの操作をまとめた関数
@@ -22,54 +25,63 @@ void CheckWheterTheHit();//キャラが当たっているかどうか確認する関数
 void GiveGravity();//重力を与える関数
 void CreatePerDecision();//オブジェクトの当たり判定を生成する関数
 void PlayerExists();//プレイヤーのどちらかが画面から消えていないか、つまり勝敗がついていないかどうかを確認する関数
-void finishGameOperation();//勝敗がついてからキー入力でシーン遷移を行う関数
+void FinishGameOperation();//勝敗がついてからキー入力でシーン遷移を行う関数
 void ShowDebugFont();//デバッグのためにフォントを表示させる関数
 
 	/*グローバル変数*/
-int prevKey[256];//キー入力の受付の制限を行うための変数
-int prevPad[PADMAX];
+static int wallJump1PCount;//壁ジャンプしてからのフレームを数える変数
+static int wallJump2PCount;//壁ジャンプしてからのフレームを数える変数
 static int framecount;//キー入力が行われて、プレイヤーのアニメーションを起こすための変数
 static int framecount2P;//キー入力が行われて、プレイヤーのアニメーションを起こすための変数
-static int accelerationcount1PRight = 0;
-static int accelerationcount1PLeft = 0;
-static int accelerationcount2PRight = 0;
-static int accelerationcount2PLeft = 0;
-static int acceleration1PLeft = 0;
-static int acceleration1PRight = 0;
-static int acceleration2PLeft = 0;
-static int acceleration2PRight = 0;
-static bool JFlag = false;//プレイヤーa1のジャンプのフラグ
-static bool JFlag2P = false;//プレイヤー２のジャンプのフラグ
-static int Jcount = 0;//多段ジャンプを可能にする変数
-static int Jcount2P = 0;//多段ジャンプを可能にする変数
-int PlayerMode1P = RIGHT_DIRECTION1P;//プレイヤー１が左右どちらを向いているかの変数
-int PlayerMode2P = RIGHT_DIRECTION2P;//プレイヤー２が左右どちらを向いているかの変数
-float MoveImage = 0;//プレイヤー1のTU,TVをいじるための変数
-float MoveImage2P = 0;//プレイヤー２のTU,TVをいじるための変数
-static int time1P = 0;//１Pの重力を計算するための変数
-static int time2P = 0;//２Pの重力を計算するための変数
-static int syosokudo1P = 0;//１Pジャンプの初速度
-static int syosokudo2P = 0;//２Pジャンプの初速度
-static bool first1P = true;//ジャンプが永遠と起こるのを防ぐための変数
-static bool first2P = true;//ジャンプが永遠と起こるのを防ぐための変数
-bool firstTime = true;//初めの処理かどうかのフラグ管理をするための変数
-float gravity1P = 0;//重力を保存する変数
-static float gravity2P = 0;//重力を保存する変数
-float movementStageX = 0;//ステージのXを移動させるための変数
-int win = 0;//どっちが勝ったか判定する変数
-bool gameFinish = false;//勝敗が決まったかどうかのフラグ
-static float prevFrameMovement1P = 0;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
-static float prevFrameMovement2P = 0;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
-OBJECT_STATE g_Player = { 30.f,500.f,30.f,40.f };
-OBJECT_STATE g_Player2P = { 30.f,500.f,30.f,40.f };
-OBJECT_STATE g_Trampoline = { 0.f,0.f,32.f,32.f };
-OBJECT_STATE g_Manhole = { 0.f,0.f,32.f,32.f };
-OBJECT_STATE g_Itembox = { 0.f,0.f,32.f,64.f };
-OBJECT_STATE g_Goal = { 0.f,0.f,32.f,32.f };
-OBJECT_POSITION oldPlayer1P = { 0,0 };//プレイヤー1の前の座標を保存し、差分を出すために使う
-OBJECT_POSITION oldPlayer2P = { 0,0 };//プレイヤー2の前の座標を保存し、さ分を出すために使う
-OBJECT_POSITION sabun1P = { 0,0 };
-OBJECT_POSITION sabun2P = { 0,0 };
+static bool wallJump1PMoveRight;//壁ジャンプしたときに右へ強制的に動かすためのフラグ
+static bool wallJump1PMoveLeft;//壁ジャンプしたときに左へ強制的に動かすためのフラグ
+static bool wallJump2PMoveRight;//壁ジャンプしたときに右へ強制的に動かすためのフラグ
+static bool wallJump2PMoveLeft;//壁ジャンプしたときに左へ強制的に動かすためのフラグ
+static bool wallJump1PFlag;//壁ジャンプフラグ
+static bool wallJump2PFlag;//壁ジャンプフラグ
+static int player1PRub;//プレイヤー1が壁にこすり落ちながら落ちるかどうかフラグ
+static int player2PRub;//プレイヤー2が壁にこすり落ちながら落ちるかどうかフラグ
+static int accelerationcount1PRight;
+static int accelerationcount1PLeft;
+static int accelerationcount2PRight;
+static int accelerationcount2PLeft;
+static int acceleration1PLeft;
+static int acceleration1PRight;
+static int acceleration2PLeft;
+static int acceleration2PRight;
+static bool JFlag;//プレイヤーa1のジャンプのフラグ
+static bool JFlag2P;//プレイヤー２のジャンプのフラグ
+static int Jcount;//多段ジャンプを可能にする変数
+static int Jcount2P;//多段ジャンプを可能にする変数
+int PlayerMode1P;//プレイヤー１が左右どちらを向いているかの変数
+int PlayerMode2P;//プレイヤー２が左右どちらを向いているかの変数
+float MoveImage;//プレイヤー1のTU,TVをいじるための変数
+float MoveImage2P;//プレイヤー２のTU,TVをいじるための変数
+static int time1P;//１Pの重力を計算するための変数
+static int time2P;//２Pの重力を計算するための変数
+static int syosokudo1P;//１Pジャンプの初速度
+static int syosokudo2P;//２Pジャンプの初速度
+static bool first1P;//ジャンプが永遠と起こるのを防ぐための変数
+static bool first2P;//ジャンプが永遠と起こるのを防ぐための変数
+bool firstTime;//初めの処理かどうかのフラグ管理をするための変数
+static float gravity1P;//重力を保存する変数
+static float gravity2P;//重力を保存する変数
+float movementStageX;//ステージのXを移動させるための変数
+float movementStageY;//ステージのYを移動させるための変数
+int win;//どっちが勝ったか判定する変数
+bool gameFinish;//勝敗が決まったかどうかのフラグ
+static float prevFrameMovement1P;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
+static float prevFrameMovement2P;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
+OBJECT_STATE g_Player;
+OBJECT_STATE g_Player2P;
+OBJECT_STATE g_Trampoline;
+OBJECT_STATE g_Manhole;
+OBJECT_STATE g_Itembox;
+OBJECT_STATE g_Goal;
+OBJECT_POSITION oldPlayer1P;//プレイヤー1の前の座標を保存し、差分を出すために使う
+OBJECT_POSITION oldPlayer2P;//プレイヤー2の前の座標を保存し、さ分を出すために使う
+OBJECT_POSITION sabun1P;
+OBJECT_POSITION sabun2P;
 
 	/*制御処理*/
 void GameControl(void)
@@ -84,9 +96,9 @@ void GameControl(void)
 		PlayerExists();
 	}
 	if (gameFinish == true) {
-		finishGameOperation();
+		FinishGameOperation();
 	}
-	ShowDebugFont();
+	//ShowDebugFont();
 }
 
 
@@ -123,18 +135,29 @@ void InitState() {
 		firstTime = true;//初めの処理かどうかのフラグ管理をするための変数
 		win = 0;//どっちが勝ったか判定する変数
 		gameFinish = false;//勝敗が決まったかどうかのフラグ
-		gravity1P = 0;
-		gravity2P = 0;
-		movementStageX = 0;
+		gravity1P = 0;//プレイヤー1の重力変数
+		gravity2P = 0;//プレイヤー２の重力変数
+		player1PRub = DONT_NEIGHBOR_WALL;//プレイヤー1が壁にこすり落ちながら落ちるかどうかフラグ
+		player2PRub = DONT_NEIGHBOR_WALL;//プレイヤー2が壁にこすり落ちながら落ちるかどうかフラグ
+		wallJump1PFlag = false;//壁ジャンプフラグ
+		wallJump2PFlag = false;//壁ジャンプフラグ
+		wallJump1PMoveRight = false;//壁ジャンプしたときに右へ強制的に動かすためのフラグ
+		wallJump1PMoveLeft = false;//壁ジャンプしたときに左へ強制的に動かすためのフラグ
+		wallJump2PMoveRight = false;//壁ジャンプしたときに右へ強制的に動かすためのフラグ
+		wallJump2PMoveLeft = false;//壁ジャンプしたときに左へ強制的に動かすためのフラグ
+		movementStageY = 0;//ステージをY座標にスクロールさせるための変数
+		movementStageX = 0;//ステージをx座標にスクロールさせるための変数
+		wallJump1PCount = 0;//壁ジャンプしてからのフレームを数える変数
+		wallJump2PCount = 0;//壁ジャンプしてからのフレームを数える変数
 
-		g_Player = { 30.f,500.f,90.f,120.f };
-		g_Player2P = { 30.f,500.f,90.f,120.f };
+		g_Player = { 100.f,400.f,16.f,24.f };
+		g_Player2P = { 100.f,400.f,16.f,24.f };
 		g_Trampoline = { 0.f,0.f,32.f,32.f };
 		g_Manhole = { 0.f,0.f,32.f,32.f };
 		g_Itembox = { 0.f,0.f,32.f,64.f };
 		g_Goal = { 0.f,0.f,32.f,32.f };
 		oldPlayer1P = { 0,0 };//プレイヤー1の前の座標を保存し、差分を出すために使う
-		oldPlayer2P = { 0,0 };//プレイヤー2の前の座標を保存し、さ分を出すために使う
+		oldPlayer2P = { 0,0 };//プレイヤー2の前の座標を保存し、差分を出すために使う
 		sabun1P = { 0,0 };
 		sabun2P = { 0,0 };
 
@@ -152,7 +175,7 @@ void InitState() {
 //ジャンプの処理を行う関数
 void CheckWhetherPlayerIsJamping() {
 
-	//1Pのジャンプ処理
+	//1Pの通常ジャンプ処理
 	if (JFlag) {
 
 		if ((Jcount == 1 || Jcount == 2) && first1P == true) {
@@ -165,7 +188,33 @@ void CheckWhetherPlayerIsJamping() {
 			}
 		}
 	}
-
+	//1Pの壁ジャンプ処理
+	if (wallJump1PFlag) {
+		wallJump1PCount++;
+		syosokudo1P = SYOSOKUDO;
+		if (player1PRub == WALL_LEFT) {
+			wallJump1PMoveRight = true;
+		}
+		if (player1PRub == WALL_RIGHT) {
+			wallJump1PMoveLeft = true;
+		}
+		//壁ジャンプしたときに一定フレーム間、動きが強制される処理
+		if (wallJump1PMoveRight == true) {
+			g_Player.x += WALL_JUMP_SPEED;
+			prevFrameMovement1P += WALL_JUMP_SPEED;
+		}
+		if (wallJump1PMoveLeft == true) {
+			g_Player.x -= WALL_JUMP_SPEED;
+			prevFrameMovement1P -= WALL_JUMP_SPEED;
+		}
+		//壁ジャンプによる動きの制限が一定フレームたったら解放される処理
+		if (wallJump1PCount == WALL_JUMP_FORSED_FRAME) {
+			wallJump1PFlag = false;
+			wallJump1PMoveRight = false;
+			wallJump1PMoveLeft = false;
+			wallJump1PCount = 0;
+		}
+	}
 
 	//２Pのジャンプ処理
 	if (JFlag2P) {
@@ -181,6 +230,33 @@ void CheckWhetherPlayerIsJamping() {
 		}
 
 	}
+	//2Pの壁ジャンプ処理
+	if (wallJump2PFlag) {
+		wallJump2PCount++;
+		syosokudo2P = SYOSOKUDO;
+		if (player2PRub == WALL_LEFT) {
+			wallJump2PMoveRight = true;
+		}
+		if (player2PRub == WALL_RIGHT) {
+			wallJump2PMoveLeft = true;
+		}
+		//壁ジャンプしたときに一定フレーム間、動きが強制される処理
+		if (wallJump2PMoveRight == true) {
+			g_Player2P.x += WALL_JUMP_SPEED;
+			prevFrameMovement2P += WALL_JUMP_SPEED;
+		}
+		if (wallJump2PMoveLeft == true) {
+			g_Player2P.x -= WALL_JUMP_SPEED;
+			prevFrameMovement2P -= WALL_JUMP_SPEED;
+		}
+		//壁ジャンプによる動きの制限が一定フレームたったら解放される処理
+		if (wallJump2PCount == WALL_JUMP_FORSED_FRAME) {
+			wallJump2PFlag = false;
+			wallJump2PMoveRight = false;
+			wallJump2PMoveLeft = false;
+			wallJump2PCount = 0;
+		}
+	}
 
 	
 }
@@ -188,18 +264,57 @@ void CheckWhetherPlayerIsJamping() {
 //重力の仕組みの処理の関数
 void GiveGravity() 
 {
+	//壁ジャンプの壁伝いにずるずる落ちさせるために制限をかける処理
+	if ((player1PRub == WALL_RIGHT) || (player1PRub == WALL_LEFT)) {
+		syosokudo1P = 0;
+		time1P = 0;
+	}
+	if ((player2PRub == WALL_RIGHT) || (player2PRub == WALL_LEFT)) {
+		syosokudo2P = 0;
+		time2P = 0;
+	}
+	//毎フレーム重力を計算する処理
 	time1P += 1;
 	time2P += 1;
 	gravity1P = (syosokudo1P - KASOKUDO * time1P);
 	gravity2P = (syosokudo2P - KASOKUDO * time2P);
-	if (gravity1P < -31) {
-		gravity1P = -31;
+	//重力が一定の速さになったらそれ以上は早くならない処理 すり抜け防止のため
+	if (gravity1P < (PREVENTION_PASS_BLOCK)) {
+		gravity1P = (PREVENTION_PASS_BLOCK);
 	}
-	if (gravity2P < -31) {
-		gravity2P = -31;
+	if (gravity2P < (PREVENTION_PASS_BLOCK)) {
+		gravity2P = (PREVENTION_PASS_BLOCK);
 	}
-	g_Player.y -= gravity1P;
-	g_Player2P.y -= gravity2P;
+	//１Pの重力の処理＆縦スクロールの処理
+	if ((g_Player.y > 700) && (gravity1P < 0)) {//先行プレイヤーがある高さで下に移動しようとするときときに、ステージを上にスクロールさせる処理
+		movementStageY -= gravity1P;
+		g_Player2P.y += gravity1P;
+	}
+	else if ((g_Player.y > 700) && (gravity1P > 0)) {//先行プレイヤーがある高さでジャンプできなくなるのを防ぐ条件処理
+		g_Player.y -= gravity1P;
+	}
+	else if ((g_Player.y < 150) && (gravity1P > 0)){ //先行プレイヤーがある高さで上に移動しようとするとき、ステージを下にスクロールさせる処理
+		movementStageY -= gravity1P;
+		g_Player2P.y += gravity1P;
+	}
+	else {//それ以外の通常の時は、通常に重力を与える処理
+		g_Player.y -= gravity1P;
+	}
+	//２Pの重力の処理＆縦スクロールの処理
+	if ((g_Player2P.y > 700) && (gravity2P < 0)) {//先行プレイヤーがある高さで下に移動しようとするときときに、ステージを上にスクロールさせる処理
+		movementStageY -= gravity2P;
+		g_Player.y += gravity2P;
+	}
+	else if ((g_Player2P.y > 700) && (gravity2P > 0)) {//先行プレイヤーがある高さでジャンプできなくなるのを防ぐ条件処理
+		g_Player2P.y -= gravity2P;
+	}
+	else if ((g_Player2P.y < 150) && (gravity2P > 0)) {//先行プレイヤーがある高さで上に移動しようとするとき、ステージを下にスクロールさせる処理
+		movementStageY -= gravity2P;
+		g_Player.y += gravity2P;
+	}
+	else {//それ以外の通常の時は、通常に重力を与える処理
+		g_Player2P.y -= gravity2P;
+	}
 }
 
 //キー入力を受け付け、キーに応じた処理を行う関数
@@ -216,21 +331,31 @@ void CheckKey() {
 
 		//Wを入力した直後だけジャンプのフラグをオンにする処理
 		if ((diks[DIK_W] & 0x80 && !prevKey[DIK_W]) || g_Pad1P.up && !prevPad[PadUP1P]) {
-
+			//通常状態のジャンプ処理
 			Jcount++;
-			if (Jcount < 3) {
+			if ((Jcount < 3) && (player1PRub == DONT_NEIGHBOR_WALL)) {
 				JFlag = true;
 				first1P = true;
 			}
+			//壁ジャンプの処理
+			if ((player1PRub == WALL_LEFT) || (player1PRub == WALL_RIGHT)) {
+				wallJump1PFlag = true;
+			}
+
 		}
 		//UPを入力した直後だけジャンプのフラグをオンにする処理
 		if (diks[DIK_UP] & 0x80 && !prevKey[DIK_UP] || g_Pad2P.up && !prevPad[PadUP2P])
 		{
+			//通常状態のジャンプ処理
 			Jcount2P++;
-			if (Jcount2P < 3)
+			if ((Jcount2P < 3) && (player2PRub == DONT_NEIGHBOR_WALL))
 			{
 				JFlag2P = true;
 				first2P = true;
+			}
+			//壁ジャンプの処理
+			if ((player2PRub == WALL_LEFT) || (player2PRub == WALL_RIGHT)) {
+				wallJump2PFlag = true;
 			}
 		}
 
@@ -268,7 +393,7 @@ void CheckKey() {
 				}
 			}
 			//Aが入力されなくなった時の処理
-			if (!prevKey[DIK_A] && !prevPad[g_Pad1P.left]) {
+			if (!prevKey[DIK_A] && !prevPad[PadLEFT1P]) {
 				acceleration1PLeft = 0;
 				accelerationcount1PLeft = 0;
 			}
@@ -437,7 +562,7 @@ void CheckKey() {
 		if ((!diks[DIK_A] && !diks[DIK_D])&& (!prevPad[PadLEFT1P] && !prevPad[PadRIGHT1P])) {
 			MoveImage = 0;
 		}
-		if ((diks[DIK_LEFT] && diks[DIK_RIGHT])&& (!prevPad[PadLEFT2P] && !prevPad[PadRIGHT2P])) {
+		if ((diks[DIK_LEFT] && diks[DIK_RIGHT])&& (prevPad[PadLEFT2P] && prevPad[PadRIGHT2P])) {
 			MoveImage2P = 0;
 		}
 		if ((!diks[DIK_LEFT] && !diks[DIK_RIGHT]) && (!prevPad[PadLEFT2P] && !prevPad[PadRIGHT2P])) {
@@ -530,6 +655,27 @@ void CreatePerDecision(void) {
 	goalCount = 0;
 }
 
+//プレイヤーが左の壁をずるずると降りているかどうかチェックする関数
+BOOL CheckPlayerRubLeftMap02(float *arrayToCheckLeftCollision, OBJECT_STATE g_Player) {
+	for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+		if (MapData02[((int)arrayToCheckLeftCollision[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)g_Player.x - 1 + (int)movementStageX) / CELL_SIZE] == 2) {
+			return true;
+		}
+	}
+	return false;
+}
+
+//プレイヤーが右の壁をずるずると降りているかどうかチェックする関数
+BOOL CheckPlayerRubRightMap02(float *arrayToCheckLeftCollision , OBJECT_STATE g_Player) {
+	for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+		if (MapData02[((int)arrayToCheckLeftCollision[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)g_Player.x + (int)g_Player.scale_x + 1 + (int)movementStageX) / CELL_SIZE] == 2) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
 //プレイヤーとマップの当たり判定を行う関数
 void CheckWheterTheHit()
 {
@@ -541,16 +687,39 @@ void CheckWheterTheHit()
 	//プレイヤーの左の方向にブロックがあるとき
 	if (prevFrameMovement1P < 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint]) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] != 0) {
+			if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == 2) {
 				g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+				player1PRub = WALL_LEFT;
+				wallJump1PFlag = false;
+				wallJump1PMoveRight = false;
+				wallJump1PMoveLeft = false;
+				wallJump1PCount = 0;
+			}
+			if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY )/ CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == 1) {
+				g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+				wallJump1PFlag = false;
+				wallJump1PMoveRight = false;
+				wallJump1PMoveLeft = false;
+				wallJump1PCount = 0;
 			}
 		}
 	}//プレイヤーの右の方向にブロックがあるとき
 	else if (prevFrameMovement1P > 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[(int)arrayToCheckRightCollision1P[collisionPoint] / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] != 0) {
-				g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + +(int)movementStageX) / CELL_SIZE) * CELL_SIZE -1 - g_Player.scale_x - (int)movementStageX;
-
+			if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == 2) {
+				g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x +(int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+				player1PRub = WALL_RIGHT;
+				wallJump1PFlag = false;
+				wallJump1PMoveRight = false;
+				wallJump1PMoveLeft = false;
+				wallJump1PCount = 0;
+			} 
+			if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == 1) {
+				g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x +(int)movementStageX) / CELL_SIZE) * CELL_SIZE -1 - g_Player.scale_x - (int)movementStageX;
+				wallJump1PFlag = false;
+				wallJump1PMoveRight = false;
+				wallJump1PMoveLeft = false;
+				wallJump1PCount = 0;
 			}
 		}
 	}
@@ -559,8 +728,13 @@ void CheckWheterTheHit()
 	//プレイヤーの上の方向にブロックがあるとき
 	if (gravity1P > 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] != 0) {
-				g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y) / CELL_SIZE) * CELL_SIZE + CELL_SIZE;
+			if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 1) {
+				g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+				syosokudo1P = 0;
+				time1P = 0;
+			}
+			if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 2) {
+				g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
 				syosokudo1P = 0;
 				time1P = 0;
 			}
@@ -568,9 +742,27 @@ void CheckWheterTheHit()
 	}//プレイヤーの下の方向にブロックがあるとき
 	else if (gravity1P < 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] != 0) {
-				g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y) / CELL_SIZE ) * CELL_SIZE -1 - g_Player.scale_y;
+			if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 1) {
+				g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE ) * CELL_SIZE -1 - g_Player.scale_y - (int)movementStageY;
 				JFlag = false;
+				wallJump1PFlag = false;
+				wallJump1PMoveRight = false;
+				wallJump1PMoveLeft = false;
+				wallJump1PCount = 0;
+				player1PRub = DONT_NEIGHBOR_WALL;
+				time1P = 0;
+				Jcount = 0;
+				first1P = true;
+				syosokudo1P = 0;
+			}
+			if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 2) {
+				g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+				JFlag = false;
+				wallJump1PFlag = false;
+				wallJump1PMoveRight = false;
+				wallJump1PMoveLeft = false;
+				wallJump1PCount = 0;
+				player1PRub = DONT_NEIGHBOR_WALL;
 				time1P = 0;
 				Jcount = 0;
 				first1P = true;
@@ -578,45 +770,112 @@ void CheckWheterTheHit()
 			}
 		}
 	}
-	
+	//プレイヤー1の壁ジャンプのためのフラグ確認
+	//左1ピクセルずらしたところが2番の壁ならフラグをオンのまま、それ以外ならフラグをオフにする
+	if (player1PRub == WALL_LEFT) {
+		if (CheckPlayerRubLeftMap02(arrayToCheckLeftCollision1P, g_Player) == false) {
+			player1PRub = DONT_NEIGHBOR_WALL;
+		}
+	}
+	//右1ピクセルずらしたところが2番の壁ならフラグをオンのまま、それ以外ならフラグをオフにする
+	if (player1PRub == WALL_RIGHT) {
+		if (CheckPlayerRubRightMap02(arrayToCheckRightCollision1P,g_Player) == false) {
+			player1PRub = DONT_NEIGHBOR_WALL;
+		}
+	}
+
 	//2Pの当たり判定
 	float arrayToCheckRightCollision2P[6] = { oldPlayer2P.y, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 1, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 2, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 3, oldPlayer2P.y + g_Player2P.scale_y,oldPlayer2P.x + g_Player2P.scale_x };
 	float arrayToCheckLeftCollision2P[6] = { oldPlayer2P.y, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 1, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 2, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 3, oldPlayer2P.y + g_Player2P.scale_y, oldPlayer2P.x };
 	sabun2P.x = g_Player2P.x - oldPlayer2P.x;//sabun2P.xがプラスの値ならプラスの方向に進んだということ
-	sabun2P.y = g_Player2P.y - oldPlayer2P.y;//sabun2P.yがプラスの値ならプラスの方向に進んだということ
-										   //プレイヤーの左の方向にブロックがあるとき
+	sabun2P.y = g_Player2P.y - oldPlayer2P.y;//sabun2P.yがプラスの値ならプラスの方向に進んだということ					  
+	//プレイヤーの左の方向にブロックがあるとき
 	if (prevFrameMovement2P < 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint]) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] != 0) {
+			if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == 2) {
 				g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+				player2PRub = WALL_LEFT;
+				wallJump2PFlag = false;
+				wallJump2PMoveRight = false;
+				wallJump2PMoveLeft = false;
+				wallJump2PCount = 0;
+			}
+			if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == 1) {
+				g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+				wallJump2PFlag = false;
+				wallJump2PMoveRight = false;
+				wallJump2PMoveLeft = false;
+				wallJump2PCount = 0;
 			}
 		}
 	}//プレイヤーの右の方向にブロックがあるとき
 	else if (prevFrameMovement2P > 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[(int)arrayToCheckRightCollision2P[collisionPoint] / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] != 0) {
+			if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == 2) {
 				g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
-
+				player2PRub = WALL_RIGHT;
+				wallJump2PFlag = false;
+				wallJump2PMoveRight = false;
+				wallJump2PMoveLeft = false;
+				wallJump2PCount = 0;
+			}
+			if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == 1) {
+				g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+				wallJump2PFlag = false;
+				wallJump2PMoveRight = false;
+				wallJump2PMoveLeft = false;
+				wallJump2PCount = 0;
 			}
 		}
 	}
 	float arrayToCheckTopCollision2P[6] = { g_Player2P.x, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 1, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 2, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 3, g_Player2P.x + g_Player2P.scale_x, oldPlayer2P.y };
 	float arrayToCheckBottomCollision2P[6] = { g_Player2P.x, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 1, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 2, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 3, g_Player2P.x + g_Player2P.scale_x, oldPlayer2P.y + g_Player2P.scale_y };
 	//プレイヤーの上の方向にブロックがあるとき
-	if (sabun2P.y < 0) {
+	if (gravity2P > 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] != 0) {
-				g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y) / CELL_SIZE) * CELL_SIZE + CELL_SIZE;
+			if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 1) {
+				g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
 				syosokudo2P = 0;
 				time2P = 0;
+				wallJump2PFlag = false;
+				wallJump2PMoveRight = false;
+				wallJump2PMoveLeft = false;
+				wallJump2PCount = 0;
+			}
+			if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 2) {
+				g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+				syosokudo2P = 0;
+				time2P = 0;
+				wallJump2PFlag = false;
+				wallJump2PMoveRight = false;
+				wallJump2PMoveLeft = false;
+				wallJump2PCount = 0;
 			}
 		}
 	}//プレイヤーの下の方向にブロックがあるとき
-	else if (sabun2P.y > 0) {
+	else if (gravity2P < 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] != 0) {
-				g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y;
+			if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 1) {
+				g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
 				JFlag2P = false;
+				player2PRub = DONT_NEIGHBOR_WALL;
+				wallJump2PFlag = false;
+				wallJump2PMoveRight = false;
+				wallJump2PMoveLeft = false;
+				wallJump2PCount = 0;
+				time2P = 0;
+				Jcount2P = 0;
+				first2P = true;
+				syosokudo2P = 0;
+			}
+			if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 2) {
+				g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+				JFlag2P = false;
+				player2PRub = DONT_NEIGHBOR_WALL;
+				wallJump2PFlag = false;
+				wallJump2PMoveRight = false;
+				wallJump2PMoveLeft = false;
+				wallJump2PCount = 0;
 				time2P = 0;
 				Jcount2P = 0;
 				first2P = true;
@@ -624,7 +883,19 @@ void CheckWheterTheHit()
 			}
 		}
 	}
-
+	//プレイヤー2の壁ジャンプのためのフラグ確認
+	//左1ピクセルずらしたところが2番の壁ならフラグをオンのまま、それ以外ならフラグをオフにする
+	if (player2PRub == WALL_LEFT) {
+		if (CheckPlayerRubLeftMap02(arrayToCheckLeftCollision2P, g_Player2P) == false) {
+			player2PRub = DONT_NEIGHBOR_WALL;
+		}
+	}
+	//右1ピクセルずらしたところが2番の壁ならフラグをオンのまま、それ以外ならフラグをオフにする
+	if (player2PRub == WALL_RIGHT) {
+		if (CheckPlayerRubRightMap02(arrayToCheckRightCollision2P, g_Player2P) == false) {
+			player2PRub = DONT_NEIGHBOR_WALL;
+		}
+	}
 	
 }
 
@@ -651,7 +922,7 @@ void PlayerExists() {
 }
 
 //勝敗がついた後にエンターキー入力を受け付け、リザルトへ移動させるための関数　いずれはステージ選択にも飛ばせるような処理も必要
-void finishGameOperation() {
+void FinishGameOperation() {
 	HRESULT hr = pKeyDevice->Acquire();
 	if ((hr == DI_OK) || (hr == S_FALSE))
 	{
@@ -671,6 +942,8 @@ void finishGameOperation() {
 	itemboxcount = 0;
 	goalCount = 0;
 }
+
+//壁キックを
 
 //デバッグのためにフォントを表示させる関数
 void ShowDebugFont() {

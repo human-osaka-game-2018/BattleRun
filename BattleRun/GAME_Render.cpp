@@ -27,12 +27,20 @@ void GameRender(void)
 		{ 0.f,                DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
-	CUSTOMVERTEX vertexPlayerStateSpace[4]
+	CUSTOMVERTEX vertexPlayer1PStateSpace[4]
 	{
-		{ 0.f,                        750.f, 1.f,1.f, 0xFFFF0000, 0.f, 0.f },
-		{ DISPLAY_WIDTH,              750.f, 1.f,1.f, 0xFF0000FF, 1.f, 0.f },
-		{ DISPLAY_WIDTH,      DISPLAY_HIGHT, 1.f,1.f, 0xFF0000FF, 1.f, 1.f },
-		{ 0.f,                DISPLAY_HIGHT, 1.f,1.f, 0xFFFF0000, 0.f, 1.f }
+		{ 50.f,      10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 400,       10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 400,       60, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 50.f,      60, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+
+	CUSTOMVERTEX vertexPlayer2PStateSpace[4]
+	{
+		{ 450.f,             10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 850,               10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 850,               60, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 450.f,             60, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX  PLAYER[4]
@@ -116,7 +124,7 @@ void GameRender(void)
 			}
 
 			int left = FIELD_LEFT + CELL_SIZE * i - movementStageX;
-			int top = FIELD_TOP + CELL_SIZE * j;
+			int top = FIELD_TOP + CELL_SIZE * j - movementStageY;
 			CELL[0].x = left;
 			CELL[0].y = top;
 			CELL[1].x = left + CELL_SIZE;
@@ -131,8 +139,8 @@ void GameRender(void)
 			case GROUND_BLOCK:
 				TextureID = GROUND_BLOCK_TEX;
 				break;
-			case SCAFFOLD:
-				TextureID = SCAFFOLD_TEX;
+			case WALL_BLOCK:
+				TextureID = WALL_BLOCK_TEX;
 				break;
 			case TRAMPOLINE_BLOCK:
 				TextureID = TRAMPOLINE_TEX;
@@ -189,8 +197,11 @@ void GameRender(void)
 	}
 
 
-	g_pD3Device->SetTexture(0, g_pTexture[GAME_PLAYER_STATE_SPACE_TEX]);
-	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayerStateSpace, sizeof(CUSTOMVERTEX));
+	g_pD3Device->SetTexture(0, g_pTexture[GAME_PLAYER1P_STATE_SPACE_TEX]);
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer1PStateSpace, sizeof(CUSTOMVERTEX));
+
+	g_pD3Device->SetTexture(0, g_pTexture[GAME_PLAYER2P_STATE_SPACE_TEX]);
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer2PStateSpace, sizeof(CUSTOMVERTEX));
 
 	//勝敗がついたら描画
 	if (gameFinish == true) {
@@ -219,23 +230,23 @@ void GameRender(void)
 	}
 
 	
-	RECT player1P;
-	player1P.left = 100;			//左上のX座標
-	player1P.top = 770;			//左上のY座標
-	player1P.right = 800;		//右下のX座標
-	player1P.bottom = 900;		//右下のY座標
+	//RECT player1P;
+	//player1P.left = 100;			//左上のX座標
+	//player1P.top = 770;			//左上のY座標
+	//player1P.right = 800;		//右下のX座標
+	//player1P.bottom = 900;		//右下のY座標
 
-	char arrayToShowPlayer1P[3] = "1P";
-	g_pFont[DEBUG_FONT]->DrawText(NULL, arrayToShowPlayer1P, -1, &player1P, DT_LEFT, 0xFF000000);
+	//char arrayToShowPlayer1P[3] = "1P";
+	//g_pFont[DEBUG_FONT]->DrawText(NULL, arrayToShowPlayer1P, -1, &player1P, DT_LEFT, 0xFF000000);
 
-	RECT player2P;
-	player2P.left = 800;			//左上のX座標
-	player2P.top = 770;			//左上のY座標
-	player2P.right = 1300;		//右下のX座標
-	player2P.bottom = 900;		//右下のY座標
+	//RECT player2P;
+	//player2P.left = 800;			//左上のX座標
+	//player2P.top = 770;			//左上のY座標
+	//player2P.right = 1300;		//右下のX座標
+	//player2P.bottom = 900;		//右下のY座標
 
-	char arrayToShowPlayer2P[3] = "2P";
-	g_pFont[DEBUG_FONT]->DrawText(NULL, arrayToShowPlayer2P, -1, &player2P, DT_LEFT, 0xFF000000);
+	//char arrayToShowPlayer2P[3] = "2P";
+	//g_pFont[DEBUG_FONT]->DrawText(NULL, arrayToShowPlayer2P, -1, &player2P, DT_LEFT, 0xFF000000);
 
 	//描画の終了
 	g_pD3Device->EndScene();

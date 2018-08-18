@@ -1,7 +1,6 @@
 #include"main.h"
 #include"RESULT_Control.h"
 #include"RESULT_Render.h"
-#include"GAME_Control.h"
 
 void ResultControl() {
 	HRESULT hr = pKeyDevice->Acquire();

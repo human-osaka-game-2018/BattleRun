@@ -16,6 +16,13 @@ enum PLAYER_NUM
 	PLAYER2P_WIN
 };
 
+enum PLAYER_WALL_SIDE
+{
+	DONT_NEIGHBOR_WALL,
+	WALL_RIGHT,
+	WALL_LEFT
+};
+
 void GameControl();
 
 extern OBJECT_STATE g_Player;
@@ -30,10 +37,9 @@ extern int PlayerMode1P;//プレイヤー１が左右どちらを向いているかの変数
 extern int PlayerMode2P;//プレイヤー２が左右どちらを向いているかの変数
 extern float MoveImage;
 extern float MoveImage2;
-extern float gravity1P;
-extern float movementStageX;
+extern float movementStageX;//ステージのXを移動させるための変数
+extern float movementStageY;//ステージのYを移動させるための変数
 extern int win;//プレイヤー勝敗の表示に使う変数
 extern bool gameFinish;//ゲームの勝敗の表示に使うフラグ
-extern int prevKey[256];//キー入力の制限のために使う
 
 #endif // !GAME_CONTROL_

@@ -29,6 +29,8 @@ int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];
 SoundLib::SoundsManager soundsManager;
 
 PadState g_Pad1P, g_Pad2P;
+int prevKey[256];//キー入力の受付の制限を行うための変数
+int prevPad[PADMAX];//パッド入力の受付の制限を行うための変数
 
 //マップデータを読み込む関数
 void ReadMapData(const char* FileName, int* MapData, int MapWidth)
@@ -68,99 +70,110 @@ void ReadMapData(const char* FileName, int* MapData, int MapWidth)
 void ReadTexture(void) {
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"teamlogo.png",
+		"texture/teamlogo.png",
 		&g_pTexture[TEAMLOGO_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"title_BKG.jpg",
+		"texture/title_BKG.jpg",
 		&g_pTexture[TITLE_BKG_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"title_logo.png",
+		"texture/title_logo.png",
 		&g_pTexture[TITLE_LOGO_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"title_botton.png",
+		"texture/title_botton.png",
 		&g_pTexture[TITLE_BOTTON_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"game_BKG.png",
+		"texture/game_BKG.png",
 		&g_pTexture[GAME_BKG_TEX]);
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"game_player.png",
+		"texture/game_player.png",
 		&g_pTexture[GAME_PLAYER_TEX]);
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"StageSelectBKG.png",
+		"texture/StageSelectBKG.png",
 		&g_pTexture[StageSelect_BKG_TEX]);
+		
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"result_BKG.png",
+		"texture/result_BKG.png",
 		&g_pTexture[RESULT_BKG_TEX]);
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"Player_Move_Right2.png",
+		"texture/Player_Move_Right2.png",
 		&g_pTexture[PLAYER_RIGHT_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"Player_Move_Left2.png",
+		"texture/Player_Move_Left2.png",
 		&g_pTexture[PLAYER_LEFT_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"Player_Move_Right2.png",
+		"texture/Player_Move_Right2.png",
 		&g_pTexture[PLAYER_2P_RIGHT_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"Player_Move_Left2.png",
+		"texture/Player_Move_Left2.png",
 		&g_pTexture[PLAYER_2P_LEFT_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"block.png",
-		&g_pTexture[SCAFFOLD_TEX]);
+		"texture/blackBlock.png",
+		&g_pTexture[WALL_BLOCK_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"blackBlock.png",
+		"texture/blackBlock.png",
 		&g_pTexture[GROUND_BLOCK_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"trampoline.png",
+		"texture/trampoline.png",
 		&g_pTexture[TRAMPOLINE_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"hole.png",
+		"texture/hole.png",
 		&g_pTexture[MANHOLE_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"goal.png",
+		"texture/goal.png",
 		&g_pTexture[GOAL_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"itembox.png",
+		"texture/itembox.png",
 		&g_pTexture[ITEMBOX_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"1P_win.png",
+		"texture/1P_win.png",
 		&g_pTexture[WIN_1P_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"2P_win.png",
+		"texture/2P_win.png",
 		&g_pTexture[WIN_2P_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/player1PState.png",
+		&g_pTexture[GAME_PLAYER1P_STATE_SPACE_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/player2PState.png",
+		&g_pTexture[GAME_PLAYER2P_STATE_SPACE_TEX]);
 }
 
 
@@ -229,9 +242,8 @@ void FreeDx()
 }
 
 void GetPadState() {
-	static XINPUT_STATE pad1PPrev;
-	static XINPUT_STATE pad2PPrev;
-
+	//XINPUT_STATE pad1PPrev;
+	//XINPUT_STATE pad2PPrev;
 	XINPUT_STATE xInput;
 
 	if (XInputGetState(0, &xInput)) {
@@ -244,14 +256,14 @@ void GetPadState() {
 	g_Pad1P.down = (wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
 	g_Pad1P.left = (wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
 	g_Pad1P.right = (wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
-	g_Pad1P.a = wButtons & XINPUT_GAMEPAD_A;
+	g_Pad1P.a = (wButtons & XINPUT_GAMEPAD_A);
 	g_Pad1P.b = (wButtons & XINPUT_GAMEPAD_B);
-	g_Pad1P.x = wButtons & XINPUT_GAMEPAD_X;
+	g_Pad1P.x = (wButtons & XINPUT_GAMEPAD_X);
 	g_Pad1P.lb = (wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
 	g_Pad1P.rb = (wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
 	g_Pad1P.lTrigger = (xInput.Gamepad.bLeftTrigger > 0);
 	g_Pad1P.rTrigger = (xInput.Gamepad.bRightTrigger > 0);
-	pad1PPrev = xInput;
+	//pad1PPrev = xInput;
 
 	XInputGetState(1, &xInput);
 	wButtons = xInput.Gamepad.wButtons;
@@ -266,7 +278,7 @@ void GetPadState() {
 	g_Pad2P.rb = (wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
 	g_Pad2P.lTrigger = (xInput.Gamepad.bLeftTrigger > 0);
 	g_Pad2P.rTrigger = (xInput.Gamepad.bRightTrigger > 0);
-	pad2PPrev = xInput;
+	//pad2PPrev = xInput;
 }
 
 void SoundConfiguration(void) {
@@ -278,27 +290,27 @@ void SoundConfiguration(void) {
 	// 音声ファイルオープン
 	// 第2引数は音声ファイルを識別するための任意の文字列をキーとして指定する。
 	// この後の操作関数の呼び出し時には、ここで設定したキーを指定して音声を識別する。
-	const TCHAR* filePath = _T("game_BGM.mp3");
+	const TCHAR* filePath = _T("music/game_BGM.mp3");
 	isSuccess = soundsManager.AddFile(filePath, _T("gameBGM"));
-	const TCHAR* filePath2 = _T("titleBGM2.mp3");
+	const TCHAR* filePath2 = _T("music/titleBGM2.mp3");
 	isSuccess = soundsManager.AddFile(filePath2, _T("titleBGM"));
-	const TCHAR* filePath3 = _T("attack03.mp3");
+	const TCHAR* filePath3 = _T("music/attack03.mp3");
 	isSuccess = soundsManager.AddFile(filePath3, _T("titleBotton"));
-	const TCHAR* filePath4 = _T("jump01.mp3");
+	const TCHAR* filePath4 = _T("music/jump01.mp3");
 	isSuccess = soundsManager.AddFile(filePath4, _T("gamePlayerJump"));
-	const TCHAR* filePath5 = _T("jump02.mp3");
+	const TCHAR* filePath5 = _T("music/jump02.mp3");
 	isSuccess = soundsManager.AddFile(filePath5, _T("gamePlayerJump2"));
-	const TCHAR* filePath6 = _T("jump03.mp3");
+	const TCHAR* filePath6 = _T("music/jump03.mp3");
 	isSuccess = soundsManager.AddFile(filePath6, _T("gamePlayerJump3"));
-	const TCHAR* filePath7 = _T("jump04.mp3");
+	const TCHAR* filePath7 = _T("music/jump04.mp3");
 	isSuccess = soundsManager.AddFile(filePath7, _T("gamePlayerJump4"));
-	const TCHAR* filePath8 = _T("jump09.mp3");
+	const TCHAR* filePath8 = _T("music/jump09.mp3");
 	isSuccess = soundsManager.AddFile(filePath8, _T("gameTrampoline"));
-	const TCHAR* filePath9 = _T("jump09_2.mp3");
+	const TCHAR* filePath9 = _T("music/jump09_2.mp3");
 	isSuccess = soundsManager.AddFile(filePath9, _T("gameTrampoline2"));
-	const TCHAR* filePath10 = _T("clapping1.mp3");
+	const TCHAR* filePath10 = _T("music/clapping1.mp3");
 	isSuccess = soundsManager.AddFile(filePath10, _T("clappingSE"));
-	const TCHAR* filePath11 = _T("cheers2.mp3");
+	const TCHAR* filePath11 = _T("music/cheers2.mp3");
 	isSuccess = soundsManager.AddFile(filePath11, _T("cheersSE"));
 
 }
@@ -404,10 +416,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	//マップ、テクスチャの読み込みの処理群
 	ReadTexture();
-	ReadMapData("BigField.csv", &MapData01[0][0], MAP_01_WIDTH);
-	ReadMapData("Book2.csv", &MapData02[0][0], MAP_02_WIDTH);
-
-
+	ReadMapData("csv/BigField.csv", &MapData01[0][0], MAP_01_WIDTH);
+	ReadMapData("csv/Book2.csv", &MapData02[0][0], MAP_02_WIDTH);
 
 	DWORD SyncOld = timeGetTime();	//	システム時間を取得
 	DWORD SyncNow;
