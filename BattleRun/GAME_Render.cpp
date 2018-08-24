@@ -10,7 +10,7 @@ int itemboxcount = 0;
 OBJECT_POSITION trampoline[10];//トランポリンの座標を保存する構造体配列、10個まで
 OBJECT_POSITION manhole[10];//マンホールの座標を保存する構造体配列
 OBJECT_POSITION itembox[10];
-OBJECT_POSITION goal[10];//ゴールの座標を保存する構造体配列、10個まで
+OBJECT_POSITION goal[35];//ゴールの座標を保存する構造体配列、10個まで
 
 //描画処理
 void GameRender(void)
@@ -168,14 +168,14 @@ void GameRender(void)
 				break;
 			case ITEMBOX_BLOCK:
 				TextureID = ITEMBOX_TEX;
-				CELL[0].x = itembox[itemboxcount].x = left - g_Itembox.scale_x;
-				CELL[0].y = itembox[itemboxcount].y = top - g_Itembox.scale_y;
-				CELL[1].x = left + CELL_SIZE + g_Itembox.scale_x;
-				CELL[1].y = top - g_Itembox.scale_y;
-				CELL[2].x = left + CELL_SIZE + g_Itembox.scale_x;
-				CELL[2].y = top + CELL_SIZE;
-				CELL[3].x = left - g_Itembox.scale_x;
-				CELL[3].y = top + CELL_SIZE;
+				CELL[0].x = itembox[itemboxcount].x = left;//g_Itembox.scale_x;
+				CELL[0].y = itembox[itemboxcount].y = top;//g_Itembox.scale_y;
+				CELL[1].x = left + g_Itembox.scale_x;	
+				CELL[1].y = top;
+				CELL[2].x = left + g_Itembox.scale_x;
+				CELL[2].y = top + g_Itembox.scale_y;
+				CELL[3].x = left;// -g_Itembox.scale_x;
+				CELL[3].y = top + g_Itembox.scale_y;
 				itemboxcount++;
 				break;
 			case GOAL_BLOCK:
@@ -203,8 +203,32 @@ void GameRender(void)
 	g_pD3Device->SetTexture(0, g_pTexture[GAME_PLAYER2P_STATE_SPACE_TEX]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer2PStateSpace, sizeof(CUSTOMVERTEX));
 
+	//カウントダウンの描画
+	CUSTOMVERTEX  vertexCountNum[4]
+	{
+		{ g_CountDownNum.x,                           g_CountDownNum.y                         , 1.f, 1.f, countDownARGB, 0.f, 0.f },
+		{ g_CountDownNum.x + g_CountDownNum.scale_x,  g_CountDownNum.y                         , 1.f, 1.f, countDownARGB, 1.f, 0.f },
+		{ g_CountDownNum.x + g_CountDownNum.scale_x,  g_CountDownNum.y + g_CountDownNum.scale_y, 1.f, 1.f, countDownARGB, 1.f, 1.f },
+		{ g_CountDownNum.x,                           g_CountDownNum.y + g_CountDownNum.scale_y, 1.f, 1.f, countDownARGB, 0.f, 1.f }
+	};
+	switch (countDownNum) {
+	case 1:
+		TextureID = COUNT_DOWN_THREE_TEX;
+		break;
+	case 2:
+		TextureID = COUNT_DOWN_TWO_TEX;
+		break;
+	case 3:
+		TextureID = COUNT_DOWN_ONE_TEX;
+		break;
+	case 4:
+		TextureID = COUNT_DOWN_START_TEX;
+	}
+	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexCountNum, sizeof(CUSTOMVERTEX));
+
 	//勝敗がついたら描画
-	if (gameFinish == true) {
+	if (gameState == FINISH) {
 		if (win == PLAYER1P_WIN) {
 			CUSTOMVERTEX  vertexWinPlayer1P[4]
 			{

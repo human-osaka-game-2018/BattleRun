@@ -17,7 +17,7 @@ extern int goalCount;
 extern OBJECT_POSITION trampoline[10];
 extern OBJECT_POSITION manhole[10];
 extern OBJECT_POSITION itembox[10];
-extern OBJECT_POSITION goal[10];
+extern OBJECT_POSITION goal[35];
 
 void GameRender();
 

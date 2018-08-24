@@ -27,6 +27,7 @@ void CreatePerDecision();//オブジェクトの当たり判定を生成する関数
 void PlayerExists();//プレイヤーのどちらかが画面から消えていないか、つまり勝敗がついていないかどうかを確認する関数
 void FinishGameOperation();//勝敗がついてからキー入力でシーン遷移を行う関数
 void ShowDebugFont();//デバッグのためにフォントを表示させる関数
+void CountDown();//3,2,1,と数えるための関数
 
 	/*グローバル変数*/
 static int wallJump1PCount;//壁ジャンプしてからのフレームを数える変数
@@ -69,11 +70,17 @@ static float gravity2P;//重力を保存する変数
 float movementStageX;//ステージのXを移動させるための変数
 float movementStageY;//ステージのYを移動させるための変数
 int win;//どっちが勝ったか判定する変数
-bool gameFinish;//勝敗が決まったかどうかのフラグ
+int gameState;//勝敗が決まったかどうかのフラグ
 static float prevFrameMovement1P;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
 static float prevFrameMovement2P;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
+static int countDownFrame;//カウントダウンの表示をフレーム数によって管理するための変数
+static bool countDownFlag;//カウントダウンを行うためのフラグ
+static bool gameStart;//ゲームが開始したかどうかフラグ
+int countDownNum;//カウントダウンで今何が表示されてるかどうかを確認する変数
+unsigned long countDownARGB;//カウントダウンの数字のARGBを変更する変数
 OBJECT_STATE g_Player;
 OBJECT_STATE g_Player2P;
+OBJECT_STATE g_CountDownNum;
 OBJECT_STATE g_Trampoline;
 OBJECT_STATE g_Manhole;
 OBJECT_STATE g_Itembox;
@@ -87,15 +94,18 @@ OBJECT_POSITION sabun2P;
 void GameControl(void)
 {
 	InitState();
-	if (gameFinish == false) {
-		CheckKey();
+	CountDown();
+	if (gameState == PLAY) {
+		if (gameStart == true) {
+			CheckKey();
+		}
 		CheckWhetherPlayerIsJamping();
 		GiveGravity();
 		CheckWheterTheHit();
 		CreatePerDecision();
 		PlayerExists();
 	}
-	if (gameFinish == true) {
+	if (gameState == FINISH) {
 		FinishGameOperation();
 	}
 	//ShowDebugFont();
@@ -134,7 +144,7 @@ void InitState() {
 		first2P = true;//ジャンプが永遠と起こるのを防ぐための変数
 		firstTime = true;//初めの処理かどうかのフラグ管理をするための変数
 		win = 0;//どっちが勝ったか判定する変数
-		gameFinish = false;//勝敗が決まったかどうかのフラグ
+		gameState = PLAY;//COUNT_DOWN;//勝敗が決まったかどうかのフラグ
 		gravity1P = 0;//プレイヤー1の重力変数
 		gravity2P = 0;//プレイヤー２の重力変数
 		player1PRub = DONT_NEIGHBOR_WALL;//プレイヤー1が壁にこすり落ちながら落ちるかどうかフラグ
@@ -149,12 +159,18 @@ void InitState() {
 		movementStageX = 0;//ステージをx座標にスクロールさせるための変数
 		wallJump1PCount = 0;//壁ジャンプしてからのフレームを数える変数
 		wallJump2PCount = 0;//壁ジャンプしてからのフレームを数える変数
+		countDownARGB = 0x00FFFFFF;//カウントダウンの数字のARGBを変更する変数
+		countDownNum = 1;//カウントダウンで今何が表示されてるかどうかを確認する変数
+		countDownFrame = 0;//カウントダウンの表示をフレーム数によって管理するための変数
+		countDownFlag = true;//カウントダウンを行うためのフラグ
+		gameStart = false;//ゲームが開始したかどうかフラグ
 
-		g_Player = { 100.f,400.f,16.f,24.f };
-		g_Player2P = { 100.f,400.f,16.f,24.f };
-		g_Trampoline = { 0.f,0.f,32.f,32.f };
+		g_Player = { 100.f,400.f,31.f,50.f };
+		g_Player2P = { 100.f,400.f,31.f,50.f };
+		g_CountDownNum = { 600.f,300.f,200.f,200.f };
+		g_Trampoline = { 0.f,0.f,96.f,32.f };
 		g_Manhole = { 0.f,0.f,32.f,32.f };
-		g_Itembox = { 0.f,0.f,32.f,64.f };
+		g_Itembox = { 0.f,0.f,64.f,64.f };
 		g_Goal = { 0.f,0.f,32.f,32.f };
 		oldPlayer1P = { 0,0 };//プレイヤー1の前の座標を保存し、差分を出すために使う
 		oldPlayer2P = { 0,0 };//プレイヤー2の前の座標を保存し、差分を出すために使う
@@ -170,6 +186,60 @@ void InitState() {
 	oldPlayer2P.y = g_Player2P.y;
     prevFrameMovement1P = 0;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
 	prevFrameMovement2P = 0;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
+}
+
+//カウントダウンを行う関数
+void CountDown() {
+	if (countDownFlag == true) {
+		countDownFrame++;
+		unsigned long changeARGB = 0x0F000000;
+		if ((countDownFrame >= 0) && (countDownFrame < FRAME * 1)) {
+
+		}
+		else if ((countDownFrame >= FRAME * 1) && (countDownFrame < FRAME * 2)) {
+			if (countDownFrame == FRAME * 1) {
+				countDownNum = 1;
+				countDownARGB = 0xFFFFFFFF;
+			}
+			if (countDownFrame >= FRAME * 1 + (FRAME / 2)) {
+				countDownARGB -= changeARGB;
+			}
+		}
+		else if ((countDownFrame >= FRAME * 2) && (countDownFrame < FRAME * 3)) {
+			if (countDownFrame == FRAME * 2) {
+				countDownNum = 2;
+				countDownARGB = 0xFFFFFFFF;
+			}
+			if (countDownFrame >= FRAME * 2 + (FRAME / 2)) {
+				countDownARGB -= changeARGB;
+			}
+		}
+		else if ((countDownFrame >= FRAME * 3) && (countDownFrame < FRAME * 4)) {
+			if (countDownFrame == FRAME * 3) {
+				countDownNum = 3;
+				countDownARGB = 0xFFFFFFFF;
+			}
+			if (countDownFrame >= FRAME * 3 + (FRAME / 2)) {
+				countDownARGB -= changeARGB;
+			}
+		}
+		else if ((countDownFrame >= FRAME * 4) && (countDownFrame < FRAME * 5)) {
+			if (countDownFrame == FRAME * 4) {
+				countDownNum = 4;
+				countDownARGB = 0xFFFFFFFF;
+				g_CountDownNum = { 550.f,250.f,400.f,400.f };
+				gameStart = true;
+			}
+			if (countDownFrame >= FRAME * 4 + (FRAME / 2)) {
+				countDownARGB -= changeARGB;
+			}
+		}
+		else if (countDownFrame >= FRAME * 5) {
+			countDownARGB = 0x00FFFFFF;
+			countDownFlag = false;
+		}
+	}
+
 }
 
 //ジャンプの処理を行う関数
@@ -399,12 +469,12 @@ void CheckKey() {
 			}
 
 			//左端まで行ってなくて、左に移動するときの処理
-			if (g_Player.x >= 200) {
+			if (g_Player.x >= 100) {
 				g_Player.x -= (acceleration1PLeft + MOVE_SPEED);
 				prevFrameMovement1P -= (acceleration1PLeft + MOVE_SPEED);
 
 			}//左端まで行って、さらに左に移動しようとしたときの処理
-			else if (g_Player.x < 200) {
+			else if (g_Player.x < 100) {
 				movementStageX -= (acceleration1PLeft + MOVE_SPEED);
 				prevFrameMovement1P -= (acceleration1PLeft + MOVE_SPEED);
 			
@@ -449,11 +519,11 @@ void CheckKey() {
 			}
 
 			//左端まで行ってなくて、左に移動するときの処理
-			if(g_Player2P.x >= 200) {
+			if(g_Player2P.x >= 100) {
 				prevFrameMovement2P -= (acceleration2PLeft + MOVE_SPEED);
 				g_Player2P.x -= (acceleration2PLeft + MOVE_SPEED);
 			}//左端まで行って、さらに左に移動しようとしたときの処理
-			else if (g_Player2P.x < 200) {
+			else if (g_Player2P.x < 100) {
 
 				movementStageX -= acceleration2PLeft + MOVE_SPEED;
 				prevFrameMovement2P -= (acceleration2PLeft + MOVE_SPEED);
@@ -634,7 +704,7 @@ void CreatePerDecision(void) {
 	if (PlayerDecision(goalCount, goal, g_Goal, g_Player)) {
 		//プレイヤー1の勝利
 		win = PLAYER1P_WIN;
-		gameFinish = true;
+		gameState = FINISH;
 		bool isSuccess = soundsManager.Start(_T("clappingSE"));
 		isSuccess = soundsManager.Start(_T("cheersSE"));
 		isSuccess = soundsManager.Stop(_T("gameBGM"));
@@ -643,7 +713,7 @@ void CreatePerDecision(void) {
 	if (PlayerDecision(goalCount, goal, g_Goal, g_Player2P)) {
 		//プレイヤー2の勝利
 		win = PLAYER2P_WIN;
-		gameFinish = true;
+		gameState = FINISH;
 		bool isSuccess = soundsManager.Start(_T("clappingSE"));
 		isSuccess = soundsManager.Start(_T("cheersSE"));
 		isSuccess = soundsManager.Stop(_T("gameBGM"));
@@ -906,7 +976,7 @@ void PlayerExists() {
 	//後ろのプレイヤーが消えた時点で勝ちが決まる、スクロールの仕方によってここの処理は大きな変更を伴う可能性あり
 	if (DistancePToP > 1300) {
 		win = PLAYER1P_WIN;
-		gameFinish = true;
+		gameState = FINISH;
 		bool isSuccess = soundsManager.Start(_T("clappingSE"));
 		isSuccess = soundsManager.Start(_T("cheersSE"));
 		isSuccess = soundsManager.Stop(_T("gameBGM"));
@@ -914,7 +984,7 @@ void PlayerExists() {
 	}
 	if (DistancePToP < -1300) {
 		win = PLAYER2P_WIN;
-		gameFinish = true;
+		gameState = FINISH;
 		bool isSuccess = soundsManager.Start(_T("clappingSE"));
 		isSuccess = soundsManager.Start(_T("cheersSE"));
 		isSuccess = soundsManager.Stop(_T("gameBGM"));

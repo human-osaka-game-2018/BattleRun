@@ -174,6 +174,26 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/player2PState.png",
 		&g_pTexture[GAME_PLAYER2P_STATE_SPACE_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/startNum1.png",
+		&g_pTexture[COUNT_DOWN_ONE_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/startNum2.png",
+		&g_pTexture[COUNT_DOWN_TWO_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/startNum3.png",
+		&g_pTexture[COUNT_DOWN_THREE_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/letsGo.png",
+		&g_pTexture[COUNT_DOWN_START_TEX]);
 }
 
 
