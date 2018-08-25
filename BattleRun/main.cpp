@@ -127,13 +127,28 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/blackBlock.png",
-		&g_pTexture[WALL_BLOCK_TEX]);
+		"texture/wallBlockRight.png",
+		&g_pTexture[WALL_BLOCK_RIGHT_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/wallBlockLeft.png",
+		&g_pTexture[WALL_BLOCK_LEFT_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/blackBlock.png",
 		&g_pTexture[GROUND_BLOCK_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/speedDownBlock.png",
+		&g_pTexture[DIRT_BLOCK_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/speedUpBlock.png",
+		&g_pTexture[ACCELERATED_BLOCK_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,

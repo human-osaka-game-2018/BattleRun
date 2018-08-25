@@ -43,7 +43,7 @@ void GameRender(void)
 		{ 450.f,             60, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
-	CUSTOMVERTEX  PLAYER[4]
+	CUSTOMVERTEX  vertexPlayer1P[4]
 	{
 		{ g_Player.x,                                       g_Player.y, 1.f, 1.f, 0xFFFF0000, MoveImage / 980.f, 0.f },
 		{ g_Player.x + g_Player.scale_x,                    g_Player.y, 1.f, 1.f, 0xFFFF0000, (MoveImage + 120) / 980.f, 0.f },
@@ -51,7 +51,7 @@ void GameRender(void)
 		{ g_Player.x,                    g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFF0000, MoveImage / 980.f, 140.f / 630.f }
 	};
 
-	CUSTOMVERTEX  PLAYER2P[4]
+	CUSTOMVERTEX  vertexPlayer2P[4]
 	{
 		{ g_Player2P.x,                                           g_Player2P.y, 1.f, 1.f, 0xFF0000FF, MoveImage2P / 980.f, 0.f },
 		{ g_Player2P.x + g_Player2P.scale_x,                      g_Player2P.y, 1.f, 1.f, 0xFF0000FF, (MoveImage2P + 120) / 980.f, 0.f },
@@ -100,7 +100,7 @@ void GameRender(void)
 		break;
 	}
 	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
-	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, PLAYER, sizeof(CUSTOMVERTEX));
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer1P, sizeof(CUSTOMVERTEX));
 
 	//PLAYER２の表示
 	switch (PlayerMode2P) {
@@ -112,7 +112,7 @@ void GameRender(void)
 		break;
 	}
 	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
-	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, PLAYER2P, sizeof(CUSTOMVERTEX));
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer2P, sizeof(CUSTOMVERTEX));
 
 	//マップチップの表示
 	for (int j = 0; j <MAP_02_HEIGHT; j++) {
@@ -139,43 +139,52 @@ void GameRender(void)
 			case GROUND_BLOCK:
 				TextureID = GROUND_BLOCK_TEX;
 				break;
-			case WALL_BLOCK:
-				TextureID = WALL_BLOCK_TEX;
+			case WALL_BLOCK_RIGHT:
+				TextureID = WALL_BLOCK_RIGHT_TEX;
+				break;
+			case WALL_BLOCK_LEFT:
+				TextureID = WALL_BLOCK_LEFT_TEX;
+				break;
+			case DIRT_BLOCK:
+				TextureID = DIRT_BLOCK_TEX;
+				break;
+			case ACCELERATED_BLOCK:
+				TextureID = ACCELERATED_BLOCK_TEX;
 				break;
 			case TRAMPOLINE_BLOCK:
 				TextureID = TRAMPOLINE_TEX;
-				CELL[0].x = trampoline[trampolinecount].x = left - 32;
-				CELL[0].y = trampoline[trampolinecount].y = top;
-				CELL[1].x = left + CELL_SIZE + 32;
-				CELL[1].y = top;
-				CELL[2].x = left + CELL_SIZE + 32;
-				CELL[2].y = top + CELL_SIZE;
-				CELL[3].x = left - 32;
-				CELL[3].y = top + CELL_SIZE;
+				CELL[0].x = trampoline[trampolinecount].x = left - (g_Trampoline.scale_x / 2);
+				CELL[0].y = trampoline[trampolinecount].y = top - (g_Trampoline.scale_y / 2);
+				CELL[1].x = left + (g_Trampoline.scale_x / 2);
+				CELL[1].y = top - (g_Trampoline.scale_y / 2);
+				CELL[2].x = left + (g_Trampoline.scale_x / 2);
+				CELL[2].y = top + (g_Trampoline.scale_y / 2);
+				CELL[3].x = left - (g_Trampoline.scale_x / 2);
+				CELL[3].y = top + (g_Trampoline.scale_y / 2);
 				trampolinecount++;
 				break;
 			case MANHOLE_BLOCK:
 				TextureID = MANHOLE_TEX;
-				CELL[0].x = manhole[manholecount].x = left - g_Manhole.scale_x;
-				CELL[0].y = manhole[manholecount].y = top - g_Manhole.scale_y;
-				CELL[1].x = left + CELL_SIZE + g_Manhole.scale_x;
-				CELL[1].y = top - g_Manhole.scale_y;
-				CELL[2].x = left + CELL_SIZE + g_Manhole.scale_x;
-				CELL[2].y = top + CELL_SIZE;
-				CELL[3].x = left - g_Manhole.scale_x;
-				CELL[3].y = top + CELL_SIZE;
+				CELL[0].x = manhole[manholecount].x = left - (g_Manhole.scale_x / 2);
+				CELL[0].y = manhole[manholecount].y = top - (g_Manhole.scale_y / 2);
+				CELL[1].x = left + (g_Manhole.scale_x / 2);
+				CELL[1].y = top - (g_Manhole.scale_y / 2);
+				CELL[2].x = left + (g_Manhole.scale_x / 2);
+				CELL[2].y = top + (g_Manhole.scale_y / 2);
+				CELL[3].x = left - (g_Manhole.scale_x / 2);
+				CELL[3].y = top + (g_Manhole.scale_y / 2);
 				manholecount++;
 				break;
 			case ITEMBOX_BLOCK:
 				TextureID = ITEMBOX_TEX;
-				CELL[0].x = itembox[itemboxcount].x = left;//g_Itembox.scale_x;
-				CELL[0].y = itembox[itemboxcount].y = top;//g_Itembox.scale_y;
-				CELL[1].x = left + g_Itembox.scale_x;	
-				CELL[1].y = top;
-				CELL[2].x = left + g_Itembox.scale_x;
-				CELL[2].y = top + g_Itembox.scale_y;
-				CELL[3].x = left;// -g_Itembox.scale_x;
-				CELL[3].y = top + g_Itembox.scale_y;
+				CELL[0].x = itembox[itemboxcount].x = left - (g_Itembox.scale_x / 2);
+				CELL[0].y = itembox[itemboxcount].y = top - (g_Itembox.scale_y/2);
+				CELL[1].x = left + (g_Itembox.scale_x/2);	
+				CELL[1].y = top - (g_Itembox.scale_y/2);
+				CELL[2].x = left + (g_Itembox.scale_x/2);
+				CELL[2].y = top + (g_Itembox.scale_y / 2);
+				CELL[3].x = left - (g_Itembox.scale_x / 2);
+				CELL[3].y = top + (g_Itembox.scale_y / 2);
 				itemboxcount++;
 				break;
 			case GOAL_BLOCK:
@@ -229,7 +238,7 @@ void GameRender(void)
 
 	//勝敗がついたら描画
 	if (gameState == FINISH) {
-		if (win == PLAYER1P_WIN) {
+		if (win == PLAYER1P) {
 			CUSTOMVERTEX  vertexWinPlayer1P[4]
 			{
 				{ 200.f,  100.f, 1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f }, 
@@ -240,7 +249,7 @@ void GameRender(void)
 			g_pD3Device->SetTexture(0, g_pTexture[WIN_1P_TEX]);
 			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexWinPlayer1P, sizeof(CUSTOMVERTEX));
 		}
-		else if (win == PLAYER2P_WIN) {
+		else if (win == PLAYER2P) {
 			CUSTOMVERTEX  vertexWinPlayer2P[4]
 			{
 				{ 200.f,  100.f, 1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f }, 

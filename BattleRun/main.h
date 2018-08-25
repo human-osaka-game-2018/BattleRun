@@ -63,7 +63,10 @@ enum TEXTURE//テクスチャの選別に使う
 	PLAYER_2P_LEFT_TEX,
 	PLAYER_2P_RIGHT_TEX,
 	GROUND_BLOCK_TEX,
-	WALL_BLOCK_TEX,	
+	WALL_BLOCK_RIGHT_TEX,
+	WALL_BLOCK_LEFT_TEX,
+	DIRT_BLOCK_TEX,
+	ACCELERATED_BLOCK_TEX,
 	TRAMPOLINE_TEX,
 	MANHOLE_TEX,
 	GOAL_TEX,
@@ -77,11 +80,14 @@ enum BLOCKTYPE//CSVのブロックの番号
 {
 	NONE,
 	GROUND_BLOCK,//地面の黒ブロック
-	WALL_BLOCK,//壁キックができる黒ブロック
+	WALL_BLOCK_RIGHT,//壁キックができる黒ブロック
+	WALL_BLOCK_LEFT,
 	TRAMPOLINE_BLOCK,//トランポリン
 	MANHOLE_BLOCK,//マンホール
 	ITEMBOX_BLOCK,//アイテムボックス
-	GOAL_BLOCK//ゴール判定を行うブロック
+	GOAL_BLOCK,//ゴール判定を行うブロック
+	DIRT_BLOCK,//動くスピードが遅くなる床ブロック
+	ACCELERATED_BLOCK//加速する床ブロック
 };
 
 enum FONT

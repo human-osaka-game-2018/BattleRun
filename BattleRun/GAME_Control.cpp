@@ -6,12 +6,15 @@
 	/*DEFINE*/
 #define MOVE_SPEED 5.f
 #define ACCELERATION 3.f
+#define MOVE_SPEED_DOWN 3
+#define MOVE_SPEED_UP (MOVE_SPEED + (ACCELERATION * 3))
 #define SYOSOKUDO 20
 #define KASOKUDO 2
 #define MOVEMENT_STAGE_X 15
 #define TRAMPOLINE_SYOSOKUDO 50
-#define PLAYER_RUN_TIPE2_FRAME 30
-#define PLAYER_RUN_TIPE3_FRAME 60
+#define PLAYER_RUN_TIPE2_FRAME (FRAME*1)
+#define PLAYER_RUN_TIPE3_FRAME (FRAME*2)
+#define ACCELERATED_EFFECT_FRAME (FRAME*3)
 #define WALL_JUMP_SPEED 15
 #define WALL_JUMP_FORSED_FRAME 10
 #define PREVENTION_PASS_BLOCK (-CELL_SIZE + 10)
@@ -28,6 +31,7 @@ void PlayerExists();//プレイヤーのどちらかが画面から消えていないか、つまり勝敗が
 void FinishGameOperation();//勝敗がついてからキー入力でシーン遷移を行う関数
 void ShowDebugFont();//デバッグのためにフォントを表示させる関数
 void CountDown();//3,2,1,と数えるための関数
+void CheckPlayerAccelerates();//プレイヤーの加速のフラグを時間がたつとオフにする関数
 
 	/*グローバル変数*/
 static int wallJump1PCount;//壁ジャンプしてからのフレームを数える変数
@@ -40,6 +44,10 @@ static bool wallJump2PMoveRight;//壁ジャンプしたときに右へ強制的に動かすためのフ
 static bool wallJump2PMoveLeft;//壁ジャンプしたときに左へ強制的に動かすためのフラグ
 static bool wallJump1PFlag;//壁ジャンプフラグ
 static bool wallJump2PFlag;//壁ジャンプフラグ
+static bool speedSlows1P;//スピードがダウンしているかどうかフラグ
+static bool speedSlows2P;//スピードがダウンしているかどうかフラグ
+static bool speedRises1P;//スピードがアップしているかどうかフラグ
+static bool speedRises2P;//スピードがアップしているかどうかフラグ
 static int player1PRub;//プレイヤー1が壁にこすり落ちながら落ちるかどうかフラグ
 static int player2PRub;//プレイヤー2が壁にこすり落ちながら落ちるかどうかフラグ
 static int accelerationcount1PRight;
@@ -76,6 +84,10 @@ static float prevFrameMovement2P;//キー入力によってPLAYERが移動したX座標を毎フレ
 static int countDownFrame;//カウントダウンの表示をフレーム数によって管理するための変数
 static bool countDownFlag;//カウントダウンを行うためのフラグ
 static bool gameStart;//ゲームが開始したかどうかフラグ
+static int itIsPlayer1P;//１Pか２Pか判断する関数で、引数に渡すための変数
+static int itIsPlayer2P;//１Pか２Pか判断する関数で、引数に渡すための変数
+static int countAcceleratedFrame1P;//プレイヤーが加速するフレーム数を数える変数
+static int countAcceleratedFrame2P;//プレイヤーが加速するフレーム数を数える変数
 int countDownNum;//カウントダウンで今何が表示されてるかどうかを確認する変数
 unsigned long countDownARGB;//カウントダウンの数字のARGBを変更する変数
 OBJECT_STATE g_Player;
@@ -97,6 +109,7 @@ void GameControl(void)
 	CountDown();
 	if (gameState == PLAY) {
 		if (gameStart == true) {
+			CheckPlayerAccelerates();
 			CheckKey();
 		}
 		CheckWhetherPlayerIsJamping();
@@ -126,6 +139,8 @@ void InitState() {
 		//BGM再生
 		bool isSuccess = soundsManager.Start(_T("gameBGM"), true);
 		//このシーンで使う全てを初期化する
+		itIsPlayer1P = PLAYER1P;//１Pか２Pか判断する関数で、引数に渡すための変数
+		itIsPlayer2P = PLAYER2P;//１Pか２Pか判断する関数で、引数に渡すための変数
 		framecount = 0;//キー入力が行われて、プレイヤーのアニメーションを起こすための変数
 		framecount2P = 0;//キー入力が行われて、プレイヤーのアニメーションを起こすための変数
 		JFlag = false;//プレイヤー1のジャンプのフラグ
@@ -163,13 +178,19 @@ void InitState() {
 		countDownNum = 1;//カウントダウンで今何が表示されてるかどうかを確認する変数
 		countDownFrame = 0;//カウントダウンの表示をフレーム数によって管理するための変数
 		countDownFlag = true;//カウントダウンを行うためのフラグ
+		countAcceleratedFrame1P = 0;//プレイヤーが加速するフレーム数を数える変数
+		countAcceleratedFrame2P = 0;//プレイヤーが加速するフレーム数を数える変数
 		gameStart = false;//ゲームが開始したかどうかフラグ
+		speedSlows1P = false;//スピードがダウンしているかどうかフラグ
+		speedSlows2P = false;//スピードがダウンしているかどうかフラグ
+		speedRises1P = false;//スピードがアップしているかどうかフラグ
+		speedRises2P = false;//スピードがアップしているかどうかフラグ
 
-		g_Player = { 100.f,400.f,31.f,50.f };
-		g_Player2P = { 100.f,400.f,31.f,50.f };
+		g_Player = { 100.f,400.f,30.f,50.f };
+		g_Player2P = { 100.f,400.f,30.f,50.f };
 		g_CountDownNum = { 600.f,300.f,200.f,200.f };
-		g_Trampoline = { 0.f,0.f,96.f,32.f };
-		g_Manhole = { 0.f,0.f,32.f,32.f };
+		g_Trampoline = { 0.f,0.f,96.f,64.f };
+		g_Manhole = { 0.f,0.f,32.f,64.f };
 		g_Itembox = { 0.f,0.f,64.f,64.f };
 		g_Goal = { 0.f,0.f,32.f,32.f };
 		oldPlayer1P = { 0,0 };//プレイヤー1の前の座標を保存し、差分を出すために使う
@@ -470,20 +491,34 @@ void CheckKey() {
 
 			//左端まで行ってなくて、左に移動するときの処理
 			if (g_Player.x >= 100) {
-				g_Player.x -= (acceleration1PLeft + MOVE_SPEED);
-				prevFrameMovement1P -= (acceleration1PLeft + MOVE_SPEED);
+				if (speedRises1P == true) {
+					g_Player.x -= MOVE_SPEED_UP;
+					prevFrameMovement1P -= MOVE_SPEED_UP;
+				}
+				else if(speedSlows1P == true){
+					g_Player.x -= MOVE_SPEED_DOWN;
+					prevFrameMovement1P -= MOVE_SPEED_DOWN;
+				}
+				else {
+					g_Player.x -= (acceleration1PLeft + MOVE_SPEED);
+					prevFrameMovement1P -= (acceleration1PLeft + MOVE_SPEED);
+				}
 
 			}//左端まで行って、さらに左に移動しようとしたときの処理
 			else if (g_Player.x < 100) {
-				movementStageX -= (acceleration1PLeft + MOVE_SPEED);
-				prevFrameMovement1P -= (acceleration1PLeft + MOVE_SPEED);
-			
-				//CSVマップの一番左端まで行くとスクロールを止める処理
-				if (movementStageX < -200) {
-					movementStageX = -200;
+				if (speedRises1P == true) {
+					movementStageX -= MOVE_SPEED_UP;
+					prevFrameMovement1P -= MOVE_SPEED_UP;
+					g_Player2P.x += MOVE_SPEED_UP;
 				}
-				//CSVマップの一番左端まで行っていないときの、プレイヤーがスクロールによってずらされる処理
-				if (movementStageX > -200) {
+				else if (speedSlows1P == true) {
+					movementStageX -= MOVE_SPEED_DOWN;
+					prevFrameMovement1P -= MOVE_SPEED_DOWN;
+					g_Player2P.x += MOVE_SPEED_DOWN;
+				}
+				else {
+					movementStageX -= (acceleration1PLeft + MOVE_SPEED);
+					prevFrameMovement1P -= (acceleration1PLeft + MOVE_SPEED);
 					g_Player2P.x += (acceleration1PLeft + MOVE_SPEED);
 				}
 			}
@@ -520,21 +555,37 @@ void CheckKey() {
 
 			//左端まで行ってなくて、左に移動するときの処理
 			if(g_Player2P.x >= 100) {
-				prevFrameMovement2P -= (acceleration2PLeft + MOVE_SPEED);
-				g_Player2P.x -= (acceleration2PLeft + MOVE_SPEED);
+				if (speedRises2P == true) {
+					prevFrameMovement2P -= MOVE_SPEED_UP;
+					g_Player2P.x -= MOVE_SPEED_UP;
+				}
+				else if (speedSlows2P == true) {
+					prevFrameMovement2P -= MOVE_SPEED_DOWN;
+					g_Player2P.x -= MOVE_SPEED_DOWN;
+				}
+				else {
+					prevFrameMovement2P -= (acceleration2PLeft + MOVE_SPEED);
+					g_Player2P.x -= (acceleration2PLeft + MOVE_SPEED);
+				}
 			}//左端まで行って、さらに左に移動しようとしたときの処理
 			else if (g_Player2P.x < 100) {
 
-				movementStageX -= acceleration2PLeft + MOVE_SPEED;
-				prevFrameMovement2P -= (acceleration2PLeft + MOVE_SPEED);
-			
-				//CSVマップの一番左端まで行くとスクロールを止める処理
-				if (movementStageX < -200) {
-					movementStageX = -200;
+				if (speedRises2P == true) {
+					movementStageX -= MOVE_SPEED_UP;
+					prevFrameMovement2P -= MOVE_SPEED_UP;
+					g_Player.x += MOVE_SPEED_UP;
 				}
-				if (movementStageX > -200) {
+				else if (speedSlows2P == true) {
+					movementStageX -= MOVE_SPEED_DOWN;
+					prevFrameMovement2P -= MOVE_SPEED_DOWN;
+					g_Player.x += MOVE_SPEED_DOWN;
+				}
+				else {
+					movementStageX -= acceleration2PLeft + MOVE_SPEED;
+					prevFrameMovement2P -= (acceleration2PLeft + MOVE_SPEED);
 					g_Player.x += acceleration2PLeft + MOVE_SPEED;
 				}
+				
 			}
 		}
 
@@ -569,15 +620,36 @@ void CheckKey() {
 
 			//右端まで行ってなくて、右に移動するときの処理
 			if (g_Player.x < 1200) {
-				g_Player.x += (acceleration1PRight + MOVE_SPEED);
-				prevFrameMovement1P += (acceleration1PRight + MOVE_SPEED);
+				if (speedRises1P == true) {
+					g_Player.x += MOVE_SPEED_UP;
+					prevFrameMovement1P += MOVE_SPEED_UP;
+				}
+				else if (speedSlows1P == true) {
+					g_Player.x += MOVE_SPEED_DOWN;
+					prevFrameMovement1P += MOVE_SPEED_DOWN;
+				}
+				else {
+					g_Player.x += (acceleration1PRight + MOVE_SPEED);
+					prevFrameMovement1P += (acceleration1PRight + MOVE_SPEED);
+				}
 				
 			}//右端まで行って、さらに右に移動するときの処理
 			else if (g_Player.x >= 1200) {
-				movementStageX += acceleration1PRight + MOVE_SPEED;
-				prevFrameMovement1P += (acceleration1PRight + MOVE_SPEED);
-				g_Player2P.x -= acceleration1PRight + MOVE_SPEED;
-				
+				if (speedRises1P == true) {
+					movementStageX += MOVE_SPEED_UP;
+					prevFrameMovement1P += MOVE_SPEED_UP;
+					g_Player2P.x -= MOVE_SPEED_UP;
+				}
+				else if (speedSlows1P == true) {
+					movementStageX += MOVE_SPEED_DOWN;
+					prevFrameMovement1P += MOVE_SPEED_DOWN;
+					g_Player2P.x -= MOVE_SPEED_DOWN;
+				}
+				else {
+					movementStageX += acceleration1PRight + MOVE_SPEED;
+					prevFrameMovement1P += (acceleration1PRight + MOVE_SPEED);
+					g_Player2P.x -= acceleration1PRight + MOVE_SPEED;
+				}
 			}
 		}
 
@@ -613,15 +685,36 @@ void CheckKey() {
 
 			//右端まで行ってなくて、右に移動するときの処理
 			if (g_Player2P.x < 1200) {
-				g_Player2P.x += (acceleration2PRight + MOVE_SPEED);
-				prevFrameMovement2P += (acceleration2PRight + MOVE_SPEED);
+				if (speedRises2P == true) {
+					g_Player2P.x += MOVE_SPEED_UP;
+					prevFrameMovement2P += MOVE_SPEED_UP;
+				}
+				else if (speedSlows2P == true) {
+					g_Player2P.x += MOVE_SPEED_DOWN;
+					prevFrameMovement2P += MOVE_SPEED_DOWN;
+				}
+				else {
+					g_Player2P.x += (acceleration2PRight + MOVE_SPEED);
+					prevFrameMovement2P += (acceleration2PRight + MOVE_SPEED);
+				}
 				
 			}//右端まで行って、さらに右に移動するときの処理
 			else if (g_Player2P.x >= 1200) {
-				
-				movementStageX += acceleration2PRight + MOVE_SPEED;
-				g_Player.x -= acceleration2PRight + MOVE_SPEED;
-				prevFrameMovement2P += (acceleration2PRight + MOVE_SPEED);
+				if (speedRises2P == true) {
+					movementStageX += MOVE_SPEED_UP;
+					g_Player.x -= MOVE_SPEED_UP;
+					prevFrameMovement2P += MOVE_SPEED_UP;
+				}
+				else if (speedSlows2P == true) {
+					movementStageX += MOVE_SPEED_DOWN;
+					g_Player.x -= MOVE_SPEED_DOWN;
+					prevFrameMovement2P += MOVE_SPEED_DOWN;
+				}
+				else {
+					movementStageX += acceleration2PRight + MOVE_SPEED;
+					g_Player.x -= acceleration2PRight + MOVE_SPEED;
+					prevFrameMovement2P += (acceleration2PRight + MOVE_SPEED);
+				}
 			}
 		}
 
@@ -703,7 +796,7 @@ void CreatePerDecision(void) {
 	//ゴールの処理
 	if (PlayerDecision(goalCount, goal, g_Goal, g_Player)) {
 		//プレイヤー1の勝利
-		win = PLAYER1P_WIN;
+		win = PLAYER1P;
 		gameState = FINISH;
 		bool isSuccess = soundsManager.Start(_T("clappingSE"));
 		isSuccess = soundsManager.Start(_T("cheersSE"));
@@ -712,7 +805,7 @@ void CreatePerDecision(void) {
 	}
 	if (PlayerDecision(goalCount, goal, g_Goal, g_Player2P)) {
 		//プレイヤー2の勝利
-		win = PLAYER2P_WIN;
+		win = PLAYER2P;
 		gameState = FINISH;
 		bool isSuccess = soundsManager.Start(_T("clappingSE"));
 		isSuccess = soundsManager.Start(_T("cheersSE"));
@@ -728,7 +821,10 @@ void CreatePerDecision(void) {
 //プレイヤーが左の壁をずるずると降りているかどうかチェックする関数
 BOOL CheckPlayerRubLeftMap02(float *arrayToCheckLeftCollision, OBJECT_STATE g_Player) {
 	for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-		if (MapData02[((int)arrayToCheckLeftCollision[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)g_Player.x - 1 + (int)movementStageX) / CELL_SIZE] == 2) {
+		if (MapData02[((int)arrayToCheckLeftCollision[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)g_Player.x - 1 + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+			return true;
+		}
+		else if (MapData02[((int)arrayToCheckLeftCollision[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)g_Player.x - 1 + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 			return true;
 		}
 	}
@@ -738,13 +834,79 @@ BOOL CheckPlayerRubLeftMap02(float *arrayToCheckLeftCollision, OBJECT_STATE g_Pl
 //プレイヤーが右の壁をずるずると降りているかどうかチェックする関数
 BOOL CheckPlayerRubRightMap02(float *arrayToCheckLeftCollision , OBJECT_STATE g_Player) {
 	for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-		if (MapData02[((int)arrayToCheckLeftCollision[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)g_Player.x + (int)g_Player.scale_x + 1 + (int)movementStageX) / CELL_SIZE] == 2) {
+		if (MapData02[((int)arrayToCheckLeftCollision[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)g_Player.x + (int)g_Player.scale_x + 1 + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+			return true;
+		}
+		else if (MapData02[((int)arrayToCheckLeftCollision[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)g_Player.x + (int)g_Player.scale_x + 1 + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 			return true;
 		}
 	}
 	return false;
 }
 
+//プレイヤーがサイド（左と右）のブロックと衝突していた時に初期化を行う関数
+void InitStateSideCollision(int player1POr2P) {
+	if (player1POr2P == PLAYER1P) {
+		wallJump1PFlag = false;
+		wallJump1PMoveRight = false;
+		wallJump1PMoveLeft = false;
+		wallJump1PCount = 0;
+	}
+	else if (player1POr2P == PLAYER2P) {
+		wallJump2PFlag = false;
+		wallJump2PMoveRight = false;
+		wallJump2PMoveLeft = false;
+		wallJump2PCount = 0;
+	}
+}
+
+//プレイヤーが上のブロックと衝突していた時に初期化する関数
+void InitStateTopCollision(int player1POr2P) {
+	if (player1POr2P == PLAYER1P) {
+		syosokudo1P = 0;
+		time1P = 0;
+		wallJump1PFlag = false;
+		wallJump1PMoveRight = false;
+		wallJump1PMoveLeft = false;
+		wallJump1PCount = 0;
+	}
+	else if (player1POr2P == PLAYER2P) {
+		syosokudo2P = 0;
+		time2P = 0;
+		wallJump2PFlag = false;
+		wallJump2PMoveRight = false;
+		wallJump2PMoveLeft = false;
+		wallJump2PCount = 0;
+	}
+}
+
+//プレイヤーが下のブロックと衝突していた時に初期化する関数
+void InitStateBottomCollision(int player1POr2P) {
+	if (player1POr2P == PLAYER1P) {
+		JFlag = false;
+		wallJump1PFlag = false;
+		wallJump1PMoveRight = false;
+		wallJump1PMoveLeft = false;
+		wallJump1PCount = 0;
+		player1PRub = DONT_NEIGHBOR_WALL;
+		time1P = 0;
+		Jcount = 0;
+		first1P = true;
+		syosokudo1P = 0;
+	}
+	else if (player1POr2P == PLAYER2P) {
+		JFlag2P = false;
+		player2PRub = DONT_NEIGHBOR_WALL;
+		wallJump2PFlag = false;
+		wallJump2PMoveRight = false;
+		wallJump2PMoveLeft = false;
+		wallJump2PCount = 0;
+		time2P = 0;
+		Jcount2P = 0;
+		first2P = true;
+		syosokudo2P = 0;
+	}
+}
 
 //プレイヤーとマップの当たり判定を行う関数
 void CheckWheterTheHit()
@@ -757,39 +919,53 @@ void CheckWheterTheHit()
 	//プレイヤーの左の方向にブロックがあるとき
 	if (prevFrameMovement1P < 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == 2) {
+			if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 				g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 				player1PRub = WALL_LEFT;
-				wallJump1PFlag = false;
-				wallJump1PMoveRight = false;
-				wallJump1PMoveLeft = false;
-				wallJump1PCount = 0;
+				InitStateSideCollision(itIsPlayer1P);
 			}
-			if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY )/ CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == 1) {
+			else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 				g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
-				wallJump1PFlag = false;
-				wallJump1PMoveRight = false;
-				wallJump1PMoveLeft = false;
-				wallJump1PCount = 0;
+				player1PRub = WALL_LEFT;
+				InitStateSideCollision(itIsPlayer1P);
+			}
+			else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY )/ CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+				g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+				InitStateSideCollision(itIsPlayer1P);
+			}
+			else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+				g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+				InitStateSideCollision(itIsPlayer1P);
+			}
+			else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+				g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+				InitStateSideCollision(itIsPlayer1P);
 			}
 		}
 	}//プレイヤーの右の方向にブロックがあるとき
 	else if (prevFrameMovement1P > 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == 2) {
+			if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 				g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x +(int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 				player1PRub = WALL_RIGHT;
-				wallJump1PFlag = false;
-				wallJump1PMoveRight = false;
-				wallJump1PMoveLeft = false;
-				wallJump1PCount = 0;
+				InitStateSideCollision(itIsPlayer1P);
 			} 
-			if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == 1) {
+			else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+				g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+				player1PRub = WALL_RIGHT;
+				InitStateSideCollision(itIsPlayer1P);
+			}
+			else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 				g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x +(int)movementStageX) / CELL_SIZE) * CELL_SIZE -1 - g_Player.scale_x - (int)movementStageX;
-				wallJump1PFlag = false;
-				wallJump1PMoveRight = false;
-				wallJump1PMoveLeft = false;
-				wallJump1PCount = 0;
+				InitStateSideCollision(itIsPlayer1P);
+			}
+			else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+				g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+				InitStateSideCollision(itIsPlayer1P);
+			}
+			else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+				g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+				InitStateSideCollision(itIsPlayer1P);
 			}
 		}
 	}
@@ -798,45 +974,55 @@ void CheckWheterTheHit()
 	//プレイヤーの上の方向にブロックがあるとき
 	if (gravity1P > 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 1) {
+			if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 				g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
-				syosokudo1P = 0;
-				time1P = 0;
+				InitStateTopCollision(itIsPlayer1P);
 			}
-			if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 2) {
+			else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 				g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
-				syosokudo1P = 0;
-				time1P = 0;
+				InitStateTopCollision(itIsPlayer1P);
+			}
+			else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+				g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+				InitStateTopCollision(itIsPlayer1P);
+			}
+			else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+				g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+				InitStateTopCollision(itIsPlayer1P);
+			}
+			else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+				g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+				InitStateTopCollision(itIsPlayer1P);
 			}
 		}
 	}//プレイヤーの下の方向にブロックがあるとき
 	else if (gravity1P < 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 1) {
+			if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 				g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE ) * CELL_SIZE -1 - g_Player.scale_y - (int)movementStageY;
-				JFlag = false;
-				wallJump1PFlag = false;
-				wallJump1PMoveRight = false;
-				wallJump1PMoveLeft = false;
-				wallJump1PCount = 0;
-				player1PRub = DONT_NEIGHBOR_WALL;
-				time1P = 0;
-				Jcount = 0;
-				first1P = true;
-				syosokudo1P = 0;
+				InitStateBottomCollision(itIsPlayer1P);
+				speedSlows1P = false;
 			}
-			if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 2) {
+			else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 				g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
-				JFlag = false;
-				wallJump1PFlag = false;
-				wallJump1PMoveRight = false;
-				wallJump1PMoveLeft = false;
-				wallJump1PCount = 0;
-				player1PRub = DONT_NEIGHBOR_WALL;
-				time1P = 0;
-				Jcount = 0;
-				first1P = true;
-				syosokudo1P = 0;
+				InitStateBottomCollision(itIsPlayer1P);
+				speedSlows1P = false;
+			}
+			else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+				g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+				InitStateBottomCollision(itIsPlayer1P);
+				speedSlows1P = false;
+			}
+			else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+				g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+				InitStateBottomCollision(itIsPlayer1P);
+				speedSlows1P = true;
+			}
+			else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+				g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+				InitStateBottomCollision(itIsPlayer1P);
+				speedSlows1P = false;
+				speedRises1P = true;
 			}
 		}
 	}
@@ -862,39 +1048,53 @@ void CheckWheterTheHit()
 	//プレイヤーの左の方向にブロックがあるとき
 	if (prevFrameMovement2P < 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == 2) {
+			if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 				g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 				player2PRub = WALL_LEFT;
-				wallJump2PFlag = false;
-				wallJump2PMoveRight = false;
-				wallJump2PMoveLeft = false;
-				wallJump2PCount = 0;
+				InitStateSideCollision(itIsPlayer2P);
 			}
-			if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == 1) {
+			else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 				g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
-				wallJump2PFlag = false;
-				wallJump2PMoveRight = false;
-				wallJump2PMoveLeft = false;
-				wallJump2PCount = 0;
+				player2PRub = WALL_LEFT;
+				InitStateSideCollision(itIsPlayer2P);
+			}
+			else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+				g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+				InitStateSideCollision(itIsPlayer2P);
+			}
+			else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+				g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+				InitStateSideCollision(itIsPlayer2P);
+			}
+			else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+				g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+				InitStateSideCollision(itIsPlayer2P);
 			}
 		}
 	}//プレイヤーの右の方向にブロックがあるとき
 	else if (prevFrameMovement2P > 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == 2) {
+			if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 				g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 				player2PRub = WALL_RIGHT;
-				wallJump2PFlag = false;
-				wallJump2PMoveRight = false;
-				wallJump2PMoveLeft = false;
-				wallJump2PCount = 0;
+				InitStateSideCollision(itIsPlayer2P);
 			}
-			if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == 1) {
+			else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 				g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
-				wallJump2PFlag = false;
-				wallJump2PMoveRight = false;
-				wallJump2PMoveLeft = false;
-				wallJump2PCount = 0;
+				player2PRub = WALL_RIGHT;
+				InitStateSideCollision(itIsPlayer2P);
+			}
+			else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+				g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+				InitStateSideCollision(itIsPlayer2P);
+			}
+			else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+				g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+				InitStateSideCollision(itIsPlayer2P);
+			}
+			else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+				g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+				InitStateSideCollision(itIsPlayer2P);
 			}
 		}
 	}
@@ -903,53 +1103,55 @@ void CheckWheterTheHit()
 	//プレイヤーの上の方向にブロックがあるとき
 	if (gravity2P > 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 1) {
+			if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 				g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
-				syosokudo2P = 0;
-				time2P = 0;
-				wallJump2PFlag = false;
-				wallJump2PMoveRight = false;
-				wallJump2PMoveLeft = false;
-				wallJump2PCount = 0;
+				InitStateTopCollision(itIsPlayer2P);
 			}
-			if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 2) {
+			else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 				g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
-				syosokudo2P = 0;
-				time2P = 0;
-				wallJump2PFlag = false;
-				wallJump2PMoveRight = false;
-				wallJump2PMoveLeft = false;
-				wallJump2PCount = 0;
+				InitStateTopCollision(itIsPlayer2P);
+			}
+			else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+				g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+				InitStateTopCollision(itIsPlayer2P);
+			}
+			else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+				g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+				InitStateTopCollision(itIsPlayer2P);
+			}
+			else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+				g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+				InitStateTopCollision(itIsPlayer2P);
 			}
 		}
 	}//プレイヤーの下の方向にブロックがあるとき
 	else if (gravity2P < 0) {
 		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 1) {
+			if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 				g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
-				JFlag2P = false;
-				player2PRub = DONT_NEIGHBOR_WALL;
-				wallJump2PFlag = false;
-				wallJump2PMoveRight = false;
-				wallJump2PMoveLeft = false;
-				wallJump2PCount = 0;
-				time2P = 0;
-				Jcount2P = 0;
-				first2P = true;
-				syosokudo2P = 0;
+				InitStateBottomCollision(itIsPlayer2P);
+				speedSlows2P = false;
 			}
-			if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == 2) {
+			else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 				g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
-				JFlag2P = false;
-				player2PRub = DONT_NEIGHBOR_WALL;
-				wallJump2PFlag = false;
-				wallJump2PMoveRight = false;
-				wallJump2PMoveLeft = false;
-				wallJump2PCount = 0;
-				time2P = 0;
-				Jcount2P = 0;
-				first2P = true;
-				syosokudo2P = 0;
+				InitStateBottomCollision(itIsPlayer2P);
+				speedSlows2P = false;
+			}
+			else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+				g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+				InitStateBottomCollision(itIsPlayer2P);
+				speedSlows2P = false;
+			}
+			else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+				g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+				InitStateBottomCollision(itIsPlayer2P);
+				speedSlows2P = true;
+			}
+			else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+				g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+				InitStateBottomCollision(itIsPlayer2P);
+				speedRises2P = true;
+				speedSlows2P = false;
 			}
 		}
 	}
@@ -975,7 +1177,7 @@ void PlayerExists() {
 	DistancePToP = g_Player.x - g_Player2P.x;
 	//後ろのプレイヤーが消えた時点で勝ちが決まる、スクロールの仕方によってここの処理は大きな変更を伴う可能性あり
 	if (DistancePToP > 1300) {
-		win = PLAYER1P_WIN;
+		win = PLAYER1P;
 		gameState = FINISH;
 		bool isSuccess = soundsManager.Start(_T("clappingSE"));
 		isSuccess = soundsManager.Start(_T("cheersSE"));
@@ -983,7 +1185,7 @@ void PlayerExists() {
 	
 	}
 	if (DistancePToP < -1300) {
-		win = PLAYER2P_WIN;
+		win = PLAYER2P;
 		gameState = FINISH;
 		bool isSuccess = soundsManager.Start(_T("clappingSE"));
 		isSuccess = soundsManager.Start(_T("cheersSE"));
@@ -1013,7 +1215,27 @@ void FinishGameOperation() {
 	goalCount = 0;
 }
 
-//壁キックを
+//プレイヤーの加速のフラグを時間がたつとオフにする関数
+void CheckPlayerAccelerates() {
+	if (speedRises1P == true) {
+		countAcceleratedFrame1P++;
+		if (countAcceleratedFrame1P == ACCELERATED_EFFECT_FRAME) {
+			speedRises1P = false;
+			countAcceleratedFrame1P = 0;
+			acceleration1PLeft = ACCELERATION * 2;
+			acceleration1PRight = ACCELERATION * 2;
+		}
+	}
+	if (speedRises2P == true) {
+		countAcceleratedFrame2P++;
+		if (countAcceleratedFrame2P == ACCELERATED_EFFECT_FRAME) {
+			speedRises2P = false;
+			countAcceleratedFrame2P = 0;
+			acceleration2PLeft = ACCELERATION * 2;
+			acceleration2PRight = ACCELERATION * 2;
+		}
+	}
+}
 
 //デバッグのためにフォントを表示させる関数
 void ShowDebugFont() {
