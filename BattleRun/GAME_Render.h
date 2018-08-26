@@ -14,10 +14,10 @@ extern int trampolinecount;
 extern int manholecount;
 extern int itemboxcount;
 extern int goalCount;
-extern OBJECT_POSITION trampoline[10];
-extern OBJECT_POSITION manhole[10];
-extern OBJECT_POSITION itembox[10];
-extern OBJECT_POSITION goal[35];
+extern OBJECT_POSITION trampoline[30];
+extern OBJECT_POSITION manhole[30];
+extern OBJECT_POSITION itembox[30];
+extern OBJECT_POSITION goal[50];
 
 void GameRender();
 

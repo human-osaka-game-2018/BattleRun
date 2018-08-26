@@ -90,6 +90,15 @@ static int countAcceleratedFrame1P;//プレイヤーが加速するフレーム数を数える変数
 static int countAcceleratedFrame2P;//プレイヤーが加速するフレーム数を数える変数
 int countDownNum;//カウントダウンで今何が表示されてるかどうかを確認する変数
 unsigned long countDownARGB;//カウントダウンの数字のARGBを変更する変数
+static float arrayToCheckRightCollision1P[6];
+static float arrayToCheckLeftCollision1P[6];
+static float arrayToCheckTopCollision1P[6];
+static float arrayToCheckBottomCollision1P[6];
+static float arrayToCheckRightCollision2P[6];
+static float arrayToCheckLeftCollision2P[6];
+static float arrayToCheckTopCollision2P[6];
+static float arrayToCheckBottomCollision2P[6];
+
 OBJECT_STATE g_Player;
 OBJECT_STATE g_Player2P;
 OBJECT_STATE g_CountDownNum;
@@ -126,12 +135,6 @@ void GameControl(void)
 
 
 	/*関数の実態*/
-////プレイヤーの動きの処理をまとめた関数
-//void OperatePlayer() {
-//
-//	CheckKey();
-//	CheckWhetherPlayerIsJamping();
-//}
 
 //値を初期化する関数
 void InitState() {
@@ -908,124 +911,719 @@ void InitStateBottomCollision(int player1POr2P) {
 	}
 }
 
+//当たり判定ポイントの初期化、毎フレーム行う
+void InitPlayerCollisionPoint(int player1POr2P) {
+	if (player1POr2P == PLAYER1P) {
+		arrayToCheckRightCollision1P[0] = oldPlayer1P.y;
+		arrayToCheckRightCollision1P[1] = oldPlayer1P.y + ((g_Player.scale_y) / 4) * 1;
+		arrayToCheckRightCollision1P[2] = oldPlayer1P.y + ((g_Player.scale_y) / 4) * 2;
+		arrayToCheckRightCollision1P[3] = oldPlayer1P.y + ((g_Player.scale_y) / 4) * 3;
+		arrayToCheckRightCollision1P[4] = oldPlayer1P.y + (g_Player.scale_y);
+		arrayToCheckRightCollision1P[5] = oldPlayer1P.x + g_Player.scale_x;
+		arrayToCheckLeftCollision1P[0] = oldPlayer1P.y;
+		arrayToCheckLeftCollision1P[1] = oldPlayer1P.y + ((g_Player.scale_y) / 4) * 1;
+		arrayToCheckLeftCollision1P[2] = oldPlayer1P.y + ((g_Player.scale_y) / 4) * 2;
+		arrayToCheckLeftCollision1P[3] = oldPlayer1P.y + ((g_Player.scale_y) / 4) * 3;
+		arrayToCheckLeftCollision1P[4] = oldPlayer1P.y + (g_Player.scale_y);
+		arrayToCheckLeftCollision1P[5] = oldPlayer1P.x;
+		arrayToCheckTopCollision1P[0] = g_Player.x;
+		arrayToCheckTopCollision1P[1] = g_Player.x + ((g_Player.scale_x) / 4) * 1;
+		arrayToCheckTopCollision1P[2] = g_Player.x + ((g_Player.scale_x) / 4) * 2;
+		arrayToCheckTopCollision1P[3] = g_Player.x + ((g_Player.scale_x) / 4) * 3;
+		arrayToCheckTopCollision1P[4] = g_Player.x + (g_Player.scale_x);
+		arrayToCheckTopCollision1P[5] = oldPlayer1P.y;
+		arrayToCheckBottomCollision1P[0] = g_Player.x;
+		arrayToCheckBottomCollision1P[1] = g_Player.x + ((g_Player.scale_x) / 4) * 1;
+		arrayToCheckBottomCollision1P[2] = g_Player.x + ((g_Player.scale_x) / 4) * 2;
+		arrayToCheckBottomCollision1P[3] = g_Player.x + ((g_Player.scale_x) / 4) * 3;
+		arrayToCheckBottomCollision1P[4] = g_Player.x + (g_Player.scale_x);
+		arrayToCheckBottomCollision1P[5] = oldPlayer1P.y + g_Player.scale_y;
+	}
+	else if (player1POr2P == PLAYER2P) {
+		arrayToCheckRightCollision2P[0] = oldPlayer2P.y;
+		arrayToCheckRightCollision2P[1] = oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 1;
+		arrayToCheckRightCollision2P[2] = oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 2;
+		arrayToCheckRightCollision2P[3] = oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 3;
+		arrayToCheckRightCollision2P[4] = oldPlayer2P.y + (g_Player2P.scale_y);
+		arrayToCheckRightCollision2P[5] = oldPlayer2P.x + g_Player2P.scale_x;
+		arrayToCheckLeftCollision2P[0] = oldPlayer2P.y;
+		arrayToCheckLeftCollision2P[1] = oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 1;
+		arrayToCheckLeftCollision2P[2] = oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 2;
+		arrayToCheckLeftCollision2P[3] = oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 3;
+		arrayToCheckLeftCollision2P[4] = oldPlayer2P.y + (g_Player2P.scale_y);
+		arrayToCheckLeftCollision2P[5] = oldPlayer2P.x;
+		arrayToCheckTopCollision2P[0] = g_Player2P.x;
+		arrayToCheckTopCollision2P[1] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 1;
+		arrayToCheckTopCollision2P[2] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 2;
+		arrayToCheckTopCollision2P[3] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 3;
+		arrayToCheckTopCollision2P[4] = g_Player2P.x + (g_Player2P.scale_x);
+		arrayToCheckTopCollision2P[5] = oldPlayer2P.y;
+		arrayToCheckBottomCollision2P[0] = g_Player2P.x;
+		arrayToCheckBottomCollision2P[1] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 1;
+		arrayToCheckBottomCollision2P[2] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 2;
+		arrayToCheckBottomCollision2P[3] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 3;
+		arrayToCheckBottomCollision2P[4] = g_Player2P.x + (g_Player2P.scale_x);
+		arrayToCheckBottomCollision2P[5] = oldPlayer2P.y + g_Player2P.scale_y;
+	}
+}
+
+//マップ選択によってマップとの当たり判定(左右）を適応させる関数
+void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
+
+	//１Pの時
+	if (player1POr2P == PLAYER1P) {
+		//プレイヤーの左の方向にブロックがあるとき
+		if (prevFrameMovement1P < 0) {
+			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+				if (MapDataSelect == Stagedesert) {//ステージが砂漠の時
+					if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						player1PRub = WALL_LEFT;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						player1PRub = WALL_LEFT;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+				}
+				else if (MapDataSelect == StageCity) {//ステージが街の時
+					if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						player1PRub = WALL_LEFT;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						player1PRub = WALL_LEFT;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+				}
+				else if (MapDataSelect == StageForest) {//ステージが森の時
+					if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						player1PRub = WALL_LEFT;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						player1PRub = WALL_LEFT;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+				}
+			}
+		}//プレイヤーの右の方向にブロックがあるとき
+		else if (prevFrameMovement1P > 0) {
+			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+
+				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+					if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+						player1PRub = WALL_RIGHT;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+						player1PRub = WALL_RIGHT;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+				}
+				else if (mapSelectStage == StageCity) {//ステージが街の時
+					if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+						player1PRub = WALL_RIGHT;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+						player1PRub = WALL_RIGHT;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+				}
+				else if (mapSelectStage == StageForest) {//ステージが森の時
+					if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+						player1PRub = WALL_RIGHT;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+						player1PRub = WALL_RIGHT;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer1P);
+					}
+				}
+			}
+		}
+	}//２Pの時
+	else if (player1POr2P == PLAYER2P) {
+		//プレイヤーの左の方向にブロックがあるとき
+		if (prevFrameMovement2P < 0) {
+			
+			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+					if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						player2PRub = WALL_LEFT;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						player2PRub = WALL_LEFT;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+				}
+				else if (mapSelectStage == StageCity) {//ステージが街の時
+					if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						player2PRub = WALL_LEFT;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						player2PRub = WALL_LEFT;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+				}
+				else if (mapSelectStage == StageForest) {//ステージが森の時
+					if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						player2PRub = WALL_LEFT;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						player2PRub = WALL_LEFT;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+				}
+			}
+		}//プレイヤーの右の方向にブロックがあるとき
+		else if (prevFrameMovement2P > 0) {
+			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+					if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+						player2PRub = WALL_RIGHT;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+						player2PRub = WALL_RIGHT;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+				}
+				else if (mapSelectStage == StageCity) {//ステージが街の時
+					if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+						player2PRub = WALL_RIGHT;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+						player2PRub = WALL_RIGHT;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+				}
+				else if (mapSelectStage == StageForest) {//ステージが森の時
+					if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+						player2PRub = WALL_RIGHT;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+						player2PRub = WALL_RIGHT;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
+						InitStateSideCollision(itIsPlayer2P);
+					}
+				}
+			}
+		}
+	}
+}
+
+//マップ選択によってマップとの当たり判定(上下）を適応させる関数
+void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
+	if (player1POr2P == PLAYER1P) {
+		//プレイヤーの上の方向にブロックがあるとき
+		if (gravity1P > 0) {
+			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+					if (MapData01[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer1P);
+					}
+					else if (MapData01[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer1P);
+					}
+					else if (MapData01[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer1P);
+					}
+					else if (MapData01[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer1P);
+					}
+					else if (MapData01[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer1P);
+					}
+				}
+				else if (mapSelectStage == StageCity) {//ステージが街の時
+					if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer1P);
+					}
+					else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer1P);
+					}
+					else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer1P);
+					}
+					else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer1P);
+					}
+					else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer1P);
+					}
+				}
+				else if (mapSelectStage == StageForest) {//ステージが森の時
+					if (MapData03[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer1P);
+					}
+					else if (MapData03[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer1P);
+					}
+					else if (MapData03[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer1P);
+					}
+					else if (MapData03[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer1P);
+					}
+					else if (MapData03[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer1P);
+					}
+				}
+			}
+		}//プレイヤーの下の方向にブロックがあるとき
+		else if (gravity1P < 0) {
+			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+					if (MapData01[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer1P);
+						speedSlows1P = false;
+					}
+					else if (MapData01[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer1P);
+						speedSlows1P = false;
+					}
+					else if (MapData01[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer1P);
+						speedSlows1P = false;
+					}
+					else if (MapData01[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer1P);
+						speedSlows1P = true;
+					}
+					else if (MapData01[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer1P);
+						speedSlows1P = false;
+						speedRises1P = true;
+					}
+				}
+				else if (mapSelectStage == StageCity) {//ステージが街の時
+					if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer1P);
+						speedSlows1P = false;
+					}
+					else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer1P);
+						speedSlows1P = false;
+					}
+					else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer1P);
+						speedSlows1P = false;
+					}
+					else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer1P);
+						speedSlows1P = true;
+					}
+					else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer1P);
+						speedSlows1P = false;
+						speedRises1P = true;
+					}
+				}
+				else if (mapSelectStage == StageForest) {//ステージが森の時
+					if (MapData03[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer1P);
+						speedSlows1P = false;
+					}
+					else if (MapData03[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer1P);
+						speedSlows1P = false;
+					}
+					else if (MapData03[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer1P);
+						speedSlows1P = false;
+					}
+					else if (MapData03[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer1P);
+						speedSlows1P = true;
+					}
+					else if (MapData03[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer1P);
+						speedSlows1P = false;
+						speedRises1P = true;
+					}
+				}
+			}
+		}
+
+	}
+	else if (player1POr2P == PLAYER2P) {
+		if (gravity2P > 0) {
+			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+					if (MapData01[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer2P);
+					}
+					else if (MapData01[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer2P);
+					}
+					else if (MapData01[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer2P);
+					}
+					else if (MapData01[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer2P);
+					}
+					else if (MapData01[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer2P);
+					}
+				}
+				else if (mapSelectStage == StageCity) {//ステージが街の時
+					if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer2P);
+					}
+					else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer2P);
+					}
+					else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer2P);
+					}
+					else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer2P);
+					}
+					else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer2P);
+					}
+				}
+				else if (mapSelectStage == StageForest) {//ステージが森の時
+					if (MapData03[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer2P);
+					}
+					else if (MapData03[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer2P);
+					}
+					else if (MapData03[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer2P);
+					}
+					else if (MapData03[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer2P);
+					}
+					else if (MapData03[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+						InitStateTopCollision(itIsPlayer2P);
+					}
+				}
+			}
+		}//プレイヤーの下の方向にブロックがあるとき
+		else if (gravity2P < 0) {
+			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+					if (MapData01[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer2P);
+						speedSlows2P = false;
+					}
+					else if (MapData01[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer2P);
+						speedSlows2P = false;
+					}
+					else if (MapData01[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer2P);
+						speedSlows2P = false;
+					}
+					else if (MapData01[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer2P);
+						speedSlows2P = true;
+					}
+					else if (MapData01[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer2P);
+						speedRises2P = true;
+						speedSlows2P = false;
+					}
+				}
+				else if (mapSelectStage == StageCity) {//ステージが街の時
+					if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer2P);
+						speedSlows2P = false;
+					}
+					else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer2P);
+						speedSlows2P = false;
+					}
+					else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer2P);
+						speedSlows2P = false;
+					}
+					else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer2P);
+						speedSlows2P = true;
+					}
+					else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer2P);
+						speedRises2P = true;
+						speedSlows2P = false;
+					}
+				}
+				else if (mapSelectStage == StageForest) {//ステージが森の時
+					if (MapData03[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer2P);
+						speedSlows2P = false;
+					}
+					else if (MapData03[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer2P);
+						speedSlows2P = false;
+					}
+					else if (MapData03[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer2P);
+						speedSlows2P = false;
+					}
+					else if (MapData03[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer2P);
+						speedSlows2P = true;
+					}
+					else if (MapData03[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+						InitStateBottomCollision(itIsPlayer2P);
+						speedRises2P = true;
+						speedSlows2P = false;
+					}
+				}
+			}
+		}
+
+	}
+}
+
 //プレイヤーとマップの当たり判定を行う関数
 void CheckWheterTheHit()
 {
 	//１Pの当たり判定
-	float arrayToCheckRightCollision1P[6] = { oldPlayer1P.y, oldPlayer1P.y + ((g_Player.scale_y) / 4) * 1, oldPlayer1P.y + ((g_Player.scale_y) / 4) * 2, oldPlayer1P.y + ((g_Player.scale_y) / 4) * 3, oldPlayer1P.y + g_Player.scale_y,oldPlayer1P.x + g_Player.scale_x };
-	float arrayToCheckLeftCollision1P[6] = { oldPlayer1P.y, oldPlayer1P.y + ((g_Player.scale_y) / 4) * 1, oldPlayer1P.y + ((g_Player.scale_y) / 4) * 2, oldPlayer1P.y + ((g_Player.scale_y) / 4) * 3, oldPlayer1P.y + g_Player.scale_y, oldPlayer1P.x};	
 	sabun1P.x = g_Player.x - oldPlayer1P.x;//sabun1P.xがプラスの値ならプラスの方向に進んだということ
 	sabun1P.y = g_Player.y - oldPlayer1P.y;//sabun1P.yがプラスの値ならプラスの方向に進んだということ
-	//プレイヤーの左の方向にブロックがあるとき
-	if (prevFrameMovement1P < 0) {
-		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
-				g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
-				player1PRub = WALL_LEFT;
-				InitStateSideCollision(itIsPlayer1P);
-			}
-			else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
-				g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
-				player1PRub = WALL_LEFT;
-				InitStateSideCollision(itIsPlayer1P);
-			}
-			else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY )/ CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
-				g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
-				InitStateSideCollision(itIsPlayer1P);
-			}
-			else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
-				g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
-				InitStateSideCollision(itIsPlayer1P);
-			}
-			else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
-				g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
-				InitStateSideCollision(itIsPlayer1P);
-			}
-		}
-	}//プレイヤーの右の方向にブロックがあるとき
-	else if (prevFrameMovement1P > 0) {
-		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
-				g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x +(int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
-				player1PRub = WALL_RIGHT;
-				InitStateSideCollision(itIsPlayer1P);
-			} 
-			else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
-				g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
-				player1PRub = WALL_RIGHT;
-				InitStateSideCollision(itIsPlayer1P);
-			}
-			else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
-				g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x +(int)movementStageX) / CELL_SIZE) * CELL_SIZE -1 - g_Player.scale_x - (int)movementStageX;
-				InitStateSideCollision(itIsPlayer1P);
-			}
-			else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
-				g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
-				InitStateSideCollision(itIsPlayer1P);
-			}
-			else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
-				g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
-				InitStateSideCollision(itIsPlayer1P);
-			}
-		}
-	}
-	float arrayToCheckTopCollision1P[6] = { g_Player.x, g_Player.x + ((g_Player.scale_x) / 4) * 1, g_Player.x + ((g_Player.scale_x) / 4) * 2, g_Player.x + ((g_Player.scale_x) / 4) * 3, g_Player.x + g_Player.scale_x, oldPlayer1P.y };
-	float arrayToCheckBottomCollision1P[6] = { g_Player.x, g_Player.x + ((g_Player.scale_x) / 4) * 1, g_Player.x + ((g_Player.scale_x) / 4) * 2, g_Player.x + ((g_Player.scale_x) / 4) * 3, g_Player.x + g_Player.scale_x, oldPlayer1P.y + g_Player.scale_y };
-	//プレイヤーの上の方向にブロックがあるとき
-	if (gravity1P > 0) {
-		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
-				g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
-				InitStateTopCollision(itIsPlayer1P);
-			}
-			else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
-				g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
-				InitStateTopCollision(itIsPlayer1P);
-			}
-			else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
-				g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
-				InitStateTopCollision(itIsPlayer1P);
-			}
-			else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
-				g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
-				InitStateTopCollision(itIsPlayer1P);
-			}
-			else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
-				g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
-				InitStateTopCollision(itIsPlayer1P);
-			}
-		}
-	}//プレイヤーの下の方向にブロックがあるとき
-	else if (gravity1P < 0) {
-		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
-				g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE ) * CELL_SIZE -1 - g_Player.scale_y - (int)movementStageY;
-				InitStateBottomCollision(itIsPlayer1P);
-				speedSlows1P = false;
-			}
-			else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
-				g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
-				InitStateBottomCollision(itIsPlayer1P);
-				speedSlows1P = false;
-			}
-			else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
-				g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
-				InitStateBottomCollision(itIsPlayer1P);
-				speedSlows1P = false;
-			}
-			else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
-				g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
-				InitStateBottomCollision(itIsPlayer1P);
-				speedSlows1P = true;
-			}
-			else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
-				g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
-				InitStateBottomCollision(itIsPlayer1P);
-				speedSlows1P = false;
-				speedRises1P = true;
-			}
-		}
-	}
+	//プレイヤーの左右の当たり判定
+	InitPlayerCollisionPoint(itIsPlayer1P);
+	AdaptPlayerCollisionRLToMap(MapDataSelect, itIsPlayer1P);
+	//プレイヤーの上下の当たり判定
+	InitPlayerCollisionPoint(itIsPlayer1P);
+	AdaptPlayerCollisionTBToMap(MapDataSelect, itIsPlayer1P);
 	//プレイヤー1の壁ジャンプのためのフラグ確認
 	//左1ピクセルずらしたところが2番の壁ならフラグをオンのまま、それ以外ならフラグをオフにする
 	if (player1PRub == WALL_LEFT) {
@@ -1041,120 +1639,14 @@ void CheckWheterTheHit()
 	}
 
 	//2Pの当たり判定
-	float arrayToCheckRightCollision2P[6] = { oldPlayer2P.y, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 1, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 2, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 3, oldPlayer2P.y + g_Player2P.scale_y,oldPlayer2P.x + g_Player2P.scale_x };
-	float arrayToCheckLeftCollision2P[6] = { oldPlayer2P.y, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 1, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 2, oldPlayer2P.y + ((g_Player2P.scale_y) / 4) * 3, oldPlayer2P.y + g_Player2P.scale_y, oldPlayer2P.x };
 	sabun2P.x = g_Player2P.x - oldPlayer2P.x;//sabun2P.xがプラスの値ならプラスの方向に進んだということ
-	sabun2P.y = g_Player2P.y - oldPlayer2P.y;//sabun2P.yがプラスの値ならプラスの方向に進んだということ					  
-	//プレイヤーの左の方向にブロックがあるとき
-	if (prevFrameMovement2P < 0) {
-		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
-				g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
-				player2PRub = WALL_LEFT;
-				InitStateSideCollision(itIsPlayer2P);
-			}
-			else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
-				g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
-				player2PRub = WALL_LEFT;
-				InitStateSideCollision(itIsPlayer2P);
-			}
-			else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
-				g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
-				InitStateSideCollision(itIsPlayer2P);
-			}
-			else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
-				g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
-				InitStateSideCollision(itIsPlayer2P);
-			}
-			else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
-				g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
-				InitStateSideCollision(itIsPlayer2P);
-			}
-		}
-	}//プレイヤーの右の方向にブロックがあるとき
-	else if (prevFrameMovement2P > 0) {
-		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
-				g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
-				player2PRub = WALL_RIGHT;
-				InitStateSideCollision(itIsPlayer2P);
-			}
-			else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
-				g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
-				player2PRub = WALL_RIGHT;
-				InitStateSideCollision(itIsPlayer2P);
-			}
-			else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
-				g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
-				InitStateSideCollision(itIsPlayer2P);
-			}
-			else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
-				g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
-				InitStateSideCollision(itIsPlayer2P);
-			}
-			else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
-				g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
-				InitStateSideCollision(itIsPlayer2P);
-			}
-		}
-	}
-	float arrayToCheckTopCollision2P[6] = { g_Player2P.x, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 1, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 2, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 3, g_Player2P.x + g_Player2P.scale_x, oldPlayer2P.y };
-	float arrayToCheckBottomCollision2P[6] = { g_Player2P.x, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 1, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 2, g_Player2P.x + ((g_Player2P.scale_x) / 4) * 3, g_Player2P.x + g_Player2P.scale_x, oldPlayer2P.y + g_Player2P.scale_y };
-	//プレイヤーの上の方向にブロックがあるとき
-	if (gravity2P > 0) {
-		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
-				g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
-				InitStateTopCollision(itIsPlayer2P);
-			}
-			else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
-				g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
-				InitStateTopCollision(itIsPlayer2P);
-			}
-			else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
-				g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
-				InitStateTopCollision(itIsPlayer2P);
-			}
-			else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
-				g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
-				InitStateTopCollision(itIsPlayer2P);
-			}
-			else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
-				g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
-				InitStateTopCollision(itIsPlayer2P);
-			}
-		}
-	}//プレイヤーの下の方向にブロックがあるとき
-	else if (gravity2P < 0) {
-		for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-			if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
-				g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
-				InitStateBottomCollision(itIsPlayer2P);
-				speedSlows2P = false;
-			}
-			else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
-				g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
-				InitStateBottomCollision(itIsPlayer2P);
-				speedSlows2P = false;
-			}
-			else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
-				g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
-				InitStateBottomCollision(itIsPlayer2P);
-				speedSlows2P = false;
-			}
-			else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
-				g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
-				InitStateBottomCollision(itIsPlayer2P);
-				speedSlows2P = true;
-			}
-			else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
-				g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
-				InitStateBottomCollision(itIsPlayer2P);
-				speedRises2P = true;
-				speedSlows2P = false;
-			}
-		}
-	}
+	sabun2P.y = g_Player2P.y - oldPlayer2P.y;//sabun2P.yがプラスの値ならプラスの方向に進んだということ	
+	//プレイヤーの左右の当たり判定を行う
+	InitPlayerCollisionPoint(itIsPlayer2P);
+	AdaptPlayerCollisionRLToMap(MapDataSelect, itIsPlayer2P);
+	//プレイヤーの上下の当たり判定を行う
+	InitPlayerCollisionPoint(itIsPlayer2P);
+	AdaptPlayerCollisionTBToMap(MapDataSelect, itIsPlayer2P);
 	//プレイヤー2の壁ジャンプのためのフラグ確認
 	//左1ピクセルずらしたところが2番の壁ならフラグをオンのまま、それ以外ならフラグをオフにする
 	if (player2PRub == WALL_LEFT) {

@@ -22,10 +22,12 @@
 #define SAFE_RELEASE(p) {if(p){(p)->Release(); (p)=NULL;}}
 
 #define FRAME 30 //一秒間何フレームか
-#define MAP_01_HEIGHT	150 
-#define MAP_01_WIDTH	300
-#define MAP_02_HEIGHT	35
+#define MAP_01_HEIGHT	50
+#define MAP_01_WIDTH	150
+#define MAP_02_HEIGHT	50
 #define MAP_02_WIDTH	150
+#define MAP_03_HEIGHT	50
+#define MAP_03_WIDTH	150
 #define CELL_SIZE 32 //マップチップのマスの幅
 #define FIELD_LEFT 0 //マップ
 #define FIELD_TOP  0 //
@@ -49,6 +51,13 @@ enum TEXTURE//テクスチャの選別に使う
 	TITLE_LOGO_TEX,
 	TITLE_BOTTON_TEX,
 	StageSelect_BKG_TEX,
+	StageSelect_BKG_SABAKU_TEX,
+	StageSelect_SABAKU_TEX,
+	StageSelect_BKG_MATI_TEX,
+	StageSelect_MATI_TEX,
+	StageSelect_BKG_MORI_TEX,
+	StageSelect_MORI_TEX,
+	StageSelectFrame_TEX,
 	GAME_BKG_TEX,
 	GAME_PLAYER_TEX,
 	GAME_PLAYER1P_STATE_SPACE_TEX,
@@ -115,6 +124,20 @@ enum PAD
 	PADMAX
 };
 
+enum
+{
+	stageSelectdesert,//砂漠
+	stageSelectCity,//街
+	stageSelectForest,//森
+};
+
+enum
+{
+	Stagedesert,
+	StageCity,
+	StageForest,
+};
+
 typedef struct {
 	bool up;
 	bool down;
@@ -145,8 +168,11 @@ extern IDirect3DDevice9*	  g_pD3Device;//描画に必要
 extern LPDIRECTINPUTDEVICE8 pKeyDevice;//キー入力に必要
 extern LPD3DXFONT g_pFont[FONTMAX];//フォントに必要
 extern RECT debugFont;
-extern int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];
-extern int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];
+extern int MapDataSelect;//この変数の値を変えることによってステージを変える
+extern int StageSelect;//ステージセレクトのカーソルの変数
+extern int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];//砂漠
+extern int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];//街
+extern int MapData03[MAP_03_HEIGHT][MAP_03_WIDTH];//森
 extern bool firstTime;//ゲームシーンの初期化をはじめだけ行うためのフラグを管理する変数
 extern int scene;//シーン切り替えのための変数
 extern SoundLib::SoundsManager soundsManager;

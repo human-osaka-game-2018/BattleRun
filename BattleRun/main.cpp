@@ -24,8 +24,10 @@ LPD3DXFONT g_pFont[FONTMAX];//DXフォント
 
 RECT debugFont;
 int scene = TEAMLOGO_SCENE;
-int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];
-int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];
+int MapDataSelect;//マップを選ぶのに使うための変数
+int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];//砂漠
+int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];//街
+int MapData03[MAP_03_HEIGHT][MAP_03_WIDTH];//森
 SoundLib::SoundsManager soundsManager;
 
 PadState g_Pad1P, g_Pad2P;
@@ -96,10 +98,40 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/game_player.png",
 		&g_pTexture[GAME_PLAYER_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/StageSelectBKG.png",
 		&g_pTexture[StageSelect_BKG_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/sabaku.jpg",
+		&g_pTexture[StageSelect_BKG_SABAKU_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/selectsabaku.png",
+		&g_pTexture[StageSelect_SABAKU_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/mori.png",
+		&g_pTexture[StageSelect_BKG_MORI_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/selectmori.png",
+		&g_pTexture[StageSelect_MORI_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/mati.jpg",
+		&g_pTexture[StageSelect_BKG_MATI_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/selectmati.png",
+		&g_pTexture[StageSelect_MATI_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/Selectframe.png",
+		&g_pTexture[StageSelectFrame_TEX]);
 		
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
@@ -451,8 +483,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	//マップ、テクスチャの読み込みの処理群
 	ReadTexture();
-	ReadMapData("csv/BigField.csv", &MapData01[0][0], MAP_01_WIDTH);
-	ReadMapData("csv/Book2.csv", &MapData02[0][0], MAP_02_WIDTH);
+	//ReadMapData("csv/BigField.csv", &MapData01[0][0], MAP_01_WIDTH);
+	
+	ReadMapData("csv/BigField1.csv", &MapData01[0][0], MAP_01_WIDTH);//砂漠
+	ReadMapData("csv/BigField2.csv", &MapData02[0][0], MAP_02_WIDTH);//街
+	ReadMapData("csv/BigField3.csv", &MapData03[0][0], MAP_03_WIDTH);//森
+
 
 	DWORD SyncOld = timeGetTime();	//	システム時間を取得
 	DWORD SyncNow;

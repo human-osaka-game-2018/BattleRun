@@ -7,10 +7,13 @@ int trampolinecount = 0;//マップに何個のトランポリンがあるか数える変数
 int manholecount = 0;//マップに何個のマンホールがあるか数える変数
 int goalCount = 0;//マップに何個のゴールがあるかを数える変数
 int itemboxcount = 0;
-OBJECT_POSITION trampoline[10];//トランポリンの座標を保存する構造体配列、10個まで
-OBJECT_POSITION manhole[10];//マンホールの座標を保存する構造体配列
-OBJECT_POSITION itembox[10];
-OBJECT_POSITION goal[35];//ゴールの座標を保存する構造体配列、10個まで
+int MapSelected;//選ばれたマップのマスの値を代入する変数
+int MapSelectedHEIGHT;//選ばれたマップの縦幅を代入する変数
+int MapSelectedWIDTH;//選ばれたマップの横幅を代入する変数
+OBJECT_POSITION trampoline[30];//トランポリンの座標を保存する構造体配列、10個まで
+OBJECT_POSITION manhole[30];//マンホールの座標を保存する構造体配列
+OBJECT_POSITION itembox[30];
+OBJECT_POSITION goal[50];//ゴールの座標を保存する構造体配列、10個まで
 
 //描画処理
 void GameRender(void)
@@ -115,12 +118,38 @@ void GameRender(void)
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer2P, sizeof(CUSTOMVERTEX));
 
 	//マップチップの表示
-	for (int j = 0; j <MAP_02_HEIGHT; j++) {
-		for (int i = 0; i < MAP_02_WIDTH; i++) {
+	if (MapDataSelect == Stagedesert) {
+		MapSelectedHEIGHT = MAP_01_HEIGHT;
+		MapSelectedWIDTH = MAP_01_WIDTH;
+	}
+	if (MapDataSelect == StageCity) {
+		MapSelectedHEIGHT = MAP_02_HEIGHT;
+		MapSelectedWIDTH = MAP_02_WIDTH;
+	}
+	if (MapDataSelect == StageForest) {
+		MapSelectedHEIGHT = MAP_03_HEIGHT;
+		MapSelectedWIDTH = MAP_03_WIDTH;
+	}
+	for (int j = 0; j < MapSelectedHEIGHT; j++) {
+		for (int i = 0; i < MapSelectedWIDTH; i++) {
 
-			if (MapData02[j][i] == 0)
-			{
-				continue;
+			if (MapDataSelect == Stagedesert) {
+				if (MapData01[j][i] == 0)
+				{
+					continue;
+				}
+			}
+			if (MapDataSelect == StageCity) {
+				if (MapData02[j][i] == 0)
+				{
+					continue;
+				}
+			}
+			if (MapDataSelect == StageForest) {
+				if (MapData03[j][i] == 0)
+				{
+					continue;
+				}
 			}
 
 			int left = FIELD_LEFT + CELL_SIZE * i - movementStageX;
@@ -134,7 +163,16 @@ void GameRender(void)
 			CELL[3].x = left;
 			CELL[3].y = top + CELL_SIZE;
 
-			switch (MapData02[j][i]) {
+			if (MapDataSelect == Stagedesert) {
+				MapSelected = MapData01[j][i];
+			}
+			if (MapDataSelect == StageCity) {
+				MapSelected = MapData02[j][i];
+			}
+			if (MapDataSelect == StageForest) {
+				MapSelected = MapData03[j][i];
+			}
+			switch (MapSelected) {
 
 			case GROUND_BLOCK:
 				TextureID = GROUND_BLOCK_TEX;
