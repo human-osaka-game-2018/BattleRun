@@ -40,6 +40,9 @@ enum SCENE//シーンの遷移に使う
 {
 	TEAMLOGO_SCENE,
 	TITLE_SCENE,
+	RULE_SCENE,
+	RULE_RULE_SCENE,
+	RULE_ITEM_SCENE,
 	STAGESELECT_SCENE,
 	//TUTORIAL_SCENE,
 	GAME_SCENE,
@@ -60,6 +63,13 @@ enum TEXTURE//テクスチャの選別に使う
 	TITLE_BKG_TEX,
 	TITLE_LOGO_TEX,
 	TITLE_BOTTON_TEX,
+	RuleSelect_BKG_TEX,
+	RuleSelect_TEX,
+	RuleSelect_mark_TEX,
+	RuleDscription1_TEX,
+	RuleDscription2_TEX,
+	ItemDscription1_TEX,
+	ItemDscription2_TEX,
 	StageSelect_BKG_TEX,
 	StageSelect_BKG_SABAKU_TEX,
 	StageSelect_SABAKU_TEX,
@@ -140,6 +150,20 @@ enum PAD
 	PADMAX
 };
 
+enum//ルールなどの説明
+{
+	RuleSelectRule,
+	RuleSelectItem,
+	RuleSelectGame,
+};
+
+enum//説明の選択後
+{
+	RuleDscriptionRule,
+	RuleDscriptionItem,
+};
+
+
 enum
 {
 	stageSelectdesert,//砂漠
@@ -186,6 +210,9 @@ extern LPD3DXFONT g_pFont[FONTMAX];//フォントに必要
 extern RECT debugFont;
 extern int MapDataSelect;//この変数の値を変えることによってステージを変える
 extern int StageSelect;//ステージセレクトのカーソルの変数
+extern int RuleSelect;
+extern int RuleDscription;
+extern int page;
 extern int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];//砂漠
 extern int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];//街
 extern int MapData03[MAP_03_HEIGHT][MAP_03_WIDTH];//森

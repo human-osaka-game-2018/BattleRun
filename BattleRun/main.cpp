@@ -3,6 +3,8 @@
 #include"TEAMLOGO_Render.h"
 #include"TITLE_Control.h"
 #include"TITLE_Render.h"
+#include"RULE_Control.h"
+#include"RULE_Render.h"
 #include"STAGESELECT_Control.h"
 #include"STAGESELECT_Render.h"
 #include"GAME_Control.h"
@@ -89,6 +91,34 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/title_botton.png",
 		&g_pTexture[TITLE_BOTTON_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"RuleSelectBKG.jpg",
+		&g_pTexture[RuleSelect_BKG_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"RuleSelect.png",
+		&g_pTexture[RuleSelect_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"RuleSelect–îˆó.png",
+		&g_pTexture[RuleSelect_mark_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"RuleDscription1.png",
+		&g_pTexture[RuleDscription1_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"RuleDscription2.png",
+		&g_pTexture[RuleDscription2_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"ItemDscription1.png",
+		&g_pTexture[ItemDscription1_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"ItemDscription2.png",
+		&g_pTexture[ItemDscription2_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
@@ -546,6 +576,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				case TITLE_SCENE:
 					TitleControl();
 					TitleRender();
+					break;
+				case RULE_SCENE:
+					RuleControl();
+					RuleRender();
+					break;
+				case RULE_RULE_SCENE:
+					RuleControlRule();
+					RuleRenderRule();
+					break;
+				case RULE_ITEM_SCENE:
+					RuleControlItem();
+					RuleRenderItem();
 					break;
 				case STAGESELECT_SCENE:
 					StageselectControl();
