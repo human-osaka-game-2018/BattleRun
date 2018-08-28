@@ -48,6 +48,7 @@ extern OBJECT_STATE g_Player;
 extern OBJECT_STATE g_Player2P;
 extern OBJECT_STATE g_CountDownNum;
 extern OBJECT_STATE g_Trampoline;
+extern OBJECT_STATE g_TrampolineLeft;
 extern OBJECT_STATE g_Manhole;
 extern OBJECT_STATE g_Itembox;
 extern OBJECT_STATE g_Goal;

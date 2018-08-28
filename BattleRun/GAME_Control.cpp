@@ -129,6 +129,7 @@ OBJECT_STATE g_SecondItem1P = { 310.f,760.f,70.f,70.f };
 OBJECT_STATE g_FirstItem2P = { 930.f,760.f,70.f,70.f };
 OBJECT_STATE g_SecondItem2P = { 1010.f,760.f,70.f,70.f };
 OBJECT_STATE g_Trampoline;
+OBJECT_STATE g_TrampolineLeft;
 OBJECT_STATE g_Manhole;
 OBJECT_STATE g_Itembox;
 OBJECT_STATE g_Goal;
@@ -243,6 +244,7 @@ void InitState() {
 		g_Player2P = { 100.f,400.f,30.f,50.f };
 		g_CountDownNum = { 600.f,300.f,200.f,200.f };
 		g_Trampoline = { 0.f,0.f,96.f,64.f };
+		g_TrampolineLeft = { 0.f,0.f,32.f,96.f };
 		g_Manhole = { 0.f,0.f,32.f,64.f };
 		g_Itembox = { 0.f,0.f,64.f,64.f };
 		g_Goal = { 0.f,0.f,32.f,32.f };
@@ -629,6 +631,7 @@ void UseItem(int Player) {
 		break;
 	}
 }
+
 //キー入力を受け付け、キーに応じた処理を行う関数
 void CheckKey() {
 
@@ -655,6 +658,7 @@ void CheckKey() {
 			}
 
 		}
+
 		//UPを入力した直後だけジャンプのフラグをオンにする処理
 		if (diks[DIK_UP] & 0x80 && !prevKey[DIK_UP] || g_Pad2P.up && !prevPad[PadUP2P])
 		{
@@ -670,17 +674,6 @@ void CheckKey() {
 				wallJump2PFlag = true;
 			}
 		}
-
-		/*if (diks[DIK_S] & 0x80)
-		{
-			g_Player.y += MOVE_SPEED;
-		}*/
-
-		/*if (diks[DIK_DOWN] & 0x80)
-		{
-			g_Player2P.y += MOVE_SPEED;
-		}*/
-
 
 		if (diks[DIK_A] & 0x80 || g_Pad1P.left)
 		{
@@ -1004,16 +997,6 @@ void CheckKey() {
 				}
 			}
 		}
-		if (diks[DIK_Q] & 0x80 && !prevKey[DIK_Q] && FirstItem1P) {
-			
-			UseItem(PLAYER1);
-		}
-
-		if (diks[DIK_RCONTROL] & 0x80 && !prevKey[DIK_RCONTROL] && FirstItem2P) {
-			
-			UseItem(PLAYER2);
-		}
-
 
 		if (diks[DIK_Q] & 0x80 && !prevKey[DIK_Q] && FirstItem1P) {
 			
@@ -1123,6 +1106,18 @@ void CreatePerDecision(void) {
 		bool isSuccess = soundsManager.Start(_T("gameTrampoline2"));
 	}
 
+	//トランポリン(右側)の処理
+	if (PlayerDecision(trampolineleftcount, trampolineleft, g_TrampolineLeft, g_Player)) {
+		time1P = 0;
+		syosokudo1P = TRAMPOLINE_SYOSOKUDO;
+		bool isSuccess = soundsManager.Start(_T("gameTrampoline"));
+	}
+	if (PlayerDecision(trampolineleftcount, trampolineleft, g_TrampolineLeft, g_Player2P)) {
+		time2P = 0;
+		syosokudo2P = TRAMPOLINE_SYOSOKUDO;
+		bool isSuccess = soundsManager.Start(_T("gameTrampoline2"));
+	}
+
 	//マンホールの処理
 	if (PlayerDecision(manholecount, manhole, g_Manhole, g_Player)) {
 		g_Player.y = 100;
@@ -1174,6 +1169,7 @@ void CreatePerDecision(void) {
 	}
 
 	trampolinecount = 0;
+	trampolineleftcount = 0;
 	manholecount = 0;
 	itemboxcount = 0;
 	goalCount = 0;

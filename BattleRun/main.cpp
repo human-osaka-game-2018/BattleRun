@@ -229,6 +229,11 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
+		"texture/trampolineleft.png",
+		&g_pTexture[TRAMPOLINE_LEFT_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
 		"texture/hole.png",
 		&g_pTexture[MANHOLE_TEX]);
 

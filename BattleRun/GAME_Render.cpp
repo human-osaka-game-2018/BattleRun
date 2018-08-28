@@ -3,6 +3,7 @@
 #include"GAME_Render.h"
 
 int trampolinecount = 0;//マップに何個のトランポリンがあるか数える変数
+int trampolineleftcount = 0;
 int manholecount = 0;//マップに何個のマンホールがあるか数える変数
 int goalCount = 0;//マップに何個のゴールがあるかを数える変数
 int itemboxcount = 0;
@@ -11,6 +12,7 @@ int MapSelected;//選ばれたマップのマスの値を代入する変数
 int MapSelectedHEIGHT;//選ばれたマップの縦幅を代入する変数
 int MapSelectedWIDTH;//選ばれたマップの横幅を代入する変数
 OBJECT_POSITION trampoline[30];//トランポリンの座標を保存する構造体配列、10個まで
+OBJECT_POSITION trampolineleft[30];
 OBJECT_POSITION manhole[30];//マンホールの座標を保存する構造体配列
 OBJECT_POSITION itembox[30];
 OBJECT_POSITION goal[50];//ゴールの座標を保存する構造体配列、10個まで
@@ -270,6 +272,18 @@ void GameRender(void)
 				CELL[3].y = top + (g_Trampoline.scale_y / 2);
 				trampolinecount++;
 				break;
+			case TRAMPOLINE_LEFT_BLOCK:
+				TextureID = TRAMPOLINE_LEFT_TEX;
+				CELL[0].x = trampolineleft[trampolineleftcount].x = left - (g_TrampolineLeft.scale_x / 2);
+				CELL[0].y = trampolineleft[trampolineleftcount].y = top - (g_TrampolineLeft.scale_y / 2);
+				CELL[1].x = left + (g_TrampolineLeft.scale_x / 2);
+				CELL[1].y = top - (g_TrampolineLeft.scale_y / 2);
+				CELL[2].x = left + (g_TrampolineLeft.scale_x / 2);
+				CELL[2].y = top + (g_TrampolineLeft.scale_y / 2);
+				CELL[3].x = left - (g_TrampolineLeft.scale_x / 2);
+				CELL[3].y = top + (g_TrampolineLeft.scale_y / 2);
+				trampolineleftcount++;
+				break;
 			case MANHOLE_BLOCK:
 				TextureID = MANHOLE_TEX;
 				CELL[0].x = manhole[manholecount].x = left - (g_Manhole.scale_x / 2);
@@ -285,10 +299,10 @@ void GameRender(void)
 			case ITEMBOX_BLOCK:
 				TextureID = ITEMBOX_TEX;
 				CELL[0].x = itembox[itemboxcount].x = left - (g_Itembox.scale_x / 2);
-				CELL[0].y = itembox[itemboxcount].y = top - (g_Itembox.scale_y/2);
-				CELL[1].x = left + (g_Itembox.scale_x/2);	
-				CELL[1].y = top - (g_Itembox.scale_y/2);
-				CELL[2].x = left + (g_Itembox.scale_x/2);
+				CELL[0].y = itembox[itemboxcount].y = top - (g_Itembox.scale_y / 2);
+				CELL[1].x = left + (g_Itembox.scale_x / 2);
+				CELL[1].y = top - (g_Itembox.scale_y / 2);
+				CELL[2].x = left + (g_Itembox.scale_x / 2);
 				CELL[2].y = top + (g_Itembox.scale_y / 2);
 				CELL[3].x = left - (g_Itembox.scale_x / 2);
 				CELL[3].y = top + (g_Itembox.scale_y / 2);
@@ -390,7 +404,7 @@ void GameRender(void)
 	//RECT player1P;
 	//player1P.left = 100;			//左上のX座標
 	//player1P.top = 770;			//左上のY座標
-	//player1P.right = 800;		//右下のX座標
+	//player1P.right = 800;			//右下のX座標
 	//player1P.bottom = 900;		//右下のY座標
 
 	//char arrayToShowPlayer1P[3] = "1P";
