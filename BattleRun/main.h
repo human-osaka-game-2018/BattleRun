@@ -6,6 +6,7 @@
 #include <XInput.h>
 #include <math.h>
 #include <stdio.h>
+#include <time.h>
 #include "../Debug_x86/Debug_x86/Include/SoundsManager.h"
 #include "../Debug_x86/Debug_x86/Include/SoundLibCWrapper.h"
 #pragma comment(lib, "winmm.lib")
@@ -46,8 +47,15 @@ enum SCENE//シーンの遷移に使う
 	//THANKYOU_SCENE
 };
 
+enum PLAYER
+{
+	PLAYER1,
+	PLAYER2
+};
+
 enum TEXTURE//テクスチャの選別に使う
 {
+	NO_TEX,
 	TEAMLOGO_TEX,
 	TITLE_BKG_TEX,
 	TITLE_LOGO_TEX,
@@ -84,6 +92,10 @@ enum TEXTURE//テクスチャの選別に使う
 	MANHOLE_TEX,
 	GOAL_TEX,
 	ITEMBOX_TEX,
+	ITEMA_TEX,
+	ITEMB_TEX,
+	ITEMC_TEX,
+	ITEMD_TEX,
 	WIN_1P_TEX,
 	WIN_2P_TEX,
 	TEXMAX

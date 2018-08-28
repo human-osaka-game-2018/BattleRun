@@ -251,6 +251,26 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/letsGo.png",
 		&g_pTexture[COUNT_DOWN_START_TEX]);
+		
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"itema.jpg",
+		&g_pTexture[ITEMA_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"itemb.jpg",
+		&g_pTexture[ITEMB_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"itemc.jpg",
+		&g_pTexture[ITEMC_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"itemd.jpg",
+		&g_pTexture[ITEMD_TEX]);
 }
 
 

@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include"main.h"
 #include"GAME_Control.h"
 #include"GAME_Render.h"
@@ -7,6 +6,7 @@ int trampolinecount = 0;//マップに何個のトランポリンがあるか数える変数
 int manholecount = 0;//マップに何個のマンホールがあるか数える変数
 int goalCount = 0;//マップに何個のゴールがあるかを数える変数
 int itemboxcount = 0;
+int TextureID = 0;//描画のテクスチャ番号を保存する変数
 int MapSelected;//選ばれたマップのマスの値を代入する変数
 int MapSelectedHEIGHT;//選ばれたマップの縦幅を代入する変数
 int MapSelectedWIDTH;//選ばれたマップの横幅を代入する変数
@@ -15,12 +15,32 @@ OBJECT_POSITION manhole[30];//マンホールの座標を保存する構造体配列
 OBJECT_POSITION itembox[30];
 OBJECT_POSITION goal[50];//ゴールの座標を保存する構造体配列、10個まで
 
+void ItemIconRender(int ItemNumber,CUSTOMVERTEX *vertices) {
+
+	TextureID = 0;
+
+	switch (ItemNumber) {
+	case ITEMBREAK:
+		TextureID = ITEMA_TEX;
+		break;
+	case JUMPUP:
+		TextureID = ITEMB_TEX;
+		break;
+	case SPEEDUP:
+		TextureID = ITEMC_TEX;
+		break;
+	case SPEEDDOWN:
+		TextureID = ITEMD_TEX;
+		break;
+	}
+
+	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertices, sizeof(CUSTOMVERTEX));
+	
+}
 //描画処理
 void GameRender(void)
 {
-	
-	int TextureID = 0;//描画のテクスチャ番号を保存する変数
-	
 
 	CUSTOMVERTEX vertexGameBKG[4]
 	{
@@ -86,13 +106,37 @@ void GameRender(void)
 		{ 980.f,             60, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
-	//CUSTOMVERTEX  TRAMPOLINE[4]
-	//{
-	//	{ g_Trampoline.x,                                               g_Trampoline.y, 1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
-	//	{ g_Trampoline.x + g_Trampoline.scale_x,                        g_Trampoline.y, 1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f },
-	//	{ g_Trampoline.x + g_Trampoline.scale_x, g_Trampoline.y + g_Trampoline.scale_y, 1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
-	//	{ g_Trampoline.x,                        g_Trampoline.y + g_Trampoline.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
-	//};
+	CUSTOMVERTEX FIRSTITEM1P[4]
+	{
+		{ g_FirstItem1P.x,                                                 g_FirstItem1P.y, 1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ g_FirstItem1P.x + g_FirstItem1P.scale_x,                         g_FirstItem1P.y, 1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ g_FirstItem1P.x + g_FirstItem1P.scale_x, g_FirstItem1P.y + g_FirstItem1P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ g_FirstItem1P.x,                         g_FirstItem1P.y + g_FirstItem1P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+
+	CUSTOMVERTEX SECONDITEM1P[4]
+	{
+		{ g_SecondItem1P.x,                                                   g_SecondItem1P.y, 1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ g_SecondItem1P.x + g_SecondItem1P.scale_x,                          g_SecondItem1P.y, 1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ g_SecondItem1P.x + g_SecondItem1P.scale_x, g_SecondItem1P.y + g_SecondItem1P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ g_SecondItem1P.x,                          g_SecondItem1P.y + g_SecondItem1P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+
+	CUSTOMVERTEX FIRSTITEM2P[4]
+	{
+		{ g_FirstItem2P.x,                                                 g_FirstItem2P.y, 1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ g_FirstItem2P.x + g_FirstItem2P.scale_x,                         g_FirstItem2P.y, 1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ g_FirstItem2P.x + g_FirstItem2P.scale_x, g_FirstItem2P.y + g_FirstItem2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ g_FirstItem2P.x,                         g_FirstItem2P.y + g_FirstItem2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+
+	CUSTOMVERTEX SECONDITEM2P[4]
+	{
+		{ g_SecondItem2P.x,                                                   g_SecondItem2P.y, 1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ g_SecondItem2P.x + g_SecondItem2P.scale_x,                          g_SecondItem2P.y, 1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ g_SecondItem2P.x + g_SecondItem2P.scale_x, g_SecondItem2P.y + g_SecondItem2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ g_SecondItem2P.x,                          g_SecondItem2P.y + g_SecondItem2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
 
 	//画面の消去
 	g_pD3Device->Clear(
@@ -310,6 +354,11 @@ void GameRender(void)
 	}
 	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexCountNum, sizeof(CUSTOMVERTEX));
+
+	ItemIconRender(FirstItem1P, FIRSTITEM1P);
+	ItemIconRender(SecondItem1P, SECONDITEM1P);
+	ItemIconRender(FirstItem2P, FIRSTITEM2P);
+	ItemIconRender(SecondItem2P, SECONDITEM2P);
 
 	//勝敗がついたら描画
 	if (gameState == FINISH) {
