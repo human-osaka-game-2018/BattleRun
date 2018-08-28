@@ -58,6 +58,7 @@ void StageselectControl()
 					MapDataSelect = StageForest;
 				}
 				scene = GAME_SCENE;
+				firstTime = true;
 			}
 		}
 		keymemorise[0] = diks[DIK_LEFT];

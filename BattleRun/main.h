@@ -4,6 +4,7 @@
 #include <d3dx9.h>
 #include <dinput.h>
 #include <XInput.h>
+#include <math.h>
 #include <stdio.h>
 #include "../Debug_x86/Debug_x86/Include/SoundsManager.h"
 #include "../Debug_x86/Debug_x86/Include/SoundLibCWrapper.h"
@@ -31,7 +32,8 @@
 #define CELL_SIZE 32 //マップチップのマスの幅
 #define FIELD_LEFT 0 //マップ
 #define FIELD_TOP  0 //
-
+#define FIRST_CHECK_POINT 50//csvでのチェックポイントの始まりの番号
+#define FINAL_CHECK_POINT 100//csvでのチェックポイントの最後の番号
 
 enum SCENE//シーンの遷移に使う
 {
@@ -62,6 +64,8 @@ enum TEXTURE//テクスチャの選別に使う
 	GAME_PLAYER_TEX,
 	GAME_PLAYER1P_STATE_SPACE_TEX,
 	GAME_PLAYER2P_STATE_SPACE_TEX,
+	GAME_RANK_ONE_TEX,
+	GAME_RANK_TWO_TEX,
 	COUNT_DOWN_START_TEX,
 	COUNT_DOWN_ONE_TEX,
 	COUNT_DOWN_TWO_TEX,

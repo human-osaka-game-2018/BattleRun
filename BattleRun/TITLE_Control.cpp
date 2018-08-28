@@ -53,7 +53,6 @@ void TitleControl() {
 			bool isSuccess2 = soundsManager.Start(_T("titleBotton"));
 			Sleep(1 * 1000);
 			scene = STAGESELECT_SCENE;
-			firstTime = true;
 		}
 	}
 }

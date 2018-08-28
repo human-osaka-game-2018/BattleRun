@@ -40,10 +40,10 @@ void GameRender(void)
 
 	CUSTOMVERTEX vertexPlayer2PStateSpace[4]
 	{
-		{ 450.f,             10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 850,               10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 850,               60, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 450.f,             60, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 550.f,             10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 950,               10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 950,               60, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 550.f,             60, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX  vertexPlayer1P[4]
@@ -68,6 +68,22 @@ void GameRender(void)
 		{ 0.f, 0.f, 1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f }, // x,yの数値は0で良い
 		{ 0.f, 0.f, 1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
 		{ 0.f, 0.f, 1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+
+	CUSTOMVERTEX vertexPlayer1PRankingSpace[4]
+	{
+		{ 430.f,      10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 520,       10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 520,       60, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 430.f,      60, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+
+	CUSTOMVERTEX vertexPlayer2PRankingSpace[4]
+	{
+		{ 980.f,             10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 1070,               10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 1070,               60, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 980.f,             60, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	//CUSTOMVERTEX  TRAMPOLINE[4]
@@ -138,16 +154,25 @@ void GameRender(void)
 				{
 					continue;
 				}
+				else if ((MapData01[j][i] >= FIRST_CHECK_POINT) && (MapData01[j][i] < FINAL_CHECK_POINT)) {
+					continue;
+				}
 			}
 			if (MapDataSelect == StageCity) {
 				if (MapData02[j][i] == 0)
 				{
 					continue;
 				}
+				else if ((MapData02[j][i] >= FIRST_CHECK_POINT) && (MapData01[j][i] < FINAL_CHECK_POINT)) {
+					continue;
+				}
 			}
 			if (MapDataSelect == StageForest) {
 				if (MapData03[j][i] == 0)
 				{
+					continue;
+				}
+				else if ((MapData02[j][i] >= FIRST_CHECK_POINT) && (MapData01[j][i] < FINAL_CHECK_POINT)) {
 					continue;
 				}
 			}
@@ -250,6 +275,18 @@ void GameRender(void)
 	g_pD3Device->SetTexture(0, g_pTexture[GAME_PLAYER2P_STATE_SPACE_TEX]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer2PStateSpace, sizeof(CUSTOMVERTEX));
 
+	if (win == PLAYER1P) {
+		g_pD3Device->SetTexture(0, g_pTexture[GAME_RANK_ONE_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer1PRankingSpace, sizeof(CUSTOMVERTEX));
+		g_pD3Device->SetTexture(0, g_pTexture[GAME_RANK_TWO_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer2PRankingSpace, sizeof(CUSTOMVERTEX));
+	}
+	else if (win == PLAYER2P) {
+		g_pD3Device->SetTexture(0, g_pTexture[GAME_RANK_ONE_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer2PRankingSpace, sizeof(CUSTOMVERTEX));
+		g_pD3Device->SetTexture(0, g_pTexture[GAME_RANK_TWO_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer1PRankingSpace, sizeof(CUSTOMVERTEX));
+	}
 	//カウントダウンの描画
 	CUSTOMVERTEX  vertexCountNum[4]
 	{

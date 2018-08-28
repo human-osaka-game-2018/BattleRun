@@ -101,6 +101,16 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
+		"texture/rankOne.png",
+		&g_pTexture[GAME_RANK_ONE_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/rankTwo.png",
+		&g_pTexture[GAME_RANK_TWO_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
 		"texture/StageSelectBKG.png",
 		&g_pTexture[StageSelect_BKG_TEX]);
 
