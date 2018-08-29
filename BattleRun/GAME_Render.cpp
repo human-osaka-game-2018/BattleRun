@@ -218,7 +218,7 @@ void GameRender(void)
 				{
 					continue;
 				}
-				else if ((MapData02[j][i] >= FIRST_CHECK_POINT) && (MapData01[j][i] < FINAL_CHECK_POINT)) {
+				else if ((MapData03[j][i] >= FIRST_CHECK_POINT) && (MapData01[j][i] < FINAL_CHECK_POINT)) {
 					continue;
 				}
 			}

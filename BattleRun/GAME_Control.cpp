@@ -85,6 +85,8 @@ int win;//どっちが勝ったか判定する変数
 int gameState;//勝敗が決まったかどうかのフラグ
 static float prevFrameMovement1P;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
 static float prevFrameMovement2P;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
+static float prevFrameStageMovementX;//キー入力によってstageが移動したX座標を毎フレーム記録する変数
+static float prevFrameStageMovementY;//キー入力によってstageが移動したY座標を毎フレーム記録する変数
 static int countDownFrame;//カウントダウンの表示をフレーム数によって管理するための変数
 static bool countDownFlag;//カウントダウンを行うためのフラグ
 static bool gameStart;//ゲームが開始したかどうかフラグ
@@ -208,6 +210,8 @@ void InitState() {
 		wallJump2PMoveLeft = false;//壁ジャンプしたときに左へ強制的に動かすためのフラグ
 		movementStageY = 0;//ステージをY座標にスクロールさせるための変数
 		movementStageX = 0;//ステージをx座標にスクロールさせるための変数
+		prevFrameStageMovementX = 0;//キー入力によってstageが移動したX座標を毎フレーム記録する変数
+		prevFrameStageMovementY = 0;//キー入力によってstageが移動したY座標を毎フレーム記録する変数
 		wallJump1PCount = 0;//壁ジャンプしてからのフレームを数える変数
 		wallJump2PCount = 0;//壁ジャンプしてからのフレームを数える変数
 		countDownARGB = 0x00FFFFFF;//カウントダウンの数字のARGBを変更する変数
@@ -221,8 +225,8 @@ void InitState() {
 		speedSlows2P = false;//スピードがダウンしているかどうかフラグ
 		speedRises1P = false;//スピードがアップしているかどうかフラグ
 		speedRises2P = false;//スピードがアップしているかどうかフラグ
-		latestCheckPoint1P = FIRST_CHECK_POINT;//順位判定を行う際に、プレイヤーがどこのチェックポイントまで進んだかを記録する変数
-		latestCheckPoint2P = FIRST_CHECK_POINT;//順位判定を行う際に、プレイヤーがどこのチェックポイントまで進んだかを記録する変数
+		latestCheckPoint1P = FIRST_CHECK_POINT - 1;//順位判定を行う際に、プレイヤーがどこのチェックポイントまで進んだかを記録する変数
+		latestCheckPoint2P = FIRST_CHECK_POINT - 1;//順位判定を行う際に、プレイヤーがどこのチェックポイントまで進んだかを記録する変数
 		distanceToCheckPoint1PX = 0;//順位判定を行う際に、プレイヤーとチェックポイントまでのXの距離を記録する変数
 		distanceToCheckPoint1PY = 0;//順位判定を行う際に、プレイヤーとチェックポイントまでのYの距離を記録する変数
 		distanceToCheckPoint2PX = 0;//順位判定を行う際に、プレイヤーとチェックポイントまでのXの距離を記録する変数
@@ -259,7 +263,6 @@ void InitState() {
 			checkPoint[hoge].x = 0;
 			checkPoint[hoge].y = 0;
 		}
-		//チェックポイントの位置を保存する処理
 		//マップが変わっても適応できる
 		if (MapDataSelect == Stagedesert) {
 			MapSelectedHEIGHT = MAP_01_HEIGHT;
@@ -273,37 +276,37 @@ void InitState() {
 			MapSelectedHEIGHT = MAP_03_HEIGHT;
 			MapSelectedWIDTH = MAP_03_WIDTH;
 		}
+		//チェックポイントの位置を保存する処理
 		for (int j = 0; j < MapSelectedHEIGHT; j++) {
 			for (int i = 0; i < MapSelectedWIDTH; i++) {
 
 				if (MapDataSelect == Stagedesert) {
 					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
 						if (MapData01[j][i] == checkPointNum) {
-							checkPoint[checkPointNum - FIRST_CHECK_POINT].x = FIELD_LEFT + CELL_SIZE * i - movementStageX;
-							checkPoint[checkPointNum - FIRST_CHECK_POINT].y = FIELD_TOP + CELL_SIZE * j - movementStageY;
+							checkPoint[checkPointNum - FIRST_CHECK_POINT].x = FIELD_LEFT + CELL_SIZE * i;
+							checkPoint[checkPointNum - FIRST_CHECK_POINT].y = FIELD_TOP + CELL_SIZE * j;
 						}
 					}
 				}
 				else if (MapDataSelect == StageCity) {
 					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
 						if (MapData02[j][i] == checkPointNum) {
-							checkPoint[checkPointNum - FIRST_CHECK_POINT].x = FIELD_LEFT + CELL_SIZE * i - movementStageX;
-							checkPoint[checkPointNum - FIRST_CHECK_POINT].y = FIELD_TOP + CELL_SIZE * j - movementStageY;
+							checkPoint[checkPointNum - FIRST_CHECK_POINT].x = FIELD_LEFT + CELL_SIZE * i;
+							checkPoint[checkPointNum - FIRST_CHECK_POINT].y = FIELD_TOP + CELL_SIZE * j;
 						}
 					}
 				}
 				else if (MapDataSelect == StageForest) {
 					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
 						if (MapData03[j][i] == checkPointNum) {
-							checkPoint[checkPointNum - FIRST_CHECK_POINT].x = FIELD_LEFT + CELL_SIZE * i - movementStageX;
-							checkPoint[checkPointNum - FIRST_CHECK_POINT].y = FIELD_TOP + CELL_SIZE * j - movementStageY;
+							checkPoint[checkPointNum - FIRST_CHECK_POINT].x = FIELD_LEFT + CELL_SIZE * i;
+							checkPoint[checkPointNum - FIRST_CHECK_POINT].y = FIELD_TOP + CELL_SIZE * j;
 						}
 					}
 				}
 
 			}
 		}
-
 
 		//二回目以降に初期化関数に入らないようにする
 		firstTime = false;
@@ -314,6 +317,21 @@ void InitState() {
 	oldPlayer2P.y = g_Player2P.y;
     prevFrameMovement1P = 0;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
 	prevFrameMovement2P = 0;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
+
+	//ステージが動くと同時に、チェックポイントもずらす処理
+	if ((movementStageX - prevFrameStageMovementX) != 0) {
+		for (int checkPointNum = (FIRST_CHECK_POINT - FIRST_CHECK_POINT); checkPointNum < (FINAL_CHECK_POINT - FIRST_CHECK_POINT); checkPointNum++) {
+			checkPoint[checkPointNum].x -= (movementStageX - prevFrameStageMovementX);
+		}
+	}
+	if ((movementStageY - prevFrameStageMovementY) != 0) {
+		for (int checkPointNum = (FIRST_CHECK_POINT - FIRST_CHECK_POINT); checkPointNum < (FINAL_CHECK_POINT - FIRST_CHECK_POINT); checkPointNum++) {
+			checkPoint[checkPointNum].y -= (movementStageY - prevFrameStageMovementY);
+		}
+	}
+	prevFrameStageMovementX = movementStageX;
+	prevFrameStageMovementY = movementStageY;
+
 }
 
 //カウントダウンを行う関数
@@ -2248,7 +2266,7 @@ void JudgePlayerRanking() {
 void PlayerExists() {
 
 	if (win == PLAYER1P) {
-		if (g_Player2P.x + g_Player2P.scale_x < 0 || g_Player2P.x > 1500 || g_Player2P.y + g_Player2P.scale_y < 0 || g_Player2P.y > 850) {
+		if (g_Player2P.x + g_Player2P.scale_x < 0 || g_Player2P.x > 1550 || g_Player2P.y + g_Player2P.scale_y < 0 || g_Player2P.y > 850) {
 			gameState = FINISH;
 			bool isSuccess = soundsManager.Start(_T("clappingSE"));
 			isSuccess = soundsManager.Start(_T("cheersSE"));
@@ -2256,7 +2274,7 @@ void PlayerExists() {
 		}
 	}
 	else if (win == PLAYER2P) {
-		if (g_Player.x + g_Player.scale_x < 0 || g_Player.x > 1500 || g_Player.y + g_Player.scale_y < 0 || g_Player.y > 850) {
+		if (g_Player.x + g_Player.scale_x < 0 || g_Player.x > 1550 || g_Player.y + g_Player.scale_y < 0 || g_Player.y > 850) {
 			gameState = FINISH;
 			bool isSuccess = soundsManager.Start(_T("clappingSE"));
 			isSuccess = soundsManager.Start(_T("cheersSE"));

@@ -12,6 +12,7 @@
 #include"RESULT_Control.h"
 #include"RESULT_Render.h"
 
+
 //Directx関係----------------------------
 LPDIRECT3DTEXTURE9	  g_pTexture[TEXMAX];	//	画像の情報を入れておく為のポインタ配列
 IDirect3DDevice9*	  g_pD3Device;		//	Direct3Dのデバイス
@@ -91,34 +92,6 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/title_botton.png",
 		&g_pTexture[TITLE_BOTTON_TEX]);
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"RuleSelectBKG.jpg",
-		&g_pTexture[RuleSelect_BKG_TEX]);
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"RuleSelect.png",
-		&g_pTexture[RuleSelect_TEX]);
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"RuleSelect矢印.png",
-		&g_pTexture[RuleSelect_mark_TEX]);
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"RuleDscription1.png",
-		&g_pTexture[RuleDscription1_TEX]);
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"RuleDscription2.png",
-		&g_pTexture[RuleDscription2_TEX]);
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"ItemDscription1.png",
-		&g_pTexture[ItemDscription1_TEX]);
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"ItemDscription2.png",
-		&g_pTexture[ItemDscription2_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
@@ -229,11 +202,6 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/trampolineleft.png",
-		&g_pTexture[TRAMPOLINE_LEFT_TEX]);
-
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
 		"texture/hole.png",
 		&g_pTexture[MANHOLE_TEX]);
 
@@ -286,7 +254,43 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/letsGo.png",
 		&g_pTexture[COUNT_DOWN_START_TEX]);
-		
+	//
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/RuleSelectBKG.png",
+		&g_pTexture[RuleSelect_BKG_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/RuleSelect.png",
+		&g_pTexture[RuleSelect_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/RuleSelect矢印.png",
+		&g_pTexture[RuleSelect_mark_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/RuleDscription1.png",
+		&g_pTexture[RuleDscription1_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/RuleDscription2.png",
+		&g_pTexture[RuleDscription2_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/ItemDscription1.png",
+		&g_pTexture[ItemDscription1_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/ItemDscription2.png",
+		&g_pTexture[ItemDscription2_TEX]);
+	
+	//
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"itema.jpg",
