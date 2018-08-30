@@ -66,6 +66,8 @@ extern float MoveImage2;
 extern float movementStageX;//ステージのXを移動させるための変数
 extern float movementStageY;//ステージのYを移動させるための変数
 extern int win;//プレイヤー勝敗の表示に使う変数
+extern int winCount1P;//1P勝ち点をカウントする変数
+extern int winCount2P;//2P勝ち点をカウントする変数
 extern int gameState;//ゲームの勝敗の表示に使うフラグ
 extern int FirstItem1P;
 extern int SecondItem1P;

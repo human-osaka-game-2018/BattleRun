@@ -8,19 +8,26 @@ void StageselectRender()
 	{
 		{ 0.f,    0.f,   1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
 	{ 1600.f, 0.f,   1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-	{ 1600.f, 1000.f,1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-	{ 0.f,    1000.f,1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	{ 1600.f, 900.f,1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+	{ 0.f,    900.f,1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+	CUSTOMVERTEX   stageSelectrandom[4]
+	{
+	{ 660.f,550.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+	{ 860.f,550.f,	  1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+	{ 860.f,750.f,	  1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+	{ 660.f,750.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 	CUSTOMVERTEX   stageSelectSabaku[4]
 	{
-		{ 260.f,300.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+	{ 260.f,300.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
 	{ 460.f,300.f,	  1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
 	{ 460.f,500.f,	  1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
 	{ 260.f,500.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 	CUSTOMVERTEX   stageSelectMati[4]
 	{
-		{ 660.f,   300.f,   1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+	{ 660.f,   300.f,   1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
 	{ 860.f,   300.f,   1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
 	{ 860.f,   500.f,	  1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
 	{ 660.f,   500.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
@@ -34,10 +41,9 @@ void StageselectRender()
 	};
 
 
-
 	//•`‰æ‚ÌŠJŽn
 	g_pD3Device->BeginScene();
-	if (StageSelect == stageSelectdesert)
+	if (StageSelect == stageSelectDesert)
 	{
 		g_pD3Device->SetTexture(0, g_pTexture[StageSelect_BKG_SABAKU_TEX]);
 		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectBKG, sizeof(CUSTOMVERTEX));
@@ -52,7 +58,15 @@ void StageselectRender()
 		g_pD3Device->SetTexture(0, g_pTexture[StageSelect_BKG_MORI_TEX]);
 		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectBKG, sizeof(CUSTOMVERTEX));
 	}
+	if (StageSelect == stageSelectRandom)
+	{
+		g_pD3Device->SetTexture(0, g_pTexture[StageSelect_BKG_RANDOM_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectBKG, sizeof(CUSTOMVERTEX));
+	}
 
+
+	g_pD3Device->SetTexture(0, g_pTexture[StageSelect_RANDOM_TEX]);
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectrandom, sizeof(CUSTOMVERTEX));
 	g_pD3Device->SetTexture(0, g_pTexture[StageSelect_SABAKU_TEX]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectSabaku, sizeof(CUSTOMVERTEX));
 	g_pD3Device->SetTexture(0, g_pTexture[StageSelect_MATI_TEX]);
@@ -62,7 +76,15 @@ void StageselectRender()
 
 	static int count = 0;
 	count++;
-	if (StageSelect == stageSelectdesert)
+	if (StageSelect == stageSelectRandom)
+	{
+		if (count <= FLASH_TIME)
+		{
+			g_pD3Device->SetTexture(0, g_pTexture[StageSelectFrame_TEX]);
+			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectrandom, sizeof(CUSTOMVERTEX));
+		}
+	}
+	if (StageSelect == stageSelectDesert)
 	{
 		if (count <= FLASH_TIME)
 		{

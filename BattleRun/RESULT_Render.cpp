@@ -2,6 +2,8 @@
 #include"RESULT_Control.h"
 #include"RESULT_Render.h"
 
+int ResultWinner;//Result1PWIN‚ÅResult2PWINŸ”s‚ð”»’f‚·‚é•Ï”
+
 //•`‰æˆ—
 void ResultRender(void)
 {
@@ -30,8 +32,16 @@ void ResultRender(void)
 	//•`‰æ‚ÌŠJŽn
 	g_pD3Device->BeginScene();
 
-	g_pD3Device->SetTexture(0, g_pTexture[RESULT_BKG_TEX]);
-	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexResultBKG, sizeof(CUSTOMVERTEX));
+	if (ResultWinner == Result1PWIN)//‚PP‚ÌŸ‚¿
+	{
+		g_pD3Device->SetTexture(0, g_pTexture[RESULT_1P_BKG_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexResultBKG, sizeof(CUSTOMVERTEX));
+	}
+	if(ResultWinner == Result2PWIN)//‚QP‚ÌŸ‚¿
+	{
+		g_pD3Device->SetTexture(0, g_pTexture[RESULT_2P_BKG_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexResultBKG, sizeof(CUSTOMVERTEX));
+	}
 
 	/*g_pD3Device->SetTexture(0, g_pTexture[GAME_PLAYER_TEX]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexResult, sizeof(CUSTOMVERTEX));*/

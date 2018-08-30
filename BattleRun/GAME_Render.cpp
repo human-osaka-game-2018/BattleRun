@@ -106,6 +106,35 @@ void GameRender(void)
 		{ 980.f,             60, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
+	CUSTOMVERTEX win1PCountFlag1[4]//1P(赤)の1勝目
+	{
+	{ 140.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+	{ 210.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+	{ 210.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+	{ 140.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+	CUSTOMVERTEX win1PCountFlag2[4]//1P(赤)の2勝目
+	{
+	{ 200.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+	{ 270.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+	{ 270.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+	{ 200.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+	CUSTOMVERTEX win2PCountFlag1[4]//2P(青)の1勝目
+	{
+	{ 660.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+	{ 730.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+	{ 730.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+	{ 660.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+	CUSTOMVERTEX win2PCountFlag2[4]//2P(青)の2勝目
+	{
+	{ 720.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+	{ 790.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+	{ 790.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+	{ 720.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+
 	CUSTOMVERTEX FIRSTITEM1P[4]
 	{
 		{ g_FirstItem1P.x,                                                 g_FirstItem1P.y, 1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
@@ -360,6 +389,27 @@ void GameRender(void)
 	ItemIconRender(FirstItem2P, FIRSTITEM2P);
 	ItemIconRender(SecondItem2P, SECONDITEM2P);
 
+	//2点先取をカウントする旗
+	if (winCount1P >= 1)
+	{
+		g_pD3Device->SetTexture(0, g_pTexture[GAME_WINCOUNT_FLAG_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, win1PCountFlag1, sizeof(CUSTOMVERTEX));
+	}
+	if (winCount1P == 2)
+	{
+		g_pD3Device->SetTexture(0, g_pTexture[GAME_WINCOUNT_FLAG_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, win1PCountFlag2, sizeof(CUSTOMVERTEX));
+	}
+	if (winCount2P >= 1)
+	{
+		g_pD3Device->SetTexture(0, g_pTexture[GAME_WINCOUNT_FLAG_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, win2PCountFlag1, sizeof(CUSTOMVERTEX));
+	}
+	if (winCount2P == 2)
+	{
+		g_pD3Device->SetTexture(0, g_pTexture[GAME_WINCOUNT_FLAG_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, win2PCountFlag2, sizeof(CUSTOMVERTEX));
+	}
 	//勝敗がついたら描画
 	if (gameState == FINISH) {
 		if (win == PLAYER1P) {

@@ -2,10 +2,12 @@
 #include"STAGESELECT_Render.h"
 #include"main.h"
 
-int StageSelect = stageSelectdesert;
+int StageSelect = stageSelectDesert;
 
 void StageselectControl()
 {
+	srand((unsigned int)time(NULL));
+	int RandomSelect = rand() % 3;
 	static int keymemorise[3];
 	HRESULT hr = pKeyDevice->Acquire();
 	if ((hr == DI_OK) || (hr == S_FALSE))
@@ -18,7 +20,7 @@ void StageselectControl()
 			{
 				if (StageSelect == stageSelectCity)
 				{
-					StageSelect = stageSelectdesert;
+					StageSelect = stageSelectDesert;
 				}
 				if (StageSelect == stageSelectForest)
 				{
@@ -34,28 +36,65 @@ void StageselectControl()
 				{
 					StageSelect = stageSelectForest;
 				}
-				if (StageSelect == stageSelectdesert)
+				if (StageSelect == stageSelectDesert)
 				{
 					StageSelect = stageSelectCity;
 				}
 			}
 		}
+		if (diks[DIK_UP] & 0x80)
+		{
+			if (StageSelect == stageSelectRandom)
+			{
+				StageSelect = stageSelectCity;
+			}
+		}
+			if (diks[DIK_DOWN] & 0x80)
+			{
+				if (StageSelect == stageSelectDesert)
+				{
+					StageSelect = stageSelectRandom;
+				}
+				if (StageSelect == stageSelectCity)
+				{
+					StageSelect = stageSelectRandom;
+				}
+				if (StageSelect == stageSelectForest)
+				{
+					StageSelect = stageSelectRandom;
+				}
+			}
 		if (diks[DIK_RETURN] & 0x80)
 		{
 			if (keymemorise[2] != diks[DIK_RETURN])
 			{
 				Sleep(1 * 1000);
-				if (StageSelect == stageSelectdesert)
+				if (StageSelect == stageSelectDesert)
 				{
 					MapDataSelect = Stagedesert;
 				}
-				else if (StageSelect == stageSelectCity)
+				if (StageSelect == stageSelectCity)
 				{
 					MapDataSelect = StageCity;
 				}
-				else if (StageSelect == stageSelectForest)
+				if (StageSelect == stageSelectForest)
 				{
 					MapDataSelect = StageForest;
+				}
+				if (StageSelect == stageSelectRandom)
+				{
+					if (RandomSelect == 0)
+					{
+						MapDataSelect = Stagedesert;
+					}
+					if (RandomSelect == 1)
+					{
+						MapDataSelect = StageCity;
+					}
+					if (RandomSelect == 2)
+					{
+						MapDataSelect = StageForest;
+					}
 				}
 				scene = GAME_SCENE;
 				firstTime = true;
@@ -64,6 +103,5 @@ void StageselectControl()
 		keymemorise[0] = diks[DIK_LEFT];
 		keymemorise[1] = diks[DIK_RIGHT];
 		keymemorise[2] = diks[DIK_RETURN];
-
 	}
 }

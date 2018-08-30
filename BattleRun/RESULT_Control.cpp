@@ -10,6 +10,8 @@ void ResultControl() {
 		pKeyDevice->GetDeviceState(sizeof(diks), &diks);
 		if (diks[DIK_RETURN] & 0x80 && !prevKey[DIK_RETURN]) {
 			Sleep(0.5 * 1000);
+			StageSelect = stageSelectDesert;
+			RuleSelect = RuleSelectRule;
 			scene = TITLE_SCENE;
 			//PostQuitMessage(0);
 		}

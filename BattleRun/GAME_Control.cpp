@@ -82,6 +82,8 @@ static float gravity2P;//重力を保存する変数
 float movementStageX;//ステージのXを移動させるための変数
 float movementStageY;//ステージのYを移動させるための変数
 int win;//どっちが勝ったか判定する変数
+int winCount1P = 0;//1P勝ち点をカウントする変数
+int winCount2P = 0;//2P勝ち点をカウントする変数
 int gameState;//勝敗が決まったかどうかのフラグ
 static float prevFrameMovement1P;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
 static float prevFrameMovement2P;//キー入力によってPLAYERが移動したX座標を毎フレーム記録する変数
@@ -1158,16 +1160,17 @@ void CreatePerDecision(void) {
 	if (PlayerDecision(goalCount, goal, g_Goal, g_Player)) {
 		//プレイヤー1の勝利
 		win = PLAYER1P;
-		gameState = FINISH;
+			gameState = FINISH;
+		winCount1P++;
 		bool isSuccess = soundsManager.Start(_T("clappingSE"));
 		isSuccess = soundsManager.Start(_T("cheersSE"));
 		isSuccess = soundsManager.Stop(_T("gameBGM"));
-
 	}
 	if (PlayerDecision(goalCount, goal, g_Goal, g_Player2P)) {
 		//プレイヤー2の勝利
 		win = PLAYER2P;
 		gameState = FINISH;
+		winCount2P++;
 		bool isSuccess = soundsManager.Start(_T("clappingSE"));
 		isSuccess = soundsManager.Start(_T("cheersSE"));
 		isSuccess = soundsManager.Stop(_T("gameBGM"));
@@ -2253,6 +2256,7 @@ void PlayerExists() {
 
 	if (win == PLAYER1P) {
 		if (g_Player2P.x + g_Player2P.scale_x < 0 || g_Player2P.x - g_Player2P.scale_x > 1500 || g_Player2P.y + g_Player2P.scale_y < 0 || g_Player2P.y - g_Player2P.scale_y > 1000) {
+			winCount1P++;
 			gameState = FINISH;
 			bool isSuccess = soundsManager.Start(_T("clappingSE"));
 			isSuccess = soundsManager.Start(_T("cheersSE"));
@@ -2261,6 +2265,7 @@ void PlayerExists() {
 	}
 	else if (win == PLAYER2P) {
 		if (g_Player.x + g_Player.scale_x < 0 || g_Player.x - g_Player.scale_x > 1500 || g_Player.y + g_Player.scale_y < 0 || g_Player.y - g_Player.scale_y > 1000) {
+			winCount2P++;
 			gameState = FINISH;
 			bool isSuccess = soundsManager.Start(_T("clappingSE"));
 			isSuccess = soundsManager.Start(_T("cheersSE"));
@@ -2279,7 +2284,30 @@ void FinishGameOperation() {
 		pKeyDevice->GetDeviceState(sizeof(diks), &diks);
 
 		if (diks[DIK_RETURN] & 0x80 && !prevKey[DIK_RETURN]) {
-			scene = RESULT_SCENE;
+			if (winCount1P == 2)
+			{
+				ResultWinner = Result1PWIN;
+				winCount1P = 0;
+				winCount2P = 0;
+				StageSelect = stageSelectDesert;
+				RuleSelect = RuleSelectRule;
+				scene = RESULT_SCENE;
+			}
+			if (winCount2P == 2)
+			{
+				ResultWinner = Result2PWIN;
+				winCount1P = 0;
+				winCount2P = 0;
+				StageSelect = stageSelectDesert;
+				RuleSelect = RuleSelectRule;
+				scene = RESULT_SCENE;
+			}
+			if (winCount1P == 1 || winCount2P == 1)
+			{
+				StageSelect = stageSelectDesert;
+				RuleSelect = RuleSelectRule;
+				scene = STAGESELECT_SCENE;
+			}
 		}
 		prevKey[DIK_RETURN] = diks[DIK_RETURN];
 	}

@@ -5,6 +5,7 @@
 #include <dinput.h>
 #include <XInput.h>
 #include <math.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 #include "../Debug_x86/Debug_x86/Include/SoundsManager.h"
@@ -71,6 +72,8 @@ enum TEXTURE//テクスチャの選別に使う
 	ItemDscription1_TEX,
 	ItemDscription2_TEX,
 	StageSelect_BKG_TEX,
+	StageSelect_BKG_RANDOM_TEX,
+	StageSelect_RANDOM_TEX,
 	StageSelect_BKG_SABAKU_TEX,
 	StageSelect_SABAKU_TEX,
 	StageSelect_BKG_MATI_TEX,
@@ -84,11 +87,13 @@ enum TEXTURE//テクスチャの選別に使う
 	GAME_PLAYER2P_STATE_SPACE_TEX,
 	GAME_RANK_ONE_TEX,
 	GAME_RANK_TWO_TEX,
+	GAME_WINCOUNT_FLAG_TEX,
 	COUNT_DOWN_START_TEX,
 	COUNT_DOWN_ONE_TEX,
 	COUNT_DOWN_TWO_TEX,
 	COUNT_DOWN_THREE_TEX,
-	RESULT_BKG_TEX,
+	RESULT_1P_BKG_TEX,
+	RESULT_2P_BKG_TEX,
 	PLAYER_LEFT_TEX,
 	PLAYER_RIGHT_TEX,
 	PLAYER_2P_LEFT_TEX,
@@ -163,10 +168,16 @@ enum//説明の選択後
 	RuleDscriptionItem,
 };
 
+enum//勝敗
+{
+	Result1PWIN,
+	Result2PWIN,
+};
 
 enum
 {
-	stageSelectdesert,//砂漠
+	stageSelectRandom,//ランダム
+	stageSelectDesert,//砂漠
 	stageSelectCity,//街
 	stageSelectForest,//森
 };
@@ -212,7 +223,8 @@ extern int MapDataSelect;//この変数の値を変えることによってステージを変える
 extern int StageSelect;//ステージセレクトのカーソルの変数
 extern int RuleSelect;
 extern int RuleDscription;
-extern int page;
+extern int ResultWinner;//Result1PWINでResult2PWINの勝敗を判別する
+extern int page;//ルール説明に使うシーンのページ数
 extern int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];//砂漠
 extern int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];//街
 extern int MapData03[MAP_03_HEIGHT][MAP_03_WIDTH];//森

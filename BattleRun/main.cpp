@@ -143,7 +143,14 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/StageSelectBKG.png",
 		&g_pTexture[StageSelect_BKG_TEX]);
-
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"random.png",
+		&g_pTexture[StageSelect_BKG_RANDOM_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"selectrandom.png",
+		&g_pTexture[StageSelect_RANDOM_TEX]);
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/sabaku.jpg",
@@ -172,11 +179,18 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/Selectframe.png",
 		&g_pTexture[StageSelectFrame_TEX]);
-		
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/result_BKG.png",
-		&g_pTexture[RESULT_BKG_TEX]);
+		"WinCountFlag.png",
+		&g_pTexture[GAME_WINCOUNT_FLAG_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"Result1PWIN.png",
+		&g_pTexture[RESULT_1P_BKG_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"Result2PWIN.png",
+		&g_pTexture[RESULT_2P_BKG_TEX]);
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/Player_Move_Right2.png",
