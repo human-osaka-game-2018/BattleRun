@@ -3,6 +3,7 @@
 #include"GAME_Render.h"
 
 int trampolinecount = 0;//マップに何個のトランポリンがあるか数える変数
+int trampolineleftcount = 0;
 int manholecount = 0;//マップに何個のマンホールがあるか数える変数
 int goalCount = 0;//マップに何個のゴールがあるかを数える変数
 int itemboxcount = 0;
@@ -11,6 +12,7 @@ int MapSelected;//選ばれたマップのマスの値を代入する変数
 int MapSelectedHEIGHT;//選ばれたマップの縦幅を代入する変数
 int MapSelectedWIDTH;//選ばれたマップの横幅を代入する変数
 OBJECT_POSITION trampoline[30];//トランポリンの座標を保存する構造体配列、10個まで
+OBJECT_POSITION trampolineleft[30];
 OBJECT_POSITION manhole[30];//マンホールの座標を保存する構造体配列
 OBJECT_POSITION itembox[30];
 OBJECT_POSITION goal[50];//ゴールの座標を保存する構造体配列、10個まで
@@ -32,12 +34,32 @@ void ItemIconRender(int ItemNumber,CUSTOMVERTEX *vertices) {
 	case SPEEDDOWN:
 		TextureID = ITEMD_TEX;
 		break;
+	case BEAM:
+		TextureID = BEAM_ICON_TEX;
+		break;
 	}
 
 	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertices, sizeof(CUSTOMVERTEX));
-	
 }
+
+void PlayerRender(int PlayerMode, float* Righttu, float* Lefttu, CUSTOMVERTEX *vertices) {
+
+	switch (PlayerMode) {
+	case RIGHT_DIRECTION:
+		*Righttu = g_Player.scale_x;
+		*Lefttu = 0;
+		break;
+	case LEFT_DIRECTION:
+		*Righttu = 0;
+		*Lefttu = g_Player.scale_x;
+		break;
+	}
+	TextureID = GAME_PLAYER_TEX;
+	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertices, sizeof(CUSTOMVERTEX));
+}
+
 //描画処理
 void GameRender(void)
 {
@@ -68,18 +90,18 @@ void GameRender(void)
 
 	CUSTOMVERTEX  vertexPlayer1P[4]
 	{
-		{ g_Player.x,                                       g_Player.y, 1.f, 1.f, 0xFFFF0000, MoveImage / 980.f, 0.f },
-		{ g_Player.x + g_Player.scale_x,                    g_Player.y, 1.f, 1.f, 0xFFFF0000, (MoveImage + 120) / 980.f, 0.f },
-		{ g_Player.x + g_Player.scale_x, g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFF0000, (MoveImage + 120) / 980.f, 140.f / 630.f },
-		{ g_Player.x,                    g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFF0000, MoveImage / 980.f, 140.f / 630.f }
+		{ g_Player.x,                                       g_Player.y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage + Lefttu1P) / 1024.f, 0.f },
+		{ g_Player.x + g_Player.scale_x,                    g_Player.y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage + Righttu1P) / 1024.f, 0.f },
+		{ g_Player.x + g_Player.scale_x, g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage + Righttu1P) / 1024.f, 70.f / 1024.f },
+		{ g_Player.x,                    g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage + Lefttu1P) / 1024.f, 70.f / 1024.f }
 	};
 
 	CUSTOMVERTEX  vertexPlayer2P[4]
 	{
-		{ g_Player2P.x,                                           g_Player2P.y, 1.f, 1.f, 0xFF0000FF, MoveImage2P / 980.f, 0.f },
-		{ g_Player2P.x + g_Player2P.scale_x,                      g_Player2P.y, 1.f, 1.f, 0xFF0000FF, (MoveImage2P + 120) / 980.f, 0.f },
-		{ g_Player2P.x + g_Player2P.scale_x, g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFF0000FF, (MoveImage2P + 120) / 980.f, 140.f / 630.f },
-		{ g_Player2P.x,                      g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFF0000FF, MoveImage2P / 980.f, 140.f / 630.f }
+		{ g_Player2P.x,                      g_Player2P.y,                      1.f, 1.f, 0xFFFFFFFF, (MoveImage2P + Lefttu2P) / 1024.f, 0.f },
+		{ g_Player2P.x + g_Player2P.scale_x, g_Player2P.y,                      1.f, 1.f, 0xFFFFFFFF, (MoveImage2P + Righttu2P) / 1024.f, 0.f },
+		{ g_Player2P.x + g_Player2P.scale_x, g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage2P + Righttu2P) / 1024.f, 70.f / 1024.f },
+		{ g_Player2P.x,                      g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage2P + Lefttu2P) / 1024.f, 70.f / 1024.f }
 	};
 
 	CUSTOMVERTEX  CELL[4]
@@ -104,35 +126,6 @@ void GameRender(void)
 		{ 1070,               10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
 		{ 1070,               60, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
 		{ 980.f,             60, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
-	};
-
-	CUSTOMVERTEX win1PCountFlag1[4]//1P(赤)の1勝目
-	{
-	{ 140.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-	{ 210.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-	{ 210.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-	{ 140.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
-	};
-	CUSTOMVERTEX win1PCountFlag2[4]//1P(赤)の2勝目
-	{
-	{ 200.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-	{ 270.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-	{ 270.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-	{ 200.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
-	};
-	CUSTOMVERTEX win2PCountFlag1[4]//2P(青)の1勝目
-	{
-	{ 660.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-	{ 730.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-	{ 730.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-	{ 660.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
-	};
-	CUSTOMVERTEX win2PCountFlag2[4]//2P(青)の2勝目
-	{
-	{ 720.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-	{ 790.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-	{ 790.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-	{ 720.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX FIRSTITEM1P[4]
@@ -167,6 +160,50 @@ void GameRender(void)
 		{ g_SecondItem2P.x,                          g_SecondItem2P.y + g_SecondItem2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
+	CUSTOMVERTEX BEAM1P[4]
+	{
+		{ g_Player.x + g_Player.scale_x,		g_Player.y,					   1.f, 1.f, 0xFFFFFFFF, 0.f, Beamtutv1P / 2048.f },
+		{ g_Player.x + g_Player.scale_x + 1920, g_Player.y,					   1.f, 1.f, 0xFFFFFFFF, 1.f, Beamtutv1P / 2048.f },
+		{ g_Player.x + g_Player.scale_x + 1920, g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF, 1.f, (Beamtutv1P + 64) / 2048.f },
+		{ g_Player.x + g_Player.scale_x,        g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, (Beamtutv1P + 64) / 2048.f }
+	};
+
+	CUSTOMVERTEX BEAM2P[4]
+	{
+		{ g_Player2P.x + g_Player2P.scale_x,		g_Player2P.y,					   1.f, 1.f, 0xFFFFFFFF, 0.f, Beamtutv2P / 2048.f },
+		{ g_Player2P.x + g_Player2P.scale_x + 1920, g_Player2P.y,					   1.f, 1.f, 0xFFFFFFFF, 1.f, Beamtutv2P / 2048.f },
+		{ g_Player2P.x + g_Player2P.scale_x + 1920, g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 1.f, (Beamtutv2P + 64) / 2048.f },
+		{ g_Player2P.x + g_Player2P.scale_x,        g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, (Beamtutv2P + 64) / 2048.f }
+	};
+
+	CUSTOMVERTEX win1PCountFlag1[4]//1P(赤)の1勝目
+	{
+		{ 140.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+	{ 210.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+	{ 210.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+	{ 140.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+	CUSTOMVERTEX win1PCountFlag2[4]//1P(赤)の2勝目
+	{
+		{ 200.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+	{ 270.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+	{ 270.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+	{ 200.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+	CUSTOMVERTEX win2PCountFlag1[4]//2P(青)の1勝目
+	{
+		{ 660.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+	{ 730.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+	{ 730.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+	{ 660.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+	CUSTOMVERTEX win2PCountFlag2[4]//2P(青)の2勝目
+	{
+		{ 720.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+	{ 790.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+	{ 790.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+	{ 720.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
 	//画面の消去
 	g_pD3Device->Clear(
 		0,
@@ -182,29 +219,8 @@ void GameRender(void)
 	g_pD3Device->SetTexture(0, g_pTexture[GAME_BKG_TEX]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexGameBKG, sizeof(CUSTOMVERTEX));
 
-	//PLAYER1の表示
-	switch (PlayerMode1P) {
-	case RIGHT_DIRECTION1P:
-		TextureID = PLAYER_RIGHT_TEX;
-		break;
-	case LEFT_DIRECTION1P:
-		TextureID = PLAYER_LEFT_TEX;
-		break;
-	}
-	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
-	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer1P, sizeof(CUSTOMVERTEX));
-
-	//PLAYER２の表示
-	switch (PlayerMode2P) {
-	case RIGHT_DIRECTION2P:
-		TextureID = PLAYER_2P_RIGHT_TEX;
-		break;
-	case LEFT_DIRECTION2P:
-		TextureID = PLAYER_2P_LEFT_TEX;
-		break;
-	}
-	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
-	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer2P, sizeof(CUSTOMVERTEX));
+	PlayerRender(PlayerMode1P, &Righttu1P, &Lefttu1P, vertexPlayer1P);
+	PlayerRender(PlayerMode2P, &Righttu2P, &Lefttu2P, vertexPlayer2P);
 
 	//マップチップの表示
 	if (MapDataSelect == Stagedesert) {
@@ -245,7 +261,7 @@ void GameRender(void)
 				{
 					continue;
 				}
-				else if ((MapData02[j][i] >= FIRST_CHECK_POINT) && (MapData01[j][i] < FINAL_CHECK_POINT)) {
+				else if ((MapData03[j][i] >= FIRST_CHECK_POINT) && (MapData01[j][i] < FINAL_CHECK_POINT)) {
 					continue;
 				}
 			}
@@ -299,6 +315,18 @@ void GameRender(void)
 				CELL[3].y = top + (g_Trampoline.scale_y / 2);
 				trampolinecount++;
 				break;
+			case TRAMPOLINE_LEFT_BLOCK:
+				TextureID = TRAMPOLINE_LEFT_TEX;
+				CELL[0].x = trampolineleft[trampolineleftcount].x = left - (g_TrampolineLeft.scale_x / 2);
+				CELL[0].y = trampolineleft[trampolineleftcount].y = top - (g_TrampolineLeft.scale_y / 2);
+				CELL[1].x = left + (g_TrampolineLeft.scale_x / 2);
+				CELL[1].y = top - (g_TrampolineLeft.scale_y / 2);
+				CELL[2].x = left + (g_TrampolineLeft.scale_x / 2);
+				CELL[2].y = top + (g_TrampolineLeft.scale_y / 2);
+				CELL[3].x = left - (g_TrampolineLeft.scale_x / 2);
+				CELL[3].y = top + (g_TrampolineLeft.scale_y / 2);
+				trampolineleftcount++;
+				break;
 			case MANHOLE_BLOCK:
 				TextureID = MANHOLE_TEX;
 				CELL[0].x = manhole[manholecount].x = left - (g_Manhole.scale_x / 2);
@@ -314,10 +342,10 @@ void GameRender(void)
 			case ITEMBOX_BLOCK:
 				TextureID = ITEMBOX_TEX;
 				CELL[0].x = itembox[itemboxcount].x = left - (g_Itembox.scale_x / 2);
-				CELL[0].y = itembox[itemboxcount].y = top - (g_Itembox.scale_y/2);
-				CELL[1].x = left + (g_Itembox.scale_x/2);	
-				CELL[1].y = top - (g_Itembox.scale_y/2);
-				CELL[2].x = left + (g_Itembox.scale_x/2);
+				CELL[0].y = itembox[itemboxcount].y = top - (g_Itembox.scale_y / 2);
+				CELL[1].x = left + (g_Itembox.scale_x / 2);
+				CELL[1].y = top - (g_Itembox.scale_y / 2);
+				CELL[2].x = left + (g_Itembox.scale_x / 2);
 				CELL[2].y = top + (g_Itembox.scale_y / 2);
 				CELL[3].x = left - (g_Itembox.scale_x / 2);
 				CELL[3].y = top + (g_Itembox.scale_y / 2);
@@ -341,6 +369,16 @@ void GameRender(void)
 		}
 	}
 
+	if (BeamFlag1P) {
+		g_pD3Device->SetTexture(0, g_pTexture[BEAM_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, BEAM1P, sizeof(CUSTOMVERTEX));
+	}
+
+	if (BeamFlag2P) {
+		g_pD3Device->SetTexture(0, g_pTexture[BEAM_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, BEAM2P, sizeof(CUSTOMVERTEX));
+	}
+	
 
 	g_pD3Device->SetTexture(0, g_pTexture[GAME_PLAYER1P_STATE_SPACE_TEX]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer1PStateSpace, sizeof(CUSTOMVERTEX));
@@ -380,6 +418,7 @@ void GameRender(void)
 		break;
 	case 4:
 		TextureID = COUNT_DOWN_START_TEX;
+		break;
 	}
 	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexCountNum, sizeof(CUSTOMVERTEX));
@@ -388,7 +427,6 @@ void GameRender(void)
 	ItemIconRender(SecondItem1P, SECONDITEM1P);
 	ItemIconRender(FirstItem2P, FIRSTITEM2P);
 	ItemIconRender(SecondItem2P, SECONDITEM2P);
-
 	//2点先取をカウントする旗
 	if (winCount1P >= 1)
 	{
@@ -440,7 +478,7 @@ void GameRender(void)
 	//RECT player1P;
 	//player1P.left = 100;			//左上のX座標
 	//player1P.top = 770;			//左上のY座標
-	//player1P.right = 800;		//右下のX座標
+	//player1P.right = 800;			//右下のX座標
 	//player1P.bottom = 900;		//右下のY座標
 
 	//char arrayToShowPlayer1P[3] = "1P";

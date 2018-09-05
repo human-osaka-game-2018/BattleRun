@@ -2,106 +2,169 @@
 #include"STAGESELECT_Render.h"
 #include"main.h"
 
-int StageSelect = stageSelectDesert;
-
+int StageSelect = stageSelectdesert;
+int StageRandomCount = 0;
+bool StageRandomLoop = false;
+bool StageRandomSelected = false;
+int StageRandomLoopCount;
+static int RandomSelectCount = 0;
 void StageselectControl()
 {
 	srand((unsigned int)time(NULL));
-	int RandomSelect = rand() % 3;
+	GetPadState();
+
 	static int keymemorise[3];
 	HRESULT hr = pKeyDevice->Acquire();
 	if ((hr == DI_OK) || (hr == S_FALSE))
 	{
 		BYTE diks[256];
 		pKeyDevice->GetDeviceState(sizeof(diks), &diks);
-		if (keymemorise[0] != diks[DIK_LEFT])
+		if (!prevKey[DIK_LEFT] && !prevPad[PadLEFT1P] && !prevPad[PadLEFT2P])
 		{
-			if (diks[DIK_LEFT] & 0x80)
+			if (diks[DIK_LEFT] & 0x80 || g_Pad1P.left || g_Pad2P.left)
 			{
-				if (StageSelect == stageSelectCity)
+				switch (StageSelect)
 				{
-					StageSelect = stageSelectDesert;
-				}
-				if (StageSelect == stageSelectForest)
-				{
+				case stageSelectCity:
+					StageSelect = stageSelectdesert;
+					break;
+				case stageSelectForest:
 					StageSelect = stageSelectCity;
+					break;
 				}
 			}
 		}
-		if (diks[DIK_RIGHT] & 0x80)
+		if (diks[DIK_RIGHT] & 0x80 || g_Pad1P.right || g_Pad2P.right)
 		{
-			if (keymemorise[1] != diks[DIK_RIGHT])
+			if (!prevKey[DIK_RIGHT] && !prevPad[PadRIGHT1P] && !prevPad[PadRIGHT2P])
 			{
-				if (StageSelect == stageSelectCity)
+				switch (StageSelect)
 				{
+				case stageSelectCity:
 					StageSelect = stageSelectForest;
-				}
-				if (StageSelect == stageSelectDesert)
-				{
+					break;
+				case stageSelectdesert:
 					StageSelect = stageSelectCity;
+					break;
 				}
 			}
 		}
 		if (diks[DIK_UP] & 0x80)
 		{
-			if (StageSelect == stageSelectRandom)
+			switch (StageSelect)
 			{
+			case stageSelectRandom:
 				StageSelect = stageSelectCity;
+				break;
 			}
 		}
-			if (diks[DIK_DOWN] & 0x80)
-			{
-				if (StageSelect == stageSelectDesert)
-				{
-					StageSelect = stageSelectRandom;
-				}
-				if (StageSelect == stageSelectCity)
-				{
-					StageSelect = stageSelectRandom;
-				}
-				if (StageSelect == stageSelectForest)
-				{
-					StageSelect = stageSelectRandom;
-				}
-			}
-		if (diks[DIK_RETURN] & 0x80)
+		if (diks[DIK_DOWN] & 0x80)
 		{
-			if (keymemorise[2] != diks[DIK_RETURN])
+			switch (StageSelect)
 			{
-				Sleep(1 * 1000);
-				if (StageSelect == stageSelectDesert)
+			case stageSelectdesert:
+				StageSelect = stageSelectRandom;
+				break;
+			case stageSelectCity:
+				StageSelect = stageSelectRandom;
+				break;
+			case stageSelectForest:
+				StageSelect = stageSelectRandom;
+				break;
+			}
+		}
+		if (diks[DIK_RETURN] & 0x80 || g_Pad1P.a || g_Pad2P.a)
+		{
+			if (!prevKey[DIK_RETURN] && !prevPad[PadA1P] && !prevPad[PadA2P])
+			{
+				switch (StageSelect)
 				{
+				case stageSelectdesert:
 					MapDataSelect = Stagedesert;
-				}
-				if (StageSelect == stageSelectCity)
-				{
+					scene = GAME_SCENE;
+					break;
+				case stageSelectCity:
 					MapDataSelect = StageCity;
-				}
-				if (StageSelect == stageSelectForest)
-				{
+					scene = GAME_SCENE;
+					break;
+				case stageSelectForest:
 					MapDataSelect = StageForest;
+					scene = GAME_SCENE;
+					break;
 				}
 				if (StageSelect == stageSelectRandom)
 				{
-					if (RandomSelect == 0)
-					{
-						MapDataSelect = Stagedesert;
-					}
-					if (RandomSelect == 1)
-					{
-						MapDataSelect = StageCity;
-					}
-					if (RandomSelect == 2)
-					{
-						MapDataSelect = StageForest;
-					}
+					StageRandomLoop = true;
 				}
-				scene = GAME_SCENE;
 				firstTime = true;
 			}
 		}
-		keymemorise[0] = diks[DIK_LEFT];
-		keymemorise[1] = diks[DIK_RIGHT];
-		keymemorise[2] = diks[DIK_RETURN];
+		if (StageRandomLoop == true)
+		{
+			int RandomSelecting = rand() % 3;
+			StageRandomCount++;
+			switch (RandomSelecting)
+			{
+			case 0:
+				StageRandomLoopCount = 30;
+				break;
+			case 1:
+				StageRandomLoopCount = 32;
+				break;
+			case 2:
+				StageRandomLoopCount = 34;
+				break;
+			}
+			for (int i = 0;i < 30;i++)
+			{
+				RandomSelectCount++;
+				if (RandomSelectCount == 60)
+				{
+					StageSelect = Stagedesert;
+				}
+				if (RandomSelectCount == 120)
+				{
+					StageSelect = StageCity;
+				}
+				if (RandomSelectCount == 180)
+				{
+					StageSelect = StageForest;
+				}
+				if (RandomSelectCount == 180)
+				{
+					RandomSelectCount = 0;
+				}
+			}
+			if (StageRandomCount == StageRandomLoopCount)
+			{
+				StageRandomLoop = false;
+				StageRandomCount = 0;
+				if (StageSelect == Stagedesert)
+				{
+					MapDataSelect = Stagedesert;
+					StageRandomSelected = true;
+				}
+				if (StageSelect == StageCity)
+				{
+					MapDataSelect = StageCity;
+					StageRandomSelected = true;
+				}
+				if (StageSelect == StageForest)
+				{
+					MapDataSelect = StageForest;
+					StageRandomSelected = true;
+				}
+			}
+		}
+		prevKey[DIK_RETURN] = diks[DIK_RETURN];
+		prevKey[DIK_RIGHT] = diks[DIK_RIGHT];
+		prevKey[DIK_LEFT] = diks[DIK_LEFT];
+		prevPad[PadA1P] = g_Pad1P.a;
+		prevPad[PadA2P] = g_Pad2P.a;
+		prevPad[PadRIGHT1P] = g_Pad1P.right;
+		prevPad[PadRIGHT2P] = g_Pad2P.right;
+		prevPad[PadLEFT1P] = g_Pad1P.left;
+		prevPad[PadLEFT2P] = g_Pad2P.left;
+		
 	}
 }

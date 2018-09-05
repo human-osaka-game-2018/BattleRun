@@ -48,11 +48,12 @@ void TitleControl() {
 	{
 		BYTE diks[256];
 		pKeyDevice->GetDeviceState(sizeof(diks), &diks);
-		if (diks[DIK_RETURN] & 0x80 || g_Pad1P.a) {
+		if (diks[DIK_RETURN] & 0x80 || g_Pad1P.a || g_Pad2P.a) {
 			bool isSuccess = soundsManager.Stop(_T("titleBGM"));
 			bool isSuccess2 = soundsManager.Start(_T("titleBotton"));
 			Sleep(1 * 1000);
 			scene = RULE_SCENE;
 		}
+		prevPad[PadA1P] = g_Pad1P.a;
 	}
 }
