@@ -12,6 +12,7 @@
 #include"RESULT_Control.h"
 #include"RESULT_Render.h"
 
+
 //Directx関係----------------------------
 LPDIRECT3DTEXTURE9	  g_pTexture[TEXMAX];	//	画像の情報を入れておく為のポインタ配列
 IDirect3DDevice9*	  g_pD3Device;		//	Direct3Dのデバイス
@@ -91,42 +92,50 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/title_botton.png",
 		&g_pTexture[TITLE_BOTTON_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"RuleSelectBKG.jpg",
+		"texture/RuleSelectBKG.jpg",
 		&g_pTexture[RuleSelect_BKG_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"RuleSelect.png",
+		"texture/RuleSelect.png",
 		&g_pTexture[RuleSelect_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"RuleSelect矢印.png",
+		"texture/arrow.png",
 		&g_pTexture[RuleSelect_mark_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"RuleDscription1.png",
+		"texture/RuleDscription1.png",
 		&g_pTexture[RuleDscription1_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"RuleDscription2.png",
+		"texture/RuleDscription2.png",
 		&g_pTexture[RuleDscription2_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"ItemDscription1.png",
+		"texture/ItemDscription1.png",
 		&g_pTexture[ItemDscription1_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"ItemDscription2.png",
+		"texture/ItemDscription2.png",
 		&g_pTexture[ItemDscription2_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/game_BKG.png",
 		&g_pTexture[GAME_BKG_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/game_player.png",
+		"texture/player.png",
 		&g_pTexture[GAME_PLAYER_TEX]);
 
 	D3DXCreateTextureFromFile(
@@ -143,73 +152,71 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/StageSelectBKG.png",
 		&g_pTexture[StageSelect_BKG_TEX]);
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"random.png",
-		&g_pTexture[StageSelect_BKG_RANDOM_TEX]);
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"selectrandom.png",
-		&g_pTexture[StageSelect_RANDOM_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/sabaku.jpg",
 		&g_pTexture[StageSelect_BKG_SABAKU_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/selectsabaku.png",
 		&g_pTexture[StageSelect_SABAKU_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/mori.png",
 		&g_pTexture[StageSelect_BKG_MORI_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/selectmori.png",
 		&g_pTexture[StageSelect_MORI_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/mati.jpg",
 		&g_pTexture[StageSelect_BKG_MATI_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/selectmati.png",
 		&g_pTexture[StageSelect_MATI_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"random.png",
+		&g_pTexture[StageSelect_BKG_RANDOM_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"selectrandom.png",
+		&g_pTexture[StageSelect_RANDOM_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/Selectframe.png",
 		&g_pTexture[StageSelectFrame_TEX]);
+		
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"WinCountFlag.png",
 		&g_pTexture[GAME_WINCOUNT_FLAG_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"Result1PWIN.png",
 		&g_pTexture[RESULT_1P_BKG_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"Result2PWIN.png",
 		&g_pTexture[RESULT_2P_BKG_TEX]);
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"texture/Player_Move_Right2.png",
-		&g_pTexture[PLAYER_RIGHT_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/Player_Move_Left2.png",
-		&g_pTexture[PLAYER_LEFT_TEX]);
-
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"texture/Player_Move_Right2.png",
-		&g_pTexture[PLAYER_2P_RIGHT_TEX]);
-
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"texture/Player_Move_Left2.png",
-		&g_pTexture[PLAYER_2P_LEFT_TEX]);
+		"texture/result_BKG.png",
+		&g_pTexture[RESULT_BKG_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
@@ -295,26 +302,71 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/letsGo.png",
 		&g_pTexture[COUNT_DOWN_START_TEX]);
-		
+	
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"itema.jpg",
+		"texture/RuleSelectBKG.png",
+		&g_pTexture[RuleSelect_BKG_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/RuleSelect.png",
+		&g_pTexture[RuleSelect_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/RuleSelect矢印.png",
+		&g_pTexture[RuleSelect_mark_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/RuleDscription1.png",
+		&g_pTexture[RuleDscription1_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/RuleDscription2.png",
+		&g_pTexture[RuleDscription2_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/ItemDscription1.png",
+		&g_pTexture[ItemDscription1_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/ItemDscription2.png",
+		&g_pTexture[ItemDscription2_TEX]);
+	
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/itembreak.png",
 		&g_pTexture[ITEMA_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"itemb.jpg",
+		"texture/jumpup.jpg",
 		&g_pTexture[ITEMB_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"itemc.jpg",
+		"texture/speedup.jpg",
 		&g_pTexture[ITEMC_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"itemd.jpg",
+		"texture/speeddown.jpg",
 		&g_pTexture[ITEMD_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/beam.png",
+		&g_pTexture[BEAM_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/beamicon.png",
+		&g_pTexture[BEAM_ICON_TEX]);
 }
 
 
@@ -400,6 +452,7 @@ void GetPadState() {
 	g_Pad1P.a = (wButtons & XINPUT_GAMEPAD_A);
 	g_Pad1P.b = (wButtons & XINPUT_GAMEPAD_B);
 	g_Pad1P.x = (wButtons & XINPUT_GAMEPAD_X);
+	g_Pad1P.y = (wButtons & XINPUT_GAMEPAD_Y);
 	g_Pad1P.lb = (wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
 	g_Pad1P.rb = (wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
 	g_Pad1P.lTrigger = (xInput.Gamepad.bLeftTrigger > 0);
@@ -415,6 +468,7 @@ void GetPadState() {
 	g_Pad2P.a = wButtons & XINPUT_GAMEPAD_A;
 	g_Pad2P.b = (wButtons & XINPUT_GAMEPAD_B);
 	g_Pad2P.x = wButtons & XINPUT_GAMEPAD_X;
+	g_Pad2P.y = (wButtons & XINPUT_GAMEPAD_Y);
 	g_Pad2P.lb = (wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
 	g_Pad2P.rb = (wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
 	g_Pad2P.lTrigger = (xInput.Gamepad.bLeftTrigger > 0);
@@ -606,6 +660,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 				case STAGESELECT_SCENE:
 					StageselectControl();
 					StageselectRender();
+
+					if (StageRandomSelected == true)
+					{
+						Sleep(1800);
+						StageRandomSelected = false;
+						scene = GAME_SCENE;
+					}
 					break;
 					/*case TUTORIAL_SCENE:
 					ControlTutorial();

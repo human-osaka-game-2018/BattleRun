@@ -5,7 +5,6 @@
 #include <dinput.h>
 #include <XInput.h>
 #include <math.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 #include "../Debug_x86/Debug_x86/Include/SoundsManager.h"
@@ -72,14 +71,14 @@ enum TEXTURE//テクスチャの選別に使う
 	ItemDscription1_TEX,
 	ItemDscription2_TEX,
 	StageSelect_BKG_TEX,
-	StageSelect_BKG_RANDOM_TEX,
-	StageSelect_RANDOM_TEX,
 	StageSelect_BKG_SABAKU_TEX,
 	StageSelect_SABAKU_TEX,
 	StageSelect_BKG_MATI_TEX,
 	StageSelect_MATI_TEX,
 	StageSelect_BKG_MORI_TEX,
 	StageSelect_MORI_TEX,
+	StageSelect_BKG_RANDOM_TEX,
+	StageSelect_RANDOM_TEX,
 	StageSelectFrame_TEX,
 	GAME_BKG_TEX,
 	GAME_PLAYER_TEX,
@@ -88,22 +87,20 @@ enum TEXTURE//テクスチャの選別に使う
 	GAME_RANK_ONE_TEX,
 	GAME_RANK_TWO_TEX,
 	GAME_WINCOUNT_FLAG_TEX,
+	RESULT_1P_BKG_TEX,
+	RESULT_2P_BKG_TEX,
 	COUNT_DOWN_START_TEX,
 	COUNT_DOWN_ONE_TEX,
 	COUNT_DOWN_TWO_TEX,
 	COUNT_DOWN_THREE_TEX,
-	RESULT_1P_BKG_TEX,
-	RESULT_2P_BKG_TEX,
-	PLAYER_LEFT_TEX,
-	PLAYER_RIGHT_TEX,
-	PLAYER_2P_LEFT_TEX,
-	PLAYER_2P_RIGHT_TEX,
+	RESULT_BKG_TEX,
 	GROUND_BLOCK_TEX,
 	WALL_BLOCK_RIGHT_TEX,
 	WALL_BLOCK_LEFT_TEX,
 	DIRT_BLOCK_TEX,
 	ACCELERATED_BLOCK_TEX,
 	TRAMPOLINE_TEX,
+	TRAMPOLINE_LEFT_TEX,
 	MANHOLE_TEX,
 	GOAL_TEX,
 	ITEMBOX_TEX,
@@ -111,6 +108,8 @@ enum TEXTURE//テクスチャの選別に使う
 	ITEMB_TEX,
 	ITEMC_TEX,
 	ITEMD_TEX,
+	BEAM_TEX,
+	BEAM_ICON_TEX,
 	WIN_1P_TEX,
 	WIN_2P_TEX,
 	TEXMAX
@@ -127,7 +126,8 @@ enum BLOCKTYPE//CSVのブロックの番号
 	ITEMBOX_BLOCK,//アイテムボックス
 	GOAL_BLOCK,//ゴール判定を行うブロック
 	DIRT_BLOCK,//動くスピードが遅くなる床ブロック
-	ACCELERATED_BLOCK//加速する床ブロック
+	ACCELERATED_BLOCK,//加速する床ブロック
+	TRAMPOLINE_LEFT_BLOCK
 };
 
 enum FONT
@@ -140,6 +140,8 @@ enum PAD
 {
 	PadA1P,
 	PadA2P,
+	PadY1P,
+	PadY2P,
 	PadUP1P,
 	PadUP2P,
 	PadRIGHT1P,
@@ -176,10 +178,10 @@ enum//勝敗
 
 enum
 {
-	stageSelectRandom,//ランダム
-	stageSelectDesert,//砂漠
+	stageSelectdesert,//砂漠
 	stageSelectCity,//街
 	stageSelectForest,//森
+	stageSelectRandom,//ランダム
 };
 
 enum
@@ -197,6 +199,7 @@ typedef struct {
 	bool a;
 	bool b;
 	bool x;
+	bool y;
 	bool lb;
 	bool rb;
 	bool lTrigger;
@@ -221,10 +224,11 @@ extern LPD3DXFONT g_pFont[FONTMAX];//フォントに必要
 extern RECT debugFont;
 extern int MapDataSelect;//この変数の値を変えることによってステージを変える
 extern int StageSelect;//ステージセレクトのカーソルの変数
+extern bool StageRandomSelected;
 extern int RuleSelect;
 extern int RuleDscription;
+extern int page;
 extern int ResultWinner;//Result1PWINでResult2PWINの勝敗を判別する
-extern int page;//ルール説明に使うシーンのページ数
 extern int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];//砂漠
 extern int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];//街
 extern int MapData03[MAP_03_HEIGHT][MAP_03_WIDTH];//森
