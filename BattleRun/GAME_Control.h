@@ -39,6 +39,7 @@ enum ITEM_NUM
 	JUMPUP,
 	SPEEDUP,
 	SPEEDDOWN,
+	BEAM,
 	ITEM_MAX
 };
 
@@ -64,6 +65,12 @@ extern int PlayerMode1P;//プレイヤー１が左右どちらを向いているかの変数
 extern int PlayerMode2P;//プレイヤー２が左右どちらを向いているかの変数
 extern float MoveImage;
 extern float MoveImage2;
+extern float Lefttu1P;
+extern float Righttu1P;
+extern float Lefttu2P;
+extern float Righttu2P;
+extern float Beamtutv1P;
+extern float Beamtutv2P;
 extern float movementStageX;//ステージのXを移動させるための変数
 extern float movementStageY;//ステージのYを移動させるための変数
 extern int win;//プレイヤー勝敗の表示に使う変数
@@ -72,5 +79,7 @@ extern int FirstItem1P;
 extern int SecondItem1P;
 extern int FirstItem2P;
 extern int SecondItem2P;
+extern bool BeamFlag1P;
+extern bool BeamFlag2P;
 
 #endif // !GAME_CONTROL_

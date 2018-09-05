@@ -6,15 +6,17 @@ int StageSelect = stageSelectdesert;
 
 void StageselectControl()
 {
+	GetPadState();
+
 	static int keymemorise[3];
 	HRESULT hr = pKeyDevice->Acquire();
 	if ((hr == DI_OK) || (hr == S_FALSE))
 	{
 		BYTE diks[256];
 		pKeyDevice->GetDeviceState(sizeof(diks), &diks);
-		if (keymemorise[0] != diks[DIK_LEFT])
+		if (!prevKey[DIK_LEFT] && !prevPad[PadLEFT1P] && !prevPad[PadLEFT2P])
 		{
-			if (diks[DIK_LEFT] & 0x80)
+			if (diks[DIK_LEFT] & 0x80 || g_Pad1P.left || g_Pad2P.left)
 			{
 				if (StageSelect == stageSelectCity)
 				{
@@ -26,9 +28,9 @@ void StageselectControl()
 				}
 			}
 		}
-		if (diks[DIK_RIGHT] & 0x80)
+		if (diks[DIK_RIGHT] & 0x80 || g_Pad1P.right || g_Pad2P.right)
 		{
-			if (keymemorise[1] != diks[DIK_RIGHT])
+			if (!prevKey[DIK_RIGHT] && !prevPad[PadRIGHT1P] && !prevPad[PadRIGHT2P])
 			{
 				if (StageSelect == stageSelectCity)
 				{
@@ -40,9 +42,9 @@ void StageselectControl()
 				}
 			}
 		}
-		if (diks[DIK_RETURN] & 0x80)
+		if (diks[DIK_RETURN] & 0x80 || g_Pad1P.a || g_Pad2P.a)
 		{
-			if (keymemorise[2] != diks[DIK_RETURN])
+			if (!prevKey[DIK_RETURN] && !prevPad[PadA1P] && !prevPad[PadA2P])
 			{
 				Sleep(1 * 1000);
 				if (StageSelect == stageSelectdesert)
@@ -61,9 +63,15 @@ void StageselectControl()
 				firstTime = true;
 			}
 		}
-		keymemorise[0] = diks[DIK_LEFT];
-		keymemorise[1] = diks[DIK_RIGHT];
-		keymemorise[2] = diks[DIK_RETURN];
-
+		prevKey[DIK_RETURN] = diks[DIK_RETURN];
+		prevKey[DIK_RIGHT] = diks[DIK_RIGHT];
+		prevKey[DIK_LEFT] = diks[DIK_LEFT];
+		prevPad[PadA1P] = g_Pad1P.a;
+		prevPad[PadA2P] = g_Pad2P.a;
+		prevPad[PadRIGHT1P] = g_Pad1P.right;
+		prevPad[PadRIGHT2P] = g_Pad2P.right;
+		prevPad[PadLEFT1P] = g_Pad1P.left;
+		prevPad[PadLEFT2P] = g_Pad2P.left;
+		
 	}
 }

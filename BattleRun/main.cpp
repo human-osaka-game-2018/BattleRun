@@ -95,11 +95,47 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/game_BKG.png",
-		&g_pTexture[GAME_BKG_TEX]);
+		"texture/RuleSelectBKG.jpg",
+		&g_pTexture[RuleSelect_BKG_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/game_player.png",
+		"texture/RuleSelect.png",
+		&g_pTexture[RuleSelect_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/arrow.png",
+		&g_pTexture[RuleSelect_mark_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/RuleDscription1.png",
+		&g_pTexture[RuleDscription1_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/RuleDscription2.png",
+		&g_pTexture[RuleDscription2_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/ItemDscription1.png",
+		&g_pTexture[ItemDscription1_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/ItemDscription2.png",
+		&g_pTexture[ItemDscription2_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/game_BKG.png",
+		&g_pTexture[GAME_BKG_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/player.png",
 		&g_pTexture[GAME_PLAYER_TEX]);
 
 	D3DXCreateTextureFromFile(
@@ -121,26 +157,32 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/sabaku.jpg",
 		&g_pTexture[StageSelect_BKG_SABAKU_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/selectsabaku.png",
 		&g_pTexture[StageSelect_SABAKU_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/mori.png",
 		&g_pTexture[StageSelect_BKG_MORI_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/selectmori.png",
 		&g_pTexture[StageSelect_MORI_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/mati.jpg",
 		&g_pTexture[StageSelect_BKG_MATI_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/selectmati.png",
 		&g_pTexture[StageSelect_MATI_TEX]);
+
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/Selectframe.png",
@@ -150,25 +192,6 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/result_BKG.png",
 		&g_pTexture[RESULT_BKG_TEX]);
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"texture/Player_Move_Right2.png",
-		&g_pTexture[PLAYER_RIGHT_TEX]);
-
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"texture/Player_Move_Left2.png",
-		&g_pTexture[PLAYER_LEFT_TEX]);
-
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"texture/Player_Move_Right2.png",
-		&g_pTexture[PLAYER_2P_RIGHT_TEX]);
-
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
-		"texture/Player_Move_Left2.png",
-		&g_pTexture[PLAYER_2P_LEFT_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
@@ -254,7 +277,7 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/letsGo.png",
 		&g_pTexture[COUNT_DOWN_START_TEX]);
-	//
+	
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/RuleSelectBKG.png",
@@ -290,26 +313,35 @@ void ReadTexture(void) {
 		"texture/ItemDscription2.png",
 		&g_pTexture[ItemDscription2_TEX]);
 	
-	//
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"itema.jpg",
+		"texture/itembreak.png",
 		&g_pTexture[ITEMA_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"itemb.jpg",
+		"texture/jumpup.jpg",
 		&g_pTexture[ITEMB_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"itemc.jpg",
+		"texture/speedup.jpg",
 		&g_pTexture[ITEMC_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"itemd.jpg",
+		"texture/speeddown.jpg",
 		&g_pTexture[ITEMD_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/beam.png",
+		&g_pTexture[BEAM_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/beamicon.png",
+		&g_pTexture[BEAM_ICON_TEX]);
 }
 
 
@@ -395,6 +427,7 @@ void GetPadState() {
 	g_Pad1P.a = (wButtons & XINPUT_GAMEPAD_A);
 	g_Pad1P.b = (wButtons & XINPUT_GAMEPAD_B);
 	g_Pad1P.x = (wButtons & XINPUT_GAMEPAD_X);
+	g_Pad1P.y = (wButtons & XINPUT_GAMEPAD_Y);
 	g_Pad1P.lb = (wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
 	g_Pad1P.rb = (wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
 	g_Pad1P.lTrigger = (xInput.Gamepad.bLeftTrigger > 0);
@@ -410,6 +443,7 @@ void GetPadState() {
 	g_Pad2P.a = wButtons & XINPUT_GAMEPAD_A;
 	g_Pad2P.b = (wButtons & XINPUT_GAMEPAD_B);
 	g_Pad2P.x = wButtons & XINPUT_GAMEPAD_X;
+	g_Pad2P.y = (wButtons & XINPUT_GAMEPAD_Y);
 	g_Pad2P.lb = (wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
 	g_Pad2P.rb = (wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
 	g_Pad2P.lTrigger = (xInput.Gamepad.bLeftTrigger > 0);

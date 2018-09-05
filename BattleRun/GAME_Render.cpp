@@ -34,12 +34,32 @@ void ItemIconRender(int ItemNumber,CUSTOMVERTEX *vertices) {
 	case SPEEDDOWN:
 		TextureID = ITEMD_TEX;
 		break;
+	case BEAM:
+		TextureID = BEAM_ICON_TEX;
+		break;
 	}
 
 	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertices, sizeof(CUSTOMVERTEX));
-	
 }
+
+void PlayerRender(int PlayerMode, float* Righttu, float* Lefttu, CUSTOMVERTEX *vertices) {
+
+	switch (PlayerMode) {
+	case RIGHT_DIRECTION:
+		*Righttu = g_Player.scale_x;
+		*Lefttu = 0;
+		break;
+	case LEFT_DIRECTION:
+		*Righttu = 0;
+		*Lefttu = g_Player.scale_x;
+		break;
+	}
+	TextureID = GAME_PLAYER_TEX;
+	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertices, sizeof(CUSTOMVERTEX));
+}
+
 //描画処理
 void GameRender(void)
 {
@@ -70,18 +90,18 @@ void GameRender(void)
 
 	CUSTOMVERTEX  vertexPlayer1P[4]
 	{
-		{ g_Player.x,                                       g_Player.y, 1.f, 1.f, 0xFFFF0000, MoveImage / 980.f, 0.f },
-		{ g_Player.x + g_Player.scale_x,                    g_Player.y, 1.f, 1.f, 0xFFFF0000, (MoveImage + 120) / 980.f, 0.f },
-		{ g_Player.x + g_Player.scale_x, g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFF0000, (MoveImage + 120) / 980.f, 140.f / 630.f },
-		{ g_Player.x,                    g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFF0000, MoveImage / 980.f, 140.f / 630.f }
+		{ g_Player.x,                                       g_Player.y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage + Lefttu1P) / 1024.f, 0.f },
+		{ g_Player.x + g_Player.scale_x,                    g_Player.y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage + Righttu1P) / 1024.f, 0.f },
+		{ g_Player.x + g_Player.scale_x, g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage + Righttu1P) / 1024.f, 70.f / 1024.f },
+		{ g_Player.x,                    g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage + Lefttu1P) / 1024.f, 70.f / 1024.f }
 	};
 
 	CUSTOMVERTEX  vertexPlayer2P[4]
 	{
-		{ g_Player2P.x,                                           g_Player2P.y, 1.f, 1.f, 0xFF0000FF, MoveImage2P / 980.f, 0.f },
-		{ g_Player2P.x + g_Player2P.scale_x,                      g_Player2P.y, 1.f, 1.f, 0xFF0000FF, (MoveImage2P + 120) / 980.f, 0.f },
-		{ g_Player2P.x + g_Player2P.scale_x, g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFF0000FF, (MoveImage2P + 120) / 980.f, 140.f / 630.f },
-		{ g_Player2P.x,                      g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFF0000FF, MoveImage2P / 980.f, 140.f / 630.f }
+		{ g_Player2P.x,                      g_Player2P.y,                      1.f, 1.f, 0xFFFFFFFF, (MoveImage2P + Lefttu2P) / 1024.f, 0.f },
+		{ g_Player2P.x + g_Player2P.scale_x, g_Player2P.y,                      1.f, 1.f, 0xFFFFFFFF, (MoveImage2P + Righttu2P) / 1024.f, 0.f },
+		{ g_Player2P.x + g_Player2P.scale_x, g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage2P + Righttu2P) / 1024.f, 70.f / 1024.f },
+		{ g_Player2P.x,                      g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage2P + Lefttu2P) / 1024.f, 70.f / 1024.f }
 	};
 
 	CUSTOMVERTEX  CELL[4]
@@ -140,6 +160,22 @@ void GameRender(void)
 		{ g_SecondItem2P.x,                          g_SecondItem2P.y + g_SecondItem2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
+	CUSTOMVERTEX BEAM1P[4]
+	{
+		{ g_Player.x + g_Player.scale_x,		g_Player.y,					   1.f, 1.f, 0xFFFFFFFF, 0.f, Beamtutv1P / 2048.f },
+		{ g_Player.x + g_Player.scale_x + 1920, g_Player.y,					   1.f, 1.f, 0xFFFFFFFF, 1.f, Beamtutv1P / 2048.f },
+		{ g_Player.x + g_Player.scale_x + 1920, g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF, 1.f, (Beamtutv1P + 64) / 2048.f },
+		{ g_Player.x + g_Player.scale_x,        g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, (Beamtutv1P + 64) / 2048.f }
+	};
+
+	CUSTOMVERTEX BEAM2P[4]
+	{
+		{ g_Player2P.x + g_Player2P.scale_x,		g_Player2P.y,					   1.f, 1.f, 0xFFFFFFFF, 0.f, Beamtutv2P / 2048.f },
+		{ g_Player2P.x + g_Player2P.scale_x + 1920, g_Player2P.y,					   1.f, 1.f, 0xFFFFFFFF, 1.f, Beamtutv2P / 2048.f },
+		{ g_Player2P.x + g_Player2P.scale_x + 1920, g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 1.f, (Beamtutv2P + 64) / 2048.f },
+		{ g_Player2P.x + g_Player2P.scale_x,        g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, (Beamtutv2P + 64) / 2048.f }
+	};
+
 	//画面の消去
 	g_pD3Device->Clear(
 		0,
@@ -155,29 +191,8 @@ void GameRender(void)
 	g_pD3Device->SetTexture(0, g_pTexture[GAME_BKG_TEX]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexGameBKG, sizeof(CUSTOMVERTEX));
 
-	//PLAYER1の表示
-	switch (PlayerMode1P) {
-	case RIGHT_DIRECTION1P:
-		TextureID = PLAYER_RIGHT_TEX;
-		break;
-	case LEFT_DIRECTION1P:
-		TextureID = PLAYER_LEFT_TEX;
-		break;
-	}
-	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
-	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer1P, sizeof(CUSTOMVERTEX));
-
-	//PLAYER２の表示
-	switch (PlayerMode2P) {
-	case RIGHT_DIRECTION2P:
-		TextureID = PLAYER_2P_RIGHT_TEX;
-		break;
-	case LEFT_DIRECTION2P:
-		TextureID = PLAYER_2P_LEFT_TEX;
-		break;
-	}
-	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
-	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer2P, sizeof(CUSTOMVERTEX));
+	PlayerRender(PlayerMode1P, &Righttu1P, &Lefttu1P, vertexPlayer1P);
+	PlayerRender(PlayerMode2P, &Righttu2P, &Lefttu2P, vertexPlayer2P);
 
 	//マップチップの表示
 	if (MapDataSelect == Stagedesert) {
@@ -326,6 +341,16 @@ void GameRender(void)
 		}
 	}
 
+	if (BeamFlag1P) {
+		g_pD3Device->SetTexture(0, g_pTexture[BEAM_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, BEAM1P, sizeof(CUSTOMVERTEX));
+	}
+
+	if (BeamFlag2P) {
+		g_pD3Device->SetTexture(0, g_pTexture[BEAM_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, BEAM2P, sizeof(CUSTOMVERTEX));
+	}
+	
 
 	g_pD3Device->SetTexture(0, g_pTexture[GAME_PLAYER1P_STATE_SPACE_TEX]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer1PStateSpace, sizeof(CUSTOMVERTEX));
@@ -365,6 +390,7 @@ void GameRender(void)
 		break;
 	case 4:
 		TextureID = COUNT_DOWN_START_TEX;
+		break;
 	}
 	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexCountNum, sizeof(CUSTOMVERTEX));

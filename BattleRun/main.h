@@ -89,10 +89,6 @@ enum TEXTURE//テクスチャの選別に使う
 	COUNT_DOWN_TWO_TEX,
 	COUNT_DOWN_THREE_TEX,
 	RESULT_BKG_TEX,
-	PLAYER_LEFT_TEX,
-	PLAYER_RIGHT_TEX,
-	PLAYER_2P_LEFT_TEX,
-	PLAYER_2P_RIGHT_TEX,
 	GROUND_BLOCK_TEX,
 	WALL_BLOCK_RIGHT_TEX,
 	WALL_BLOCK_LEFT_TEX,
@@ -107,6 +103,8 @@ enum TEXTURE//テクスチャの選別に使う
 	ITEMB_TEX,
 	ITEMC_TEX,
 	ITEMD_TEX,
+	BEAM_TEX,
+	BEAM_ICON_TEX,
 	WIN_1P_TEX,
 	WIN_2P_TEX,
 	TEXMAX
@@ -137,6 +135,8 @@ enum PAD
 {
 	PadA1P,
 	PadA2P,
+	PadY1P,
+	PadY2P,
 	PadUP1P,
 	PadUP2P,
 	PadRIGHT1P,
@@ -188,6 +188,7 @@ typedef struct {
 	bool a;
 	bool b;
 	bool x;
+	bool y;
 	bool lb;
 	bool rb;
 	bool lTrigger;

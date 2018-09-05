@@ -8,15 +8,18 @@ int page = 1;
 
 void RuleControl()
 {
+	GetPadState();
+
 	static int keymemorise[3];
 	HRESULT hr = pKeyDevice->Acquire();
 	if ((hr == DI_OK) || (hr == S_FALSE))
 	{
 		BYTE diks[256];
 		pKeyDevice->GetDeviceState(sizeof(diks), &diks);
-		if (keymemorise[0] != diks[DIK_DOWN])
+
+		if (!prevKey[DIK_DOWN] && !prevPad[PadDOWN1P] && !prevPad[PadDOWN2P])
 		{
-			if (diks[DIK_DOWN] & 0x80)
+			if (diks[DIK_DOWN] & 0x80 || g_Pad1P.down || g_Pad2P.down)
 			{
 				if (RuleSelect == RuleSelectItem)
 				{
@@ -28,9 +31,9 @@ void RuleControl()
 				}
 			}
 		}
-		if (diks[DIK_UP] & 0x80)
+		if (diks[DIK_UP] & 0x80 || g_Pad1P.up || g_Pad2P.up)
 		{
-			if (keymemorise[1] != diks[DIK_UP])
+			if (!prevKey[DIK_UP] && !prevPad[PadUP1P] && !prevPad[PadUP2P])
 			{
 				if (RuleSelect == RuleSelectItem)
 				{
@@ -42,9 +45,9 @@ void RuleControl()
 				}
 			}
 		}
-		if (keymemorise[2] == diks[DIK_RETURN])
+		if (!prevKey[DIK_RETURN] && !prevPad[PadA1P] && !prevPad[PadA2P])
 		{
-			if (diks[DIK_RETURN] & 0x80)
+			if (diks[DIK_RETURN] & 0x80 || g_Pad1P.a || g_Pad2P.a)
 			{
 				Sleep(1 * 1000);
 				if (RuleSelect == RuleSelectRule)
@@ -61,56 +64,78 @@ void RuleControl()
 				}
 			}
 		}
-		keymemorise[0] = diks[DIK_DOWN];
-		keymemorise[1] = diks[DIK_UP];
-		keymemorise[2] = diks[DIK_RETURN];
+		prevKey[DIK_RETURN] = diks[DIK_RETURN];
+		prevKey[DIK_UP] = diks[DIK_UP];
+		prevKey[DIK_DOWN] = diks[DIK_DOWN];
+		prevPad[PadA1P] = g_Pad1P.a;
+		prevPad[PadA2P] = g_Pad2P.a;
+		prevPad[PadUP1P] = g_Pad1P.up;
+		prevPad[PadUP2P] = g_Pad2P.up;
+		prevPad[PadDOWN1P] = g_Pad1P.down;
+		prevPad[PadDOWN2P] = g_Pad2P.down;
 	}
 }
 
 void RuleControlRule()
 {
+	GetPadState();
+
 	HRESULT hr = pKeyDevice->Acquire();
 	if ((hr == DI_OK) || (hr == S_FALSE))
 	{
 		BYTE diks[256];
 		pKeyDevice->GetDeviceState(sizeof(diks), &diks);
-		if (diks[DIK_RETURN] & 0x80)
+		if (diks[DIK_RETURN] & 0x80 || g_Pad1P.a || g_Pad2P.a)
 		{
-			Sleep(1 * 1000);
-			switch (page)
-			{
-			case 1:
-				page++;
-				break;
-			case 2:
-				page = 1;
-				scene = RULE_SCENE;
-				break;
+			if (!prevKey[DIK_RETURN] && !prevPad[PadA1P] && !prevPad[PadA2P]) {
+
+				//Sleep(1 * 1000);
+				switch (page)
+				{
+				case 1:
+					page++;
+					break;
+				case 2:
+					page = 1;
+					scene = RULE_SCENE;
+					break;
+				}
 			}
 		}
+		prevKey[DIK_RETURN] = diks[DIK_RETURN];
+		prevPad[PadA1P] = g_Pad1P.a;
+		prevPad[PadA2P] = g_Pad2P.a;
 	}
 }
 
 void RuleControlItem()
 {
+	GetPadState();
+
 	HRESULT hr = pKeyDevice->Acquire();
 	if ((hr == DI_OK) || (hr == S_FALSE))
 	{
 		BYTE diks[256];
 		pKeyDevice->GetDeviceState(sizeof(diks), &diks);
-		if (diks[DIK_RETURN] & 0x80)
+		if (diks[DIK_RETURN] & 0x80 || g_Pad1P.a || g_Pad2P.a)
 		{
-			Sleep(1 * 1000);
-			switch (page)
-			{
-			case 1:
-				page++;
-				break;
-			case 2:
-				page = 1;
-				scene = RULE_SCENE;
-				break;
+			if (!prevKey[DIK_RETURN] && !prevPad[PadA1P] && !prevPad[PadA2P]) {
+
+				//Sleep(1 * 1000);
+				switch (page)
+				{
+				case 1:
+					page++;
+					break;
+				case 2:
+					page = 1;
+					scene = RULE_SCENE;
+					break;
+				}
 			}
 		}
+		prevKey[DIK_RETURN] = diks[DIK_RETURN];
+		prevPad[PadA1P] = g_Pad1P.a;
+		prevPad[PadA2P] = g_Pad2P.a;
 	}
 }
