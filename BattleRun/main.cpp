@@ -80,13 +80,33 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/title_BKG.jpg",
+		"TitleBKG1.png",
 		&g_pTexture[TITLE_BKG_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/title_logo.png",
-		&g_pTexture[TITLE_LOGO_TEX]);
+		"Title_BKG_Road.png",
+		&g_pTexture[TITLE_ROAD_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"とげ.png",
+		&g_pTexture[TITLE_GIMMICK_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"キャラダメージ.png",
+		&g_pTexture[TITLE_CHAR_GIMMICK_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"CharRun.png",
+		&g_pTexture[TITLE_CHAR_RUN_TEX]);
+
+	//D3DXCreateTextureFromFile(
+	//	g_pD3Device,
+	//	"texture/title_logo.png",
+	//	&g_pTexture[TITLE_LOGO_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
