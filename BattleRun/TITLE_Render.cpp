@@ -39,30 +39,32 @@ int TitleGIMMICKX4 = 4000;
 int TitleScrollSpeed = 20;
 void TitleRender(void)
 {
-	if (jflag == true)
-	{
-
-	}
+	//if (jflag == true)
+	//{
+	//
+	//}
 	static int RunCount = 0;
 	static int RunCountLoop = 0;
 	RunCount++;
 	if (RunCount == 2)
 	{
-		tu1 += 0.06;
-		tu2 += 0.06;
-		tu3 += 0.06;
-		tu4 += 0.06;
+		tu1 += 0.059;
+		tu2 += 0.059;
+		tu3 += 0.059;
+		tu4 += 0.059;
 		RunCount = 0;
 		RunCountLoop++;
 	}
-	if (RunCountLoop == 9)
+	if (RunCountLoop == 10)
 	{
-		tu1 = 0.06;
-		tu2 = 0.12;
-		tu3 = 0.12;
-		tu4 = 0.06;
+		tu1 = 0.059;
+		tu2 = 0.118;
+		tu3 = 0.118;
+		tu4 = 0.059;
 		RunCountLoop = 0;
 	}
+
+
 	CUSTOMVERTEX vertexTitleBKGRoad[4]
 	{
 		{ 0,   0, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
@@ -129,33 +131,33 @@ void TitleRender(void)
 		Title3BKGX4 = 1600;
 	}
 
-	CUSTOMVERTEX vertexTitleGimmick[4]
-	{
-		{ TitleGIMMICKX1,     750, 1.f,1.f, 0xFFFFFFFF, 0, 0 },
-	{ TitleGIMMICKX2,     750, 1.f,1.f, 0xFFFFFFFF, 1, 0 },
-	{ TitleGIMMICKX3,     840, 1.f,1.f, 0xFFFFFFFF, 1, 1 },
-	{ TitleGIMMICKX4,     840, 1.f,1.f, 0xFFFFFFFF, 0, 1 }
-	};
-	TitleGIMMICKX1 -= TitleScrollSpeed;
-	TitleGIMMICKX2 -= TitleScrollSpeed;
-	TitleGIMMICKX3 -= TitleScrollSpeed;
-	TitleGIMMICKX4 -= TitleScrollSpeed;
-	if (TitleGIMMICKX2 <= 0)
-	{
-		TitleGIMMICKX1 = 4000;
-		TitleGIMMICKX2 = 4120;
-		TitleGIMMICKX3 = 4120;
-		TitleGIMMICKX4 = 4000;
-	}
-
-	if (TitleGIMMICKX1 < 450)
-	{
-		jflag = true;
-		if (TitleGIMMICKX1 < 240)
-		{
-			//GimmickDamage = false;
-		}
-	}
+	//CUSTOMVERTEX vertexTitleGimmick[4]
+	//{
+	//	{ TitleGIMMICKX1,     750, 1.f,1.f, 0xFFFFFFFF, 0, 0 },
+	//{ TitleGIMMICKX2,     750, 1.f,1.f, 0xFFFFFFFF, 1, 0 },
+	//{ TitleGIMMICKX3,     840, 1.f,1.f, 0xFFFFFFFF, 1, 1 },
+	//{ TitleGIMMICKX4,     840, 1.f,1.f, 0xFFFFFFFF, 0, 1 }
+	//};
+	//TitleGIMMICKX1 -= TitleScrollSpeed;
+	//TitleGIMMICKX2 -= TitleScrollSpeed;
+	//TitleGIMMICKX3 -= TitleScrollSpeed;
+	//TitleGIMMICKX4 -= TitleScrollSpeed;
+	//if (TitleGIMMICKX2 <= 0)
+	//{
+	//	TitleGIMMICKX1 = 4000;
+	//	TitleGIMMICKX2 = 4120;
+	//	TitleGIMMICKX3 = 4120;
+	//	TitleGIMMICKX4 = 4000;
+	//}
+	//
+	//if (TitleGIMMICKX1 < 450)
+	//{
+	//	jflag = true;
+	//	if (TitleGIMMICKX1 < 240)
+	//	{
+	//		//GimmickDamage = false;
+	//	}
+	//}
 	CUSTOMVERTEX vertexTitleChar[4]
 	{
 		{ g_Player.x,     g_Player.y, 1.f,1.f, 0xFFFFFFFF, tu1, tv1 },
@@ -196,29 +198,29 @@ void TitleRender(void)
 	g_pD3Device->SetTexture(0, g_pTexture[TITLE_BKG_TEX]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleBKG3, sizeof(CUSTOMVERTEX));
 
-	if (GimmickDamage == true)//‘–‚Á‚Ä‚¢‚éó‘Ô
-	{
-		g_pD3Device->SetTexture(0, g_pTexture[TITLE_CHAR_RUN_TEX]);
-		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleChar, sizeof(CUSTOMVERTEX));
-	}
-	if (GimmickDamage == false) //ž™‚É“–‚½‚Á‚½ó‘Ô
-	{
-		g_pD3Device->SetTexture(0, g_pTexture[TITLE_CHAR_GIMMICK_TEX]);
-		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleCharDamage, sizeof(CUSTOMVERTEX));
-		static int count = 0;
-		count++;
-		if (count == 20)
-		{
-			GimmickDamage = true;
-			count = 0;
-		}
-	}
+	//if (GimmickDamage == true)//‘–‚Á‚Ä‚¢‚éó‘Ô
+	//{
+	g_pD3Device->SetTexture(0, g_pTexture[TITLE_CHAR_RUN_TEX]);
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleChar, sizeof(CUSTOMVERTEX));
+	//}
+	//if (GimmickDamage == false) //ž™‚É“–‚½‚Á‚½ó‘Ô
+	//{
+	//	g_pD3Device->SetTexture(0, g_pTexture[TITLE_CHAR_GIMMICK_TEX]);
+	//	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleCharDamage, sizeof(CUSTOMVERTEX));
+	//	static int count = 0;
+	//	count++;
+	//	if (count == 20)
+	//	{
+	//		GimmickDamage = true;
+	//		count = 0;
+	//	}
+	//}
 
 	g_pD3Device->SetTexture(0, g_pTexture[TITLE_BOTTON_TEX]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleBotton, sizeof(CUSTOMVERTEX));
 
-	g_pD3Device->SetTexture(0, g_pTexture[TITLE_GIMMICK_TEX]);
-	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleGimmick, sizeof(CUSTOMVERTEX));
+	//g_pD3Device->SetTexture(0, g_pTexture[TITLE_GIMMICK_TEX]);
+	//g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleGimmick, sizeof(CUSTOMVERTEX));
 
 
 	g_pD3Device->SetTexture(0, g_pTexture[TITLE_ROAD_TEX]);
