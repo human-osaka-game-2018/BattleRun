@@ -12,6 +12,17 @@ extern int itemboxcount;//マップにあるアイテムボックスの数を保存する変数
 extern int goalCount;//マップにあるゴールの数を保存する変数
 extern int MapSelectedHEIGHT;//選ばれたマップの縦幅を代入する変数
 extern int MapSelectedWIDTH;//選ばれたマップの横幅を代入する変数
+extern int FireBallState1P;//ファイアーボールの位置
+extern int FireBallState2P;//ファイアーボールの位置
+extern int FireBallSpeed;//ファイアーボールの速度
+extern int FireBallStateX1P;
+extern int FireBallStateY1P;
+extern int FireBallStateX2P;
+extern int FireBallStateY2P;
+extern int FireBallStateXDecision1P;//1Pが出すFireBoolStateX-FireBoolStateの計算結果を入れる変数
+extern int FireBallStateXDecision2P;//2Pが出すFireBoolStateX-FireBoolStateの計算結果を入れる変数
+extern int FireBallStateFlag1P;
+extern int FireBallStateFlag2P;
 extern OBJECT_POSITION trampoline[30];
 extern OBJECT_POSITION trampolineleft[30];
 extern OBJECT_POSITION manhole[30];

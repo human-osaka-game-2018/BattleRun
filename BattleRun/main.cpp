@@ -387,6 +387,16 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/beamicon.png",
 		&g_pTexture[BEAM_ICON_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"FIREBOOl_ICON.png",
+		&g_pTexture[FIREBOOl_ICON_TEX]);
+	
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"ItemIntegration.png",
+		&g_pTexture[ITEMINTEGRATION_TEX]);
 }
 
 

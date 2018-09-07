@@ -11,7 +11,7 @@
 #define SYOSOKUDO 20
 #define KASOKUDO 2
 #define MOVEMENT_STAGE_X 15
-#define TRAMPOLINE_SYOSOKUDO 50
+#define TRAMPOLINE_SYOSOKUDO 30
 #define PLAYER_RUN_TIPE2_FRAME (FRAME*1)
 #define PLAYER_RUN_TIPE3_FRAME (FRAME*2)
 #define ACCELERATED_EFFECT_FRAME (FRAME*3)
@@ -136,6 +136,16 @@ int SpeedChangeCount1P;
 int SpeedChangeCount2P;
 bool BeamFlag1P;
 bool BeamFlag2P;
+bool FireBoolFlag1P;
+bool FireBoolFlag2P;
+int  FireBool_HEIGHT1P;
+int  FireBool_WIDTH1P;
+int  FireBool_HEIGHT2P;
+int  FireBool_WIDTH2P;
+
+//int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];//砂漠
+//int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];//街
+//int MapData03[MAP_03_HEIGHT][MAP_03_WIDTH];//森
 
 OBJECT_STATE g_Player;
 OBJECT_STATE g_Player2P;
@@ -213,6 +223,8 @@ void InitState() {
 		Beamcount2P = 0;
 		BeamFlag1P = false;
 		BeamFlag2P = false;
+		FireBoolFlag1P = false;
+		FireBoolFlag2P = false;
 		time1P = 0;//１Pの重力を計算するための変数
 		time2P = 0;//２Pの重力を計算するための変数
 		syosokudo1P = 0;//１Pジャンプの初速度
@@ -687,6 +699,70 @@ void ItemEffectRelease(void) {
 
 	BeamEffect(&BeamFlag1P, &Beamcount1P, &Beamtutv1P);
 	BeamEffect(&BeamFlag2P, &Beamcount2P, &Beamtutv2P);
+
+	if (FireBoolFlag1P == true)//ファイアーボール使用FLAG
+	{
+		FireBallStateXDecision1P = (FireBallStateX1P - FireBallState1P);
+		FireBool_WIDTH1P = (FireBallStateXDecision1P + movementStageX) / CELL_SIZE;
+		FireBool_HEIGHT1P = (FireBallStateY1P + movementStageY) / CELL_SIZE;
+		switch (MapDataSelect)
+		{
+		case Stagedesert:
+			if (MapData01[FireBool_HEIGHT1P][FireBool_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
+			{
+				FireBoolFlag1P = false;
+				FireBallState1P = 100;
+			}
+			break;
+		case StageCity:
+			if (MapData02[FireBool_HEIGHT1P][FireBool_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
+			{
+				FireBoolFlag1P = false;
+				FireBallState1P = 100;
+			}
+			break;
+		case StageForest:
+			if (MapData03[FireBool_HEIGHT1P][FireBool_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
+			{
+				FireBoolFlag1P = false;
+				FireBallState1P = 100;
+			}
+			break;
+		}
+		FireBallState1P += FireBallSpeed;
+	}
+
+	if (FireBoolFlag2P == true)//ファイアーボール使用FLAG
+	{
+		FireBallStateXDecision2P = (FireBallStateX2P - FireBallState2P);
+		FireBool_WIDTH2P = (FireBallStateXDecision2P + movementStageX) / CELL_SIZE;
+		FireBool_HEIGHT2P = (FireBallStateY2P + movementStageY) / CELL_SIZE;
+		switch (MapDataSelect)
+		{
+		case Stagedesert:
+			if (MapData01[FireBool_HEIGHT2P][FireBool_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
+			{
+				FireBoolFlag2P = false;
+				FireBallState2P = 100;
+			}
+			break;
+			case StageCity:
+			if (MapData02[FireBool_HEIGHT2P][FireBool_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
+			{
+				FireBoolFlag2P = false;
+				FireBallState2P = 100;
+			}
+			break;
+		case StageForest:
+			if (MapData03[FireBool_HEIGHT2P][FireBool_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
+			{
+				FireBoolFlag2P = false;
+				FireBallState2P = 100;
+			}
+			break;
+		}
+		FireBallState2P += FireBallSpeed;
+	}
 }
 
 void ItemBreak(int Player) {
@@ -752,6 +828,31 @@ void Beam(int Player) {
 	}
 }
 
+void FireBool(int Player) {
+	switch (Player) {
+	case PLAYER1:
+		FireBallStateFlag1P = true;
+		if (FireBallStateFlag1P == true)
+		{
+			FireBallStateX1P = g_Player.x + g_Player.scale_x;
+			FireBallStateY1P = g_Player.y;
+			FireBallStateFlag1P = false;
+		}
+		FireBoolFlag1P = true;
+		break;
+	case PLAYER2:
+		FireBallStateFlag2P = true;
+		if (FireBallStateFlag2P == true)
+		{
+			FireBallStateX2P = g_Player2P.x + g_Player2P.scale_x;
+			FireBallStateY2P = g_Player2P.y;
+			FireBallStateFlag2P = false;
+		}
+		FireBoolFlag2P = true;
+		break;
+	}
+}
+
 void UseItem(int Player) {
 
 	int ItemNumber = 0;
@@ -784,6 +885,9 @@ void UseItem(int Player) {
 		break;
 	case BEAM:
 		Beam(Player);
+		break;
+	case FIREBOOL:
+		FireBool(Player);
 		break;
 	}
 }

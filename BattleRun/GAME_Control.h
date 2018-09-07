@@ -40,6 +40,7 @@ enum ITEM_NUM
 	SPEEDUP,
 	SPEEDDOWN,
 	BEAM,
+	FIREBOOL,
 	ITEM_MAX
 };
 
@@ -83,5 +84,7 @@ extern int FirstItem2P;
 extern int SecondItem2P;
 extern bool BeamFlag1P;
 extern bool BeamFlag2P;
+extern bool FireBoolFlag1P;
+extern bool FireBoolFlag2P;
 
 #endif // !GAME_CONTROL_

@@ -11,6 +11,21 @@ int TextureID = 0;//描画のテクスチャ番号を保存する変数
 int MapSelected;//選ばれたマップのマスの値を代入する変数
 int MapSelectedHEIGHT;//選ばれたマップの縦幅を代入する変数
 int MapSelectedWIDTH;//選ばれたマップの横幅を代入する変数
+float FireBallltu14=0;//ファイアーボールに使う１と4のtu
+float FireBalltv12=0.064;//ファイアーボールに使う１と２のtv
+float FireBalltu23=0.064;//ファイアーボールに使う２と３のtu
+float FireBalltv34=0.128;//ファイアーボールに使う３と４のtv
+int FireBallState1P = 100;//1Pの火の玉の位置（この値に値を＋するとファイアーボールが動く）
+int FireBallState2P = 100;//2Pの火の玉の位置（この値に値を＋するとファイアーボールが動く）
+int FireBallSpeed = 30;//ファイアーボールの速度
+int FireBallStateX1P;//発射時のファイアーボールのX座標
+int FireBallStateY1P;//発射時のファイアーボールのY座標
+int FireBallStateX2P;//発射時のファイアーボールのX座標
+int FireBallStateY2P;//発射時のファイアーボールのY座標
+int FireBallStateXDecision1P;//1Pが出すFireBoolStateX-FireBoolStateの計算結果を入れる変数
+int FireBallStateXDecision2P;//2Pが出すFireBoolStateX-FireBoolStateの計算結果を入れる変数
+int FireBallStateFlag1P = false;//ファイアーボールのXY座標を変数に入れるFLAG
+int FireBallStateFlag2P = false;//ファイアーボールのXY座標を変数に入れるFLAG
 OBJECT_POSITION trampoline[30];//トランポリンの座標を保存する構造体配列、10個まで
 OBJECT_POSITION trampolineleft[30];
 OBJECT_POSITION manhole[30];//マンホールの座標を保存する構造体配列
@@ -36,6 +51,9 @@ void ItemIconRender(int ItemNumber,CUSTOMVERTEX *vertices) {
 		break;
 	case BEAM:
 		TextureID = BEAM_ICON_TEX;
+		break;
+	case FIREBOOL:
+		TextureID = FIREBOOl_ICON_TEX;
 		break;
 	}
 
@@ -175,6 +193,24 @@ void GameRender(void)
 		{ g_Player2P.x + g_Player2P.scale_x + 1920, g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 1.f, (Beamtutv2P + 64) / 2048.f },
 		{ g_Player2P.x + g_Player2P.scale_x,        g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, (Beamtutv2P + 64) / 2048.f }
 	};
+
+
+	CUSTOMVERTEX FIREBOOL1P[4]
+	{
+	{ FireBallStateXDecision1P ,	   FireBallStateY1P,  1.f, 1.f, 0xFFFFFFFF, FireBallltu14, FireBalltv12 },
+	{ FireBallStateXDecision1P + 64,   FireBallStateY1P,  1.f, 1.f, 0xFFFFFFFF, FireBalltu23, FireBalltv12 },
+	{ FireBallStateXDecision1P + 64,   FireBallStateY1P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBalltu23, FireBalltv34 },
+	{ FireBallStateXDecision1P ,       FireBallStateY1P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBallltu14, FireBalltv34 }
+	};
+
+	CUSTOMVERTEX FIREBOOL2P[4]
+	{
+	{ FireBallStateXDecision2P ,	  FireBallStateY2P,  1.f, 1.f, 0xFFFFFFFF, FireBallltu14, FireBalltv12 },
+	{ FireBallStateXDecision2P + 64,  FireBallStateY2P,  1.f, 1.f, 0xFFFFFFFF, FireBalltu23, FireBalltv12 },
+	{ FireBallStateXDecision2P + 64,  FireBallStateY2P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBalltu23, FireBalltv34 },
+	{ FireBallStateXDecision2P ,      FireBallStateY2P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBallltu14, FireBalltv34 }
+	};
+
 
 	CUSTOMVERTEX win1PCountFlag1[4]//1P(赤)の1勝目
 	{
@@ -378,6 +414,17 @@ void GameRender(void)
 		g_pD3Device->SetTexture(0, g_pTexture[BEAM_TEX]);
 		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, BEAM2P, sizeof(CUSTOMVERTEX));
 	}
+
+	if (FireBoolFlag1P) {
+		g_pD3Device->SetTexture(0, g_pTexture[ITEMINTEGRATION_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, FIREBOOL1P, sizeof(CUSTOMVERTEX));
+	}
+
+	if (FireBoolFlag2P) {
+		g_pD3Device->SetTexture(0, g_pTexture[ITEMINTEGRATION_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, FIREBOOL2P, sizeof(CUSTOMVERTEX));
+	}
+
 	
 
 	g_pD3Device->SetTexture(0, g_pTexture[GAME_PLAYER1P_STATE_SPACE_TEX]);
