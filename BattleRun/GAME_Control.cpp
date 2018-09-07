@@ -143,10 +143,6 @@ int  FireBall_WIDTH1P;
 int  FireBall_HEIGHT2P;
 int  FireBall_WIDTH2P;
 
-//int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];//砂漠
-//int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];//街
-//int MapData03[MAP_03_HEIGHT][MAP_03_WIDTH];//森
-
 OBJECT_STATE g_Player;
 OBJECT_STATE g_Player2P;
 OBJECT_STATE g_CountDownNum;
@@ -710,21 +706,27 @@ void ItemEffectRelease(void) {
 		case Stagedesert:
 			if (MapData01[FireBall_HEIGHT1P][FireBall_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
 			{
+				FireBallFlagEfect1P = true;
 				FireBallFlag1P = false;
+				FireBallFlagEfectCount1P = 0;
 				FireBallState1P = 100;
 			}
 			break;
 		case StageCity:
 			if (MapData02[FireBall_HEIGHT1P][FireBall_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
 			{
+				FireBallFlagEfect1P = true;
 				FireBallFlag1P = false;
+				FireBallFlagEfectCount1P = 0;
 				FireBallState1P = 100;
 			}
 			break;
 		case StageForest:
 			if (MapData03[FireBall_HEIGHT1P][FireBall_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
 			{
+				FireBallFlagEfect1P = true;
 				FireBallFlag1P = false;
+				FireBallFlagEfectCount1P = 0;
 				FireBallState1P = 100;
 			}
 			break;
@@ -742,21 +744,27 @@ void ItemEffectRelease(void) {
 		case Stagedesert:
 			if (MapData01[FireBall_HEIGHT2P][FireBall_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
 			{
+				FireBallFlagEfect2P = true;
 				FireBallFlag2P = false;
+				FireBallFlagEfectCount2P = 0;
 				FireBallState2P = 100;
 			}
 			break;
 			case StageCity:
 			if (MapData02[FireBall_HEIGHT2P][FireBall_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
 			{
+				FireBallFlagEfect2P = true;
 				FireBallFlag2P = false;
+				FireBallFlagEfectCount2P = 0;
 				FireBallState2P = 100;
 			}
 			break;
 		case StageForest:
 			if (MapData03[FireBall_HEIGHT2P][FireBall_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
 			{
+				FireBallFlagEfect2P = true;
 				FireBallFlag2P = false;
+				FireBallFlagEfectCount2P = 0;
 				FireBallState2P = 100;
 			}
 			break;
@@ -872,20 +880,20 @@ void UseItem(int Player) {
 
 	switch (ItemNumber) {
 	case ITEMBREAK:
-		ItemBreak(Player);
-		break;
+		//ItemBreak(Player);
+		//break;
 	case JUMPUP:
-		JumpUp(Player);
-		break;
+		//JumpUp(Player);
+		//break;
 	case SPEEDUP:
-		SpeedUp(Player);
-		break;
+		//SpeedUp(Player);
+		//break;
 	case SPEEDDOWN:
-		SpeedDown(Player);
-		break;
+		//SpeedDown(Player);
+		//break;
 	case BEAM:
-		Beam(Player);
-		break;
+		//Beam(Player);
+		//break;
 	case FIREBOOL:
 		FireBool(Player);
 		break;

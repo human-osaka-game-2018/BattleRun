@@ -12,6 +12,10 @@ extern int itemboxcount;//マップにあるアイテムボックスの数を保存する変数
 extern int goalCount;//マップにあるゴールの数を保存する変数
 extern int MapSelectedHEIGHT;//選ばれたマップの縦幅を代入する変数
 extern int MapSelectedWIDTH;//選ばれたマップの横幅を代入する変数
+extern int FireBallFlagEfectCount1P;
+extern int FireBallFlagEfectCount2P;
+extern int FireBallFlagEfect1P;
+extern int FireBallFlagEfect2P;
 extern int FireBallState1P;//ファイアーボールの位置
 extern int FireBallState2P;//ファイアーボールの位置
 extern int FireBallSpeed;//ファイアーボールの速度

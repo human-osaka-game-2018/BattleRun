@@ -52,7 +52,8 @@ void TitleControl() {
 			bool isSuccess = soundsManager.Stop(_T("titleBGM"));
 			bool isSuccess2 = soundsManager.Start(_T("titleBotton"));
 			Sleep(1 * 1000);
-			scene = RULE_SCENE;
+			scene = STAGESELECT_SCENE;
+			//scene = RULE_SCENE;
 		}
 		prevPad[PadA1P] = g_Pad1P.a;
 	}

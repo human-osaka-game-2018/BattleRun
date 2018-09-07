@@ -11,10 +11,18 @@ int TextureID = 0;//描画のテクスチャ番号を保存する変数
 int MapSelected;//選ばれたマップのマスの値を代入する変数
 int MapSelectedHEIGHT;//選ばれたマップの縦幅を代入する変数
 int MapSelectedWIDTH;//選ばれたマップの横幅を代入する変数
-float FireBallltu14=0;//ファイアーボールに使う１と4のtu
-float FireBalltv12=0.064;//ファイアーボールに使う１と２のtv
-float FireBalltu23=0.064;//ファイアーボールに使う２と３のtu
-float FireBalltv34=0.128;//ファイアーボールに使う３と４のtv
+float FireBall1Ptu14=0;//ファイアーボールに使う１と4のtu
+float FireBall1Ptv12=0.064;//ファイアーボールに使う１と２のtv
+float FireBall1Ptu23=0.064;//ファイアーボールに使う２と３のtu
+float FireBall1Ptv34=0.128;//ファイアーボールに使う３と４のtv
+float FireBall2Ptu14=0;//ファイアーボールに使う１と4のtu
+float FireBall2Ptv12 = 0.064;//ファイアーボールに使う１と２のtv
+float FireBall2Ptu23 = 0.064;//ファイアーボールに使う２と３のtu
+float FireBall2Ptv34 = 0.128;//ファイアーボールに使う３と４のtv
+int FireBallFlagEfectCount1P = 0;
+int FireBallFlagEfectCount2P = 0;
+int FireBallFlagEfect1P = false;
+int FireBallFlagEfect2P = false;
 int FireBallState1P = 100;//1Pの火の玉の位置（この値に値を＋するとファイアーボールが動く）
 int FireBallState2P = 100;//2Pの火の玉の位置（この値に値を＋するとファイアーボールが動く）
 int FireBallSpeed = 30;//ファイアーボールの速度
@@ -195,20 +203,20 @@ void GameRender(void)
 	};
 
 
-	CUSTOMVERTEX FIREBOOL1P[4]
+	CUSTOMVERTEX FIREBALL1P[4]
 	{
-	{ FireBallStateXDecision1P ,	   FireBallStateY1P,  1.f, 1.f, 0xFFFFFFFF, FireBallltu14, FireBalltv12 },
-	{ FireBallStateXDecision1P + 64,   FireBallStateY1P,  1.f, 1.f, 0xFFFFFFFF, FireBalltu23, FireBalltv12 },
-	{ FireBallStateXDecision1P + 64,   FireBallStateY1P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBalltu23, FireBalltv34 },
-	{ FireBallStateXDecision1P ,       FireBallStateY1P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBallltu14, FireBalltv34 }
+	{ FireBallStateXDecision1P ,	   FireBallStateY1P,	  1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu14, FireBall1Ptv12 },
+	{ FireBallStateXDecision1P + 64,   FireBallStateY1P,	  1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu23,  FireBall1Ptv12 },
+	{ FireBallStateXDecision1P + 64,   FireBallStateY1P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu23,  FireBall1Ptv34 },
+	{ FireBallStateXDecision1P ,       FireBallStateY1P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu14, FireBall1Ptv34 }
 	};
 
-	CUSTOMVERTEX FIREBOOL2P[4]
+	CUSTOMVERTEX FIREBALL2P[4]
 	{
-	{ FireBallStateXDecision2P ,	  FireBallStateY2P,  1.f, 1.f, 0xFFFFFFFF, FireBallltu14, FireBalltv12 },
-	{ FireBallStateXDecision2P + 64,  FireBallStateY2P,  1.f, 1.f, 0xFFFFFFFF, FireBalltu23, FireBalltv12 },
-	{ FireBallStateXDecision2P + 64,  FireBallStateY2P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBalltu23, FireBalltv34 },
-	{ FireBallStateXDecision2P ,      FireBallStateY2P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBallltu14, FireBalltv34 }
+	{ FireBallStateXDecision2P ,	  FireBallStateY2P,	   	 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu14,  FireBall2Ptv12 },
+	{ FireBallStateXDecision2P + 64,  FireBallStateY2P,		 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu23,  FireBall2Ptv12 },
+	{ FireBallStateXDecision2P + 64,  FireBallStateY2P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu23,  FireBall2Ptv34 },
+	{ FireBallStateXDecision2P ,      FireBallStateY2P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu14,  FireBall2Ptv34 }
 	};
 
 
@@ -416,13 +424,89 @@ void GameRender(void)
 	}
 
 	if (FireBallFlag1P) {
+		FireBallFlagEfectCount1P++;
+		if (FireBallFlagEfectCount1P <= 6)
+		{
+			FireBall1Ptu14 = 0.064;
+			FireBall1Ptu23 = 0.128;
+		}
+		if (FireBallFlagEfectCount1P <= 3)
+		{
+			FireBall1Ptu14 = 0;
+			FireBall1Ptu23 = 0.064;
+		}
+		if (FireBallFlagEfectCount1P == 6)
+		{
+			FireBallFlagEfectCount1P = 0;
+		}
 		g_pD3Device->SetTexture(0, g_pTexture[ITEMINTEGRATION_TEX]);
-		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, FIREBOOL1P, sizeof(CUSTOMVERTEX));
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, FIREBALL1P, sizeof(CUSTOMVERTEX));
+	}
+	if (FireBallFlagEfect1P)
+	{
+		FireBallFlagEfectCount1P++;
+		if (FireBallFlagEfectCount1P < 8)
+		{
+			FireBall1Ptu14 = 0.192;
+			FireBall1Ptu23 = 0.256;
+			g_pD3Device->SetTexture(0, g_pTexture[ITEMINTEGRATION_TEX]);
+			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, FIREBALL1P, sizeof(CUSTOMVERTEX));
+		}
+		if (FireBallFlagEfectCount1P < 4)
+		{
+			FireBall1Ptu14 = 0.128;
+			FireBall1Ptu23 = 0.192;
+			g_pD3Device->SetTexture(0, g_pTexture[ITEMINTEGRATION_TEX]);
+			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, FIREBALL1P, sizeof(CUSTOMVERTEX));
+		}
+		if (FireBallFlagEfectCount1P == 12)
+		{
+			FireBallFlagEfectCount1P = 0;
+			FireBallFlagEfect1P = false;
+		}
 	}
 
 	if (FireBallFlag2P) {
+		FireBallFlagEfectCount2P++;
+		if (FireBallFlagEfectCount2P <= 6)
+		{
+			FireBall2Ptu14 = 0.064;
+			FireBall2Ptu23 = 0.128;
+		}
+		if (FireBallFlagEfectCount2P <= 3)
+		{
+			FireBall2Ptu14 = 0;
+			FireBall2Ptu23 = 0.064;
+		}
+		if (FireBallFlagEfectCount2P == 6)
+		{
+			FireBallFlagEfectCount2P = 0;
+		}
 		g_pD3Device->SetTexture(0, g_pTexture[ITEMINTEGRATION_TEX]);
-		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, FIREBOOL2P, sizeof(CUSTOMVERTEX));
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, FIREBALL2P, sizeof(CUSTOMVERTEX));
+	}
+	if (FireBallFlagEfect2P)
+	{
+		FireBallFlagEfectCount2P++;
+		if (FireBallFlagEfectCount2P < 8)
+		{
+			FireBall2Ptu14 = 0.192;
+			FireBall2Ptu23 = 0.256;
+			g_pD3Device->SetTexture(0, g_pTexture[ITEMINTEGRATION_TEX]);
+			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, FIREBALL2P, sizeof(CUSTOMVERTEX));
+		}
+		if (FireBallFlagEfectCount2P < 4)
+		{
+			FireBall2Ptu14 = 0.128;
+			FireBall2Ptu23 = 0.192;
+			g_pD3Device->SetTexture(0, g_pTexture[ITEMINTEGRATION_TEX]);
+			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, FIREBALL2P, sizeof(CUSTOMVERTEX));
+		}
+		if (FireBallFlagEfectCount2P == 12)
+		{
+			FireBallFlagEfectCount2P = 0;
+			FireBallFlagEfect2P = false;
+		}
 	}
 
 	
