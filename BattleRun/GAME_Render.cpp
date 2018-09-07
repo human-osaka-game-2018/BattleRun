@@ -11,6 +11,12 @@ int TextureID = 0;//•`‰æ‚ÌƒeƒNƒXƒ`ƒƒ”Ô†‚ð•Û‘¶‚·‚é•Ï”
 int MapSelected;//‘I‚Î‚ê‚½ƒ}ƒbƒv‚Ìƒ}ƒX‚Ì’l‚ð‘ã“ü‚·‚é•Ï”
 int MapSelectedHEIGHT;//‘I‚Î‚ê‚½ƒ}ƒbƒv‚Ìc•‚ð‘ã“ü‚·‚é•Ï”
 int MapSelectedWIDTH;//‘I‚Î‚ê‚½ƒ}ƒbƒv‚Ì‰¡•‚ð‘ã“ü‚·‚é•Ï”
+float FettersRighttu1P;
+float FettersLefttu1P;
+float FettersRighttu2P;
+float FettersLefttu2P;
+float Fettersscale1P;
+float Fettersscale2P;
 float FireBall1Ptu14=0;//ƒtƒ@ƒCƒA[ƒ{[ƒ‹‚ÉŽg‚¤‚P‚Æ4‚Ìtu
 float FireBall1Ptv12=0.064;//ƒtƒ@ƒCƒA[ƒ{[ƒ‹‚ÉŽg‚¤‚P‚Æ‚Q‚Ìtv
 float FireBall1Ptu23=0.064;//ƒtƒ@ƒCƒA[ƒ{[ƒ‹‚ÉŽg‚¤‚Q‚Æ‚R‚Ìtu
@@ -34,11 +40,11 @@ int FireBallStateXDecision1P;//1P‚ªo‚·FireBoolStateX-FireBoolState‚ÌŒvŽZŒ‹‰Ê‚ð“
 int FireBallStateXDecision2P;//2P‚ªo‚·FireBoolStateX-FireBoolState‚ÌŒvŽZŒ‹‰Ê‚ð“ü‚ê‚é•Ï”
 int FireBallStateFlag1P = false;//ƒtƒ@ƒCƒA[ƒ{[ƒ‹‚ÌXYÀ•W‚ð•Ï”‚É“ü‚ê‚éFLAG
 int FireBallStateFlag2P = false;//ƒtƒ@ƒCƒA[ƒ{[ƒ‹‚ÌXYÀ•W‚ð•Ï”‚É“ü‚ê‚éFLAG
-OBJECT_POSITION trampoline[30];//ƒgƒ‰ƒ“ƒ|ƒŠƒ“‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñA10ŒÂ‚Ü‚Å
-OBJECT_POSITION trampolineleft[30];
-OBJECT_POSITION manhole[30];//ƒ}ƒ“ƒz[ƒ‹‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñ
-OBJECT_POSITION itembox[30];
-OBJECT_POSITION goal[50];//ƒS[ƒ‹‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñA10ŒÂ‚Ü‚Å
+OBJECT_POSITION trampoline[50];//ƒgƒ‰ƒ“ƒ|ƒŠƒ“‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñA10ŒÂ‚Ü‚Å
+OBJECT_POSITION trampolineleft[50];
+OBJECT_POSITION manhole[50];//ƒ}ƒ“ƒz[ƒ‹‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñ
+OBJECT_POSITION itembox[50];
+OBJECT_POSITION goal[100];//ƒS[ƒ‹‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñA10ŒÂ‚Ü‚Å
 
 void ItemIconRender(int ItemNumber,CUSTOMVERTEX *vertices) {
 
@@ -46,19 +52,22 @@ void ItemIconRender(int ItemNumber,CUSTOMVERTEX *vertices) {
 
 	switch (ItemNumber) {
 	case ITEMBREAK:
-		TextureID = ITEMA_TEX;
+		TextureID = ITEMBREAK_ICON_TEX;
 		break;
 	case JUMPUP:
-		TextureID = ITEMB_TEX;
+		TextureID = JUMPUP_ICON_TEX;
 		break;
 	case SPEEDUP:
-		TextureID = ITEMC_TEX;
+		TextureID = SPEEDUP_ICON_TEX;
 		break;
 	case SPEEDDOWN:
-		TextureID = ITEMD_TEX;
+		TextureID = FETTERS_ICON_TEX;
 		break;
 	case BEAM:
 		TextureID = BEAM_ICON_TEX;
+		break;
+	case BARRIER:
+		TextureID = BARRIER_ICON_TEX;
 		break;
 	case FIREBOOL:
 		TextureID = FIREBOOl_ICON_TEX;
@@ -84,6 +93,26 @@ void PlayerRender(int PlayerMode, float* Righttu, float* Lefttu, CUSTOMVERTEX *v
 	TextureID = GAME_PLAYER_TEX;
 	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertices, sizeof(CUSTOMVERTEX));
+}
+
+void FettersRender(int PlayerMode, float* Righttu, float* Lefttu,float* Fettersscale, CUSTOMVERTEX *vertices) {
+
+	switch (PlayerMode) {
+	case RIGHT_DIRECTION:
+		*Righttu = 64;
+		*Lefttu = 0;
+		*Fettersscale = -50;
+		break;
+	case LEFT_DIRECTION:
+		*Righttu = 0;
+		*Lefttu = 64;
+		*Fettersscale = 50;
+		break;
+	}
+	TextureID = EFFECT_TEX;
+	g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertices, sizeof(CUSTOMVERTEX));
+
 }
 
 //•`‰æˆ—
@@ -188,65 +217,100 @@ void GameRender(void)
 
 	CUSTOMVERTEX BEAM1P[4]
 	{
-		{ g_Player.x + g_Player.scale_x,		g_Player.y,					   1.f, 1.f, 0xFFFFFFFF, 0.f, Beamtutv1P / 2048.f },
-		{ g_Player.x + g_Player.scale_x + 1920, g_Player.y,					   1.f, 1.f, 0xFFFFFFFF, 1.f, Beamtutv1P / 2048.f },
-		{ g_Player.x + g_Player.scale_x + 1920, g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF, 1.f, (Beamtutv1P + 64) / 2048.f },
-		{ g_Player.x + g_Player.scale_x,        g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, (Beamtutv1P + 64) / 2048.f }
+		{ g_Beam1P.x,		             g_Beam1P.y,					1.f, 1.f, 0xFFFFFFFF, 0.f, Beamtutv1P / 2048.f },
+		{ g_Beam1P.x + g_Beam1P.scale_x, g_Beam1P.y,					1.f, 1.f, 0xFFFFFFFF, 1.f, Beamtutv1P / 2048.f },
+		{ g_Beam1P.x + g_Beam1P.scale_x, g_Beam1P.y + g_Beam1P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 1.f, (Beamtutv1P + 64) / 2048.f },
+	    { g_Beam1P.x,                    g_Beam1P.y + g_Beam1P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, (Beamtutv1P + 64) / 2048.f }
 	};
 
 	CUSTOMVERTEX BEAM2P[4]
 	{
-		{ g_Player2P.x + g_Player2P.scale_x,		g_Player2P.y,					   1.f, 1.f, 0xFFFFFFFF, 0.f, Beamtutv2P / 2048.f },
-		{ g_Player2P.x + g_Player2P.scale_x + 1920, g_Player2P.y,					   1.f, 1.f, 0xFFFFFFFF, 1.f, Beamtutv2P / 2048.f },
-		{ g_Player2P.x + g_Player2P.scale_x + 1920, g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 1.f, (Beamtutv2P + 64) / 2048.f },
-		{ g_Player2P.x + g_Player2P.scale_x,        g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, (Beamtutv2P + 64) / 2048.f }
+		{ g_Beam2P.x,		             g_Beam2P.y,					1.f, 1.f, 0xFFFFFFFF, 0.f, Beamtutv2P / 2048.f },
+		{ g_Beam2P.x + g_Beam2P.scale_x, g_Beam2P.y,					1.f, 1.f, 0xFFFFFFFF, 1.f, Beamtutv2P / 2048.f },
+		{ g_Beam2P.x + g_Beam2P.scale_x, g_Beam2P.y + g_Beam2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 1.f, (Beamtutv2P + 64) / 2048.f },
+		{ g_Beam2P.x,                    g_Beam2P.y + g_Beam2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, 0.f, (Beamtutv2P + 64) / 2048.f }
 	};
 
+	CUSTOMVERTEX FETTERS1P[4]
+	{
+		{ g_Player.x + Fettersscale1P,	    g_Player.y,					 1.f, 1.f, 0xFFFFFFFF,(Fetterstu1P + FettersLefttu1P) / 1024.f, 0.f },
+		{ g_Player.x + Fettersscale1P + 64, g_Player.y,					 1.f, 1.f, 0xFFFFFFFF,(Fetterstu1P + FettersRighttu1P) / 1024.f, 0.f },
+		{ g_Player.x + Fettersscale1P + 64, g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF,(Fetterstu1P + FettersRighttu1P) / 1024.f, 64.f / 1024.f },
+		{ g_Player.x + Fettersscale1P,      g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF,(Fetterstu1P + FettersLefttu1P) / 1024.f, 64.f / 1024.f }
+	};
+
+	CUSTOMVERTEX FETTERS2P[4]
+	{
+		{ g_Player2P.x + Fettersscale2P,	  g_Player2P.y,					     1.f, 1.f, 0xFFFFFFFF, (Fetterstu2P + FettersLefttu2P) / 1024.f, 0.f },
+		{ g_Player2P.x + Fettersscale2P + 64, g_Player2P.y,					     1.f, 1.f, 0xFFFFFFFF, (Fetterstu2P + FettersRighttu2P) / 1024.f, 0.f },
+		{ g_Player2P.x + Fettersscale2P + 64, g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, (Fetterstu2P + FettersRighttu2P) / 1024.f, 64.f / 1024.f },
+		{ g_Player2P.x + Fettersscale2P,      g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, (Fetterstu2P + FettersLefttu2P) / 1024.f, 64.f / 1024.f }
+	};
+
+	int SizeUp = 15;
+
+	CUSTOMVERTEX BARRIER1P[4]
+	{
+		{ g_Player.x - SizeUp,                    g_Player.y - SizeUp,           1.f, 1.f, 0xFFFFFFFF,  Barriertu1P / 1024.f, 64.f / 1024.f },
+		{ g_Player.x + g_Player.scale_x + SizeUp, g_Player.y - SizeUp,           1.f, 1.f, 0xFFFFFFFF,  (Barriertu1P + 64.f) / 1024.f, 64.f / 1024.f },
+		{ g_Player.x + g_Player.scale_x + SizeUp, g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF,  (Barriertu1P + 64.f) / 1024.f, 128.f / 1024.f },
+		{ g_Player.x - SizeUp,                    g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF,  Barriertu1P / 1024.f, 128.f / 1024.f }
+	};
+
+	CUSTOMVERTEX BARRIER2P[4]
+	{
+		{ g_Player2P.x - SizeUp,                      g_Player2P.y - SizeUp,		     1.f, 1.f, 0xFFFFFFFF,  Barriertu2P / 1024.f, 64.f / 1024.f },
+	    { g_Player2P.x + g_Player2P.scale_x + SizeUp, g_Player2P.y - SizeUp,			 1.f, 1.f, 0xFFFFFFFF,  (Barriertu2P + 64.f) / 1024.f, 64.f / 1024.f },
+		{ g_Player2P.x + g_Player2P.scale_x + SizeUp, g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF,  (Barriertu2P + 64.f) / 1024.f, 128.f / 1024.f },
+		{ g_Player2P.x - SizeUp,                      g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF,  Barriertu2P / 1024.f, 128.f / 1024.f }
+	};
 
 	CUSTOMVERTEX FIREBALL1P[4]
 	{
-	{ FireBallStateXDecision1P ,	   FireBallStateY1P,	  1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu14, FireBall1Ptv12 },
-	{ FireBallStateXDecision1P + 64,   FireBallStateY1P,	  1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu23,  FireBall1Ptv12 },
-	{ FireBallStateXDecision1P + 64,   FireBallStateY1P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu23,  FireBall1Ptv34 },
-	{ FireBallStateXDecision1P ,       FireBallStateY1P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu14, FireBall1Ptv34 }
+		{ FireBallStateXDecision1P ,	   FireBallStateY1P,	  1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu14, FireBall1Ptv12 },
+		{ FireBallStateXDecision1P + 64,   FireBallStateY1P,	  1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu23,  FireBall1Ptv12 },
+		{ FireBallStateXDecision1P + 64,   FireBallStateY1P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu23,  FireBall1Ptv34 },
+		{ FireBallStateXDecision1P ,       FireBallStateY1P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu14, FireBall1Ptv34 }
 	};
 
 	CUSTOMVERTEX FIREBALL2P[4]
 	{
-	{ FireBallStateXDecision2P ,	  FireBallStateY2P,	   	 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu14,  FireBall2Ptv12 },
-	{ FireBallStateXDecision2P + 64,  FireBallStateY2P,		 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu23,  FireBall2Ptv12 },
-	{ FireBallStateXDecision2P + 64,  FireBallStateY2P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu23,  FireBall2Ptv34 },
-	{ FireBallStateXDecision2P ,      FireBallStateY2P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu14,  FireBall2Ptv34 }
+		{ FireBallStateXDecision2P ,	  FireBallStateY2P,	   	 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu14,  FireBall2Ptv12 },
+		{ FireBallStateXDecision2P + 64,  FireBallStateY2P,		 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu23,  FireBall2Ptv12 },
+		{ FireBallStateXDecision2P + 64,  FireBallStateY2P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu23,  FireBall2Ptv34 },
+		{ FireBallStateXDecision2P ,      FireBallStateY2P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu14,  FireBall2Ptv34 }
 	};
-
 
 	CUSTOMVERTEX win1PCountFlag1[4]//1P(Ô)‚Ì1Ÿ–Ú
 	{
 		{ 140.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-	{ 210.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-	{ 210.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-	{ 140.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 210.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 210.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 140.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
+	
 	CUSTOMVERTEX win1PCountFlag2[4]//1P(Ô)‚Ì2Ÿ–Ú
 	{
 		{ 200.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-	{ 270.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-	{ 270.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-	{ 200.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 270.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 270.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 200.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
+	
 	CUSTOMVERTEX win2PCountFlag1[4]//2P(Â)‚Ì1Ÿ–Ú
 	{
 		{ 660.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-	{ 730.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-	{ 730.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-	{ 660.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 730.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 730.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 660.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
+	
 	CUSTOMVERTEX win2PCountFlag2[4]//2P(Â)‚Ì2Ÿ–Ú
 	{
 		{ 720.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-	{ 790.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-	{ 790.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-	{ 720.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 790.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 790.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 720.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 	//‰æ–Ê‚ÌÁ‹Ž
 	g_pD3Device->Clear(
@@ -266,6 +330,24 @@ void GameRender(void)
 	PlayerRender(PlayerMode1P, &Righttu1P, &Lefttu1P, vertexPlayer1P);
 	PlayerRender(PlayerMode2P, &Righttu2P, &Lefttu2P, vertexPlayer2P);
 
+	if (FettersFlag1P) {
+		FettersRender(PlayerMode1P, &FettersRighttu1P, &FettersLefttu1P, &Fettersscale1P, FETTERS1P);
+	}
+
+	if (FettersFlag2P) {
+		FettersRender(PlayerMode2P, &FettersRighttu2P, &FettersLefttu2P, &Fettersscale2P, FETTERS2P);
+	}
+
+	if (BarrierFlag1P) {
+		g_pD3Device->SetTexture(0, g_pTexture[EFFECT_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, BARRIER1P, sizeof(CUSTOMVERTEX));
+	}
+
+	if (BarrierFlag2P) {
+		g_pD3Device->SetTexture(0, g_pTexture[EFFECT_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, BARRIER2P, sizeof(CUSTOMVERTEX));
+	}
+	
 	//ƒ}ƒbƒvƒ`ƒbƒv‚Ì•\Ž¦
 	if (MapDataSelect == Stagedesert) {
 		MapSelectedHEIGHT = MAP_01_HEIGHT;

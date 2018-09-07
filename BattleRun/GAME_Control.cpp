@@ -36,6 +36,7 @@ void ShowDebugFont();//デバッグのためにフォントを表示させる関数
 void CountDown();//3,2,1,と数えるための関数
 void CheckPlayerAccelerates();//プレイヤーの加速のフラグを時間がたつとオフにする関数
 void ItemEffectRelease();
+void UpDate();
 
 	/*グローバル変数*/
 static int wallJump1PCount;//壁ジャンプしてからのフレームを数える変数
@@ -134,6 +135,8 @@ int SpeedChange1P;
 int SpeedChange2P;
 int SpeedChangeCount1P;
 int SpeedChangeCount2P;
+int Barriercount1P;
+int Barriercount2P;
 bool BeamFlag1P;
 bool BeamFlag2P;
 bool FireBallFlag1P;
@@ -142,6 +145,20 @@ int  FireBall_HEIGHT1P;
 int  FireBall_WIDTH1P;
 int  FireBall_HEIGHT2P;
 int  FireBall_WIDTH2P;
+bool FettersFlag1P;
+bool FettersFlag2P;
+bool BarrierFlag1P;
+bool BarrierFlag2P;
+float Fetterstu1P;
+float Fetterstu2P;
+float Barriertu1P;
+float Barriertu2P;
+bool BeamHitFlag1P;
+bool BeamHitFlag2P;
+int BeamHitcount1P;
+int BeamHitcount2P;
+bool PlayerStop1P;
+bool PlayerStop2P;
 
 OBJECT_STATE g_Player;
 OBJECT_STATE g_Player2P;
@@ -155,6 +172,8 @@ OBJECT_STATE g_TrampolineLeft;
 OBJECT_STATE g_Manhole;
 OBJECT_STATE g_Itembox;
 OBJECT_STATE g_Goal;
+OBJECT_STATE g_Beam1P;
+OBJECT_STATE g_Beam2P;
 OBJECT_POSITION oldPlayer1P;//プレイヤー1の前の座標を保存し、差分を出すために使う
 OBJECT_POSITION oldPlayer2P;//プレイヤー2の前の座標を保存し、さ分を出すために使う
 OBJECT_POSITION sabun1P;
@@ -166,6 +185,7 @@ void GameControl(void)
 {
 	InitState();
 	CountDown();
+	
 	if (gameState == PLAY) {
 		if (gameStart == true) {
 			CheckPlayerAccelerates();
@@ -187,7 +207,11 @@ void GameControl(void)
 	//ShowDebugFont();
 }
 
+void UpDate(void) {
 
+	g_Beam1P = { g_Player.x + g_Player.scale_x, g_Player.y, 1920, g_Player.scale_y };
+	g_Beam2P = { g_Player2P.x + g_Player2P.scale_x, g_Player2P.y, 1920, g_Player2P.scale_y };
+}
 
 	/*関数の実態*/
 
@@ -273,11 +297,23 @@ void InitState() {
 		JumpUpCount2P = 0;
 		SpeedChange1P = 0;
 		SpeedChange2P = 0;
+		FettersFlag1P = false;
+		FettersFlag2P = false;
+		BarrierFlag1P = false;
+		BarrierFlag2P = false;
+		Barriertu1P = 0;
+		Barriertu2P = 0;
+		BeamHitcount1P = 0;
+		BeamHitcount2P = 0;
+		BeamHitFlag1P = false;
+		BeamHitFlag2P = false;
+		PlayerStop1P = false;
+		PlayerStop2P = false;
 
 		srand((unsigned int)time(NULL));
 
-		g_Player = { 100.f,400.f,60.f,70.f };
-		g_Player2P = { 100.f,400.f,60.f,70.f };
+		g_Player = { 75.f,30.f,60.f,70.f };
+		g_Player2P = { 75.f,30.f,60.f,70.f };
 		g_CountDownNum = { 600.f,300.f,200.f,200.f };
 		g_Trampoline = { 0.f,0.f,96.f,64.f };
 		g_TrampolineLeft = { 0.f,0.f,32.f,96.f };
@@ -416,7 +452,6 @@ void CountDown() {
 			countDownFlag = false;
 		}
 	}
-
 }
 
 //ジャンプの処理を行う関数
@@ -571,13 +606,13 @@ void GiveGravity()
 	}
 }
 
-void BeamEffect(bool* BeamFlag,int* Beamcount,float* Beamtv) {
+void BeamEffect(bool* BeamFlag,int* BeamCount,float* Beamtv) {
 
 	if (*BeamFlag) {
-		(*Beamcount)++;
+		(*BeamCount)++;
 	}
 
-	switch (*Beamcount) {
+	switch (*BeamCount) {
 	case 1:
 		*Beamtv = 64.f;
 		break;
@@ -621,48 +656,100 @@ void BeamEffect(bool* BeamFlag,int* Beamcount,float* Beamtv) {
 		*Beamtv = 512.f;
 		break;
 	case 60:
-		*Beamcount = 0;
+		*BeamCount = 0;
 		*Beamtv = 0.f;
 		*BeamFlag = false;
 		break;
 	}
 }
 
-void PlayerMovement(int PlayerMoveCount,float *Playertutv) {
+void BarrierEffect(bool* BarrierFlag, int* BarrierCount, float* Barriertu) {
+
+	if (*BarrierFlag) {
+		(*BarrierCount)++;
+	}
+
+	switch (*BarrierCount) {
+	case 1:
+		*Barriertu = 256.f;
+		break;
+	case 6:
+		*Barriertu = 320.f;
+		break;
+	case 9:
+		*Barriertu = 384.f;
+		break;
+	case 300:
+		*BarrierFlag = false;
+		*BarrierCount = 0;
+		break;
+	}
+}
+
+void PlayerMovement(int PlayerMoveCount,float *Playertutv,bool* FettersFlag,float* Fetterstutv) {
 
 	switch (PlayerMoveCount) {
 	case 0:
-		*Playertutv = 0;
+		*Playertutv = 0.f;
+		*Fetterstutv = 576.f;
 		break;
 	case 1:
-		*Playertutv = 60;
+		*Playertutv = 60.f;
+		*Fetterstutv = 640.f;
 		break;
 	case 2:
-		*Playertutv = 120;
+		*Playertutv = 120.f;
+		*Fetterstutv = 704.f;
 		break;
 	case 3:
-		*Playertutv = 180;
+		*Playertutv = 180.f;
+		*Fetterstutv = 640.f;
 		break;
 	case 4:
-		*Playertutv = 240;
+		*Playertutv = 240.f;
+		*Fetterstutv = 704.f;
 		break;
 	case 5:
-		*Playertutv = 300;
+		*Playertutv = 300.f;
+		*Fetterstutv = 640.f;
 		break;
 	case 6:
-		*Playertutv = 360;
+		*Playertutv = 360.f;
+		*Fetterstutv = 704.f;
 		break;
 	case 7:
-		*Playertutv = 420;
+		*Playertutv = 420.f;
+		*Fetterstutv = 640.f;
 		break;
 	case 8:
-		*Playertutv = 480;
+		*Playertutv = 480.f;
+		*Fetterstutv = 704.f;
 		break;
 	case 9:
-		*Playertutv = 540;
+		*Playertutv = 540.f;
+		*Fetterstutv = 640.f;
 		break;
 	case 10:
-		*Playertutv = 600;
+		*Playertutv = 600.f;
+		*Fetterstutv = 704.f;
+		break;
+	}
+}
+
+void BeamHit(bool* BeamHitFlag, int* BeamHitCount, bool* PlayerStop) {
+
+	if (*BeamHitFlag) {
+		(*BeamHitCount)++;
+	}
+
+	switch (*BeamHitCount) {
+	case 1:
+		*PlayerStop = true;
+		break;
+	case 90:
+		*PlayerStop = false;
+		*BeamHitFlag = false;
+		*BeamHitCount = 0;
 		break;
 	}
 }
@@ -684,17 +771,27 @@ void ItemEffectRelease(void) {
 
 	if (SpeedChangeCount1P == 300) {
 		SpeedChange1P = 0;
+		FettersFlag1P = false;
 	}
 
 	if (SpeedChangeCount2P == 300) {
 		SpeedChange2P = 0;
+		FettersFlag2P = false;
 	}
 
-	PlayerMovement(PlayerMoveCount1P, &MoveImage);
-	PlayerMovement(PlayerMoveCount2P, &MoveImage2P);
+	UpDate();
+
+	PlayerMovement(PlayerMoveCount1P, &MoveImage, &FettersFlag1P, &Fetterstu1P);
+	PlayerMovement(PlayerMoveCount2P, &MoveImage2P, &FettersFlag2P, &Fetterstu2P);
 
 	BeamEffect(&BeamFlag1P, &Beamcount1P, &Beamtutv1P);
 	BeamEffect(&BeamFlag2P, &Beamcount2P, &Beamtutv2P);
+	
+		BarrierEffect(&BarrierFlag1P, &Barriercount1P, &Barriertu1P);
+	BarrierEffect(&BarrierFlag2P, &Barriercount2P, &Barriertu2P);
+
+	BeamHit(&BeamHitFlag1P, &BeamHitcount1P, &PlayerStop1P);
+	BeamHit(&BeamHitFlag2P, &BeamHitcount2P, &PlayerStop2P);
 
 	if (FireBallFlag1P == true)//ファイアーボール使用FLAG
 	{
@@ -787,13 +884,16 @@ void ItemBreak(int Player) {
 }
 
 void JumpUp(int Player) {
+
+	int JumpUpAmount = 8;
+
 	switch (Player) {
 	case PLAYER1:
-		JumpUp1P = SYOSOKUDO;
+		JumpUp1P = JumpUpAmount;
 		JumpUpCount1P = 0;
 		break;
 	case PLAYER2:
-		JumpUp2P = SYOSOKUDO;
+		JumpUp2P = JumpUpAmount;
 		JumpUpCount2P = 0;
 		break;
 	}
@@ -815,10 +915,12 @@ void SpeedUp(int Player) {
 void SpeedDown(int Player) {
 	switch (Player) {
 	case PLAYER1:
+		FettersFlag2P = true;
 		SpeedChange2P = SPEEDDOWNVALUE;
 		SpeedChangeCount2P = 0;
 		break;
 	case PLAYER2:
+		FettersFlag1P = true;
 		SpeedChange1P = SPEEDDOWNVALUE;
 		SpeedChangeCount1P = 0;
 		break;
@@ -832,6 +934,17 @@ void Beam(int Player) {
 		break;
 	case PLAYER2:
 		BeamFlag2P = true;
+		break;
+	}
+}
+
+void Barrier(int Player) {
+	switch (Player) {
+	case PLAYER1:
+		BarrierFlag1P = true;
+		break;
+	case PLAYER2:
+		BarrierFlag2P = true;
 		break;
 	}
 }
@@ -880,20 +993,23 @@ void UseItem(int Player) {
 
 	switch (ItemNumber) {
 	case ITEMBREAK:
-		//ItemBreak(Player);
-		//break;
+		ItemBreak(Player);
+		break;
 	case JUMPUP:
-		//JumpUp(Player);
-		//break;
+		JumpUp(Player);
+		break;
 	case SPEEDUP:
-		//SpeedUp(Player);
-		//break;
+		SpeedUp(Player);
+		break;
 	case SPEEDDOWN:
-		//SpeedDown(Player);
-		//break;
+		SpeedDown(Player);
+		break;
 	case BEAM:
-		//Beam(Player);
-		//break;
+		Beam(Player);
+		break;
+	case BARRIER:
+		Barrier(Player);
+		break;
 	case FIREBOOL:
 		FireBool(Player);
 		break;
@@ -912,105 +1028,58 @@ void CheckKey() {
 		BYTE diks[256];
 		pKeyDevice->GetDeviceState(sizeof(diks), &diks);
 
-		//Wを入力した直後だけジャンプのフラグをオンにする処理
-		if ((diks[DIK_W] & 0x80 && !prevKey[DIK_W]) || g_Pad1P.a && !prevPad[PadA1P]) {
-			//通常状態のジャンプ処理
-			Jcount++;
-			if ((Jcount < 3) && (player1PRub == DONT_NEIGHBOR_WALL)) {
-				JFlag = true;
-				first1P = true;
-			}
-			//壁ジャンプの処理
-			if ((player1PRub == WALL_LEFT) || (player1PRub == WALL_RIGHT)) {
-				wallJump1PFlag = true;
-			}
-		}
+		if (!PlayerStop1P) {
 
-		//UPを入力した直後だけジャンプのフラグをオンにする処理
-		if (diks[DIK_UP] & 0x80 && !prevKey[DIK_UP] || g_Pad2P.a && !prevPad[PadA2P])
-		{
-			//通常状態のジャンプ処理
-			Jcount2P++;
-			if ((Jcount2P < 3) && (player2PRub == DONT_NEIGHBOR_WALL))
+			//Wを入力した直後だけジャンプのフラグをオンにする処理
+			if ((diks[DIK_W] & 0x80 && !prevKey[DIK_W]) || g_Pad1P.a && !prevPad[PadA1P]) {
+				//通常状態のジャンプ処理
+				Jcount++;
+				if ((Jcount < 3) && (player1PRub == DONT_NEIGHBOR_WALL)) {
+					JFlag = true;
+					first1P = true;
+				}
+				//壁ジャンプの処理
+				if ((player1PRub == WALL_LEFT) || (player1PRub == WALL_RIGHT)) {
+					wallJump1PFlag = true;
+				}
+			}
+			
+			if (diks[DIK_A] & 0x80 || g_Pad1P.left)
 			{
-				JFlag2P = true;
-				first2P = true;
-			}
-			//壁ジャンプの処理
-			if ((player2PRub == WALL_LEFT) || (player2PRub == WALL_RIGHT)) {
-				wallJump2PFlag = true;
-			}
-		}
+				PlayerMode1P = LEFT_DIRECTION;
+				//前のフレームでもAが押されていた時の処理
+				if (prevKey[DIK_A] || prevPad[PadLEFT1P]) {
 
-		if (diks[DIK_A] & 0x80 || g_Pad1P.left)
-		{
-			PlayerMode1P = LEFT_DIRECTION;
-			//前のフレームでもAが押されていた時の処理
-			if (prevKey[DIK_A] || prevPad[PadLEFT1P]) {
+					framecount++;
+					accelerationcount1PLeft++;
+					if (framecount == 3) {
 
-				framecount++;
-				accelerationcount1PLeft++;
-				if (framecount == 3) {
+						if (PlayerMoveCount1P < 10) {
+							PlayerMoveCount1P++;
+						}
+						else {
+							PlayerMoveCount1P = 1;
+						}
 
-					if (PlayerMoveCount1P < 10) {
-						PlayerMoveCount1P++;
+						framecount = 0;
 					}
-					else {
-						PlayerMoveCount1P = 1;
+
+					if (PLAYER_RUN_TIPE2_FRAME == accelerationcount1PLeft) {
+						acceleration1PLeft = ACCELERATION;
 					}
-					
-					framecount = 0;
-				}
 
-				if (PLAYER_RUN_TIPE2_FRAME == accelerationcount1PLeft) {
-					acceleration1PLeft = ACCELERATION;
-				}
-
-				if (PLAYER_RUN_TIPE3_FRAME == accelerationcount1PLeft) {
-					acceleration1PLeft = ACCELERATION * 2;
-				}
-			}
-			//Aが入力されなくなった時の処理
-			if (!prevKey[DIK_A] && !prevPad[PadLEFT1P]) {
-				acceleration1PLeft = 0;
-				accelerationcount1PLeft = 0;
-			}
-
-			//左端まで行ってなくて、左に移動するときの処理
-			if (g_Player.x >= 100) {
-				if (speedRises1P == true) {
-					g_Player.x -= MOVE_SPEED_UP;
-					prevFrameMovement1P -= MOVE_SPEED_UP;
-				}
-				else if(speedSlows1P == true){
-					g_Player.x -= MOVE_SPEED_DOWN;
-					prevFrameMovement1P -= MOVE_SPEED_DOWN;
-				}
-				else {
-					g_Player.x -= (acceleration1PLeft + MOVE_SPEED + SpeedChange1P);
-					prevFrameMovement1P -= (acceleration1PLeft + MOVE_SPEED + SpeedChange1P);
-				}
-
-			}//左端まで行って、さらに左に移動しようとしたときの処理
-			else if (g_Player.x < 100) {
-				if (win == PLAYER1P) {
-					if (speedRises1P == true) {
-						movementStageX -= MOVE_SPEED_UP;
-						prevFrameMovement1P -= MOVE_SPEED_UP;
-						g_Player2P.x += MOVE_SPEED_UP;
-					}
-					else if (speedSlows1P == true) {
-						movementStageX -= MOVE_SPEED_DOWN;
-						prevFrameMovement1P -= MOVE_SPEED_DOWN;
-						g_Player2P.x += MOVE_SPEED_DOWN;
-					}
-					else {
-						movementStageX -= (acceleration1PLeft + MOVE_SPEED + SpeedChange1P);
-						prevFrameMovement1P -= (acceleration1PLeft + MOVE_SPEED + SpeedChange1P);
-						g_Player2P.x += (acceleration1PLeft + MOVE_SPEED + SpeedChange1P);
+					if (PLAYER_RUN_TIPE3_FRAME == accelerationcount1PLeft) {
+						acceleration1PLeft = ACCELERATION * 2;
 					}
 				}
-				else if (win == PLAYER2P) {
+				//Aが入力されなくなった時の処理
+				if (!prevKey[DIK_A] && !prevPad[PadLEFT1P]) {
+					acceleration1PLeft = 0;
+					accelerationcount1PLeft = 0;
+				}
+
+				//左端まで行ってなくて、左に移動するときの処理
+				if (g_Player.x >= 100) {
 					if (speedRises1P == true) {
 						g_Player.x -= MOVE_SPEED_UP;
 						prevFrameMovement1P -= MOVE_SPEED_UP;
@@ -1023,169 +1092,79 @@ void CheckKey() {
 						g_Player.x -= (acceleration1PLeft + MOVE_SPEED + SpeedChange1P);
 						prevFrameMovement1P -= (acceleration1PLeft + MOVE_SPEED + SpeedChange1P);
 					}
+
+				}//左端まで行って、さらに左に移動しようとしたときの処理
+				else if (g_Player.x < 100) {
+					if (win == PLAYER1P) {
+						if (speedRises1P == true) {
+							movementStageX -= MOVE_SPEED_UP;
+							prevFrameMovement1P -= MOVE_SPEED_UP;
+							g_Player2P.x += MOVE_SPEED_UP;
+						}
+						else if (speedSlows1P == true) {
+							movementStageX -= MOVE_SPEED_DOWN;
+							prevFrameMovement1P -= MOVE_SPEED_DOWN;
+							g_Player2P.x += MOVE_SPEED_DOWN;
+						}
+						else {
+							movementStageX -= (acceleration1PLeft + MOVE_SPEED + SpeedChange1P);
+							prevFrameMovement1P -= (acceleration1PLeft + MOVE_SPEED + SpeedChange1P);
+							g_Player2P.x += (acceleration1PLeft + MOVE_SPEED + SpeedChange1P);
+						}
+					}
+					else if (win == PLAYER2P) {
+						if (speedRises1P == true) {
+							g_Player.x -= MOVE_SPEED_UP;
+							prevFrameMovement1P -= MOVE_SPEED_UP;
+						}
+						else if (speedSlows1P == true) {
+							g_Player.x -= MOVE_SPEED_DOWN;
+							prevFrameMovement1P -= MOVE_SPEED_DOWN;
+						}
+						else {
+							g_Player.x -= (acceleration1PLeft + MOVE_SPEED + SpeedChange1P);
+							prevFrameMovement1P -= (acceleration1PLeft + MOVE_SPEED + SpeedChange1P);
+						}
+					}
 				}
 			}
-		}
 
+			if (diks[DIK_D] & 0x80 || g_Pad1P.right)
+			{
+				PlayerMode1P = RIGHT_DIRECTION;
+				//Dが前フレームに押されているときの処理
+				if (prevKey[DIK_D] || prevPad[PadRIGHT1P]) {
 
-		if (diks[DIK_LEFT] & 0x80 || g_Pad2P.left)
-		{
-			PlayerMode2P = LEFT_DIRECTION;
-			//前のフレームでもLEFTが押されていた時の処理
-			if (prevKey[DIK_LEFT]|| prevPad[PadLEFT2P]) {
+					framecount++;
+					accelerationcount1PRight++;
+					if (framecount == 3) {
 
-				framecount2P++;
-				accelerationcount2PLeft++;
-				if (framecount2P == 3) {
+						if (PlayerMoveCount1P < 10) {
+							PlayerMoveCount1P++;
+						}
+						else {
+							PlayerMoveCount1P = 1;
+						}
 
-					if (PlayerMoveCount2P < 10) {
-						PlayerMoveCount2P++;
-					}
-					else {
-						PlayerMoveCount2P = 1;
-					}
-
-					framecount2P = 0;
-				}
-
-				if (PLAYER_RUN_TIPE2_FRAME == accelerationcount2PLeft) {
-					acceleration2PLeft = ACCELERATION;
-				}
-
-				if (PLAYER_RUN_TIPE3_FRAME == accelerationcount2PLeft) {
-					acceleration2PLeft = ACCELERATION * 2;
-				}
-			}
-			//LEFTが離された時の処理
-			if (!prevKey[DIK_LEFT] && !prevPad[PadLEFT2P]) {
-				acceleration2PLeft = 0;
-				accelerationcount2PLeft = 0;
-			}
-
-			//左端まで行ってなくて、左に移動するときの処理
-			if(g_Player2P.x >= 100) {
-				if (speedRises2P == true) {
-					prevFrameMovement2P -= MOVE_SPEED_UP;
-					g_Player2P.x -= MOVE_SPEED_UP;
-				}
-				else if (speedSlows2P == true) {
-					prevFrameMovement2P -= MOVE_SPEED_DOWN;
-					g_Player2P.x -= MOVE_SPEED_DOWN;
-				}
-				else {
-					prevFrameMovement2P -= (acceleration2PLeft + MOVE_SPEED + SpeedChange2P);
-					g_Player2P.x -= (acceleration2PLeft + MOVE_SPEED + SpeedChange2P);
-				}
-			}//左端まで行って、さらに左に移動しようとしたときの処理
-			else if (g_Player2P.x < 100) {
-
-				if (win == PLAYER2P) {
-					if (speedRises2P == true) {
-						movementStageX -= MOVE_SPEED_UP;
-						prevFrameMovement2P -= MOVE_SPEED_UP;
-						g_Player.x += MOVE_SPEED_UP;
-					}
-					else if (speedSlows2P == true) {
-						movementStageX -= MOVE_SPEED_DOWN;
-						prevFrameMovement2P -= MOVE_SPEED_DOWN;
-						g_Player.x += MOVE_SPEED_DOWN;
-					}
-					else {
-						movementStageX -= acceleration2PLeft + MOVE_SPEED + SpeedChange2P;
-						prevFrameMovement2P -= (acceleration2PLeft + MOVE_SPEED + SpeedChange2P);
-						g_Player.x += acceleration2PLeft + MOVE_SPEED + SpeedChange2P;
-					}
-				}
-				else if (win == PLAYER1P) {
-					if (speedRises2P == true) {
-						prevFrameMovement2P -= MOVE_SPEED_UP;
-						g_Player2P.x -= MOVE_SPEED_UP;
-					}
-					else if (speedSlows2P == true) {
-						prevFrameMovement2P -= MOVE_SPEED_DOWN;
-						g_Player2P.x -= MOVE_SPEED_DOWN;
-					}
-					else {
-						prevFrameMovement2P -= (acceleration2PLeft + MOVE_SPEED + SpeedChange2P);
-						g_Player2P.x -= (acceleration2PLeft + MOVE_SPEED + SpeedChange2P);
-					}
-				}
-				
-			}
-		}
-
-
-		if (diks[DIK_D] & 0x80 || g_Pad1P.right)
-		{
-			PlayerMode1P = RIGHT_DIRECTION;
-			//Dが前フレームに押されているときの処理
-			if (prevKey[DIK_D]|| prevPad[PadRIGHT1P]) {
-
-				framecount++;
-				accelerationcount1PRight++;
-				if (framecount == 3) {
-
-					if (PlayerMoveCount1P < 10) {
-						PlayerMoveCount1P++;
-					}
-					else {
-						PlayerMoveCount1P = 1;
+						framecount = 0;
 					}
 
-					framecount = 0;
-				}
-
-				if (PLAYER_RUN_TIPE2_FRAME == accelerationcount1PRight) {
-					acceleration1PRight = ACCELERATION;
-				}
-
-				if (PLAYER_RUN_TIPE3_FRAME == accelerationcount1PRight) {
-					acceleration1PRight = ACCELERATION * 2;
-				}
-			}
-			//Dが離された時の処理
-			if (!prevKey[DIK_D] && !prevPad[PadRIGHT1P]) {
-				acceleration1PRight = 0;
-				accelerationcount1PRight = 0;
-			}
-
-			//右端まで行ってなくて、右に移動するときの処理
-			if (g_Player.x < 1200) {
-				if (speedRises1P == true) {
-					g_Player.x += MOVE_SPEED_UP;
-					prevFrameMovement1P += MOVE_SPEED_UP;
-				}
-				else if (speedSlows1P == true) {
-					g_Player.x += MOVE_SPEED_DOWN;
-					prevFrameMovement1P += MOVE_SPEED_DOWN;
-				}
-				else {
-					g_Player.x += (acceleration1PRight + MOVE_SPEED + SpeedChange1P);
-					prevFrameMovement1P += (acceleration1PRight + MOVE_SPEED + SpeedChange1P);
-				}
-				
-			}//右端まで行って、さらに右に移動するときの処理
-			else if (g_Player.x >= 1200) {
-				if (win == PLAYER1P) {
-
-					if (speedRises1P == true) {
-						movementStageX += MOVE_SPEED_UP;
-						prevFrameMovement1P += MOVE_SPEED_UP;
-						g_Player2P.x -= MOVE_SPEED_UP;
+					if (PLAYER_RUN_TIPE2_FRAME == accelerationcount1PRight) {
+						acceleration1PRight = ACCELERATION;
 					}
-					else if (speedSlows1P == true) {
-						movementStageX += MOVE_SPEED_DOWN;
-						prevFrameMovement1P += MOVE_SPEED_DOWN;
-						g_Player2P.x -= MOVE_SPEED_DOWN;
-					}
-					else {
-						movementStageX += acceleration1PRight + MOVE_SPEED + SpeedChange1P;
-						prevFrameMovement1P += (acceleration1PRight + MOVE_SPEED + SpeedChange1P);
-						g_Player2P.x -= acceleration1PRight + MOVE_SPEED + SpeedChange1P;
+
+					if (PLAYER_RUN_TIPE3_FRAME == accelerationcount1PRight) {
+						acceleration1PRight = ACCELERATION * 2;
 					}
 				}
-				else if (win == PLAYER2P) {
+				//Dが離された時の処理
+				if (!prevKey[DIK_D] && !prevPad[PadRIGHT1P]) {
+					acceleration1PRight = 0;
+					accelerationcount1PRight = 0;
+				}
 
+				//右端まで行ってなくて、右に移動するときの処理
+				if (g_Player.x < 1200) {
 					if (speedRises1P == true) {
 						g_Player.x += MOVE_SPEED_UP;
 						prevFrameMovement1P += MOVE_SPEED_UP;
@@ -1198,81 +1177,203 @@ void CheckKey() {
 						g_Player.x += (acceleration1PRight + MOVE_SPEED + SpeedChange1P);
 						prevFrameMovement1P += (acceleration1PRight + MOVE_SPEED + SpeedChange1P);
 					}
-				
+
+				}//右端まで行って、さらに右に移動するときの処理
+				else if (g_Player.x >= 1200) {
+					if (win == PLAYER1P) {
+
+						if (speedRises1P == true) {
+							movementStageX += MOVE_SPEED_UP;
+							prevFrameMovement1P += MOVE_SPEED_UP;
+							g_Player2P.x -= MOVE_SPEED_UP;
+						}
+						else if (speedSlows1P == true) {
+							movementStageX += MOVE_SPEED_DOWN;
+							prevFrameMovement1P += MOVE_SPEED_DOWN;
+							g_Player2P.x -= MOVE_SPEED_DOWN;
+						}
+						else {
+							movementStageX += acceleration1PRight + MOVE_SPEED + SpeedChange1P;
+							prevFrameMovement1P += (acceleration1PRight + MOVE_SPEED + SpeedChange1P);
+							g_Player2P.x -= acceleration1PRight + MOVE_SPEED + SpeedChange1P;
+						}
+					}
+					else if (win == PLAYER2P) {
+
+						if (speedRises1P == true) {
+							g_Player.x += MOVE_SPEED_UP;
+							prevFrameMovement1P += MOVE_SPEED_UP;
+						}
+						else if (speedSlows1P == true) {
+							g_Player.x += MOVE_SPEED_DOWN;
+							prevFrameMovement1P += MOVE_SPEED_DOWN;
+						}
+						else {
+							g_Player.x += (acceleration1PRight + MOVE_SPEED + SpeedChange1P);
+							prevFrameMovement1P += (acceleration1PRight + MOVE_SPEED + SpeedChange1P);
+						}
+
+					}
 				}
+			}
+
+			if ((diks[DIK_Q] & 0x80 || g_Pad1P.y) && FirstItem1P) {
+
+				if (!prevKey[DIK_Q] && !prevPad[PadY1P]) {
+
+					UseItem(PLAYER1);
+				}
+			}
+
+			//両方向の移動キーを同時に入力されている時、同時に入力されていない時、アニメーションしない
+			if ((diks[DIK_A] && diks[DIK_D]) && (prevPad[PadLEFT1P] && prevPad[PadRIGHT1P])) {
+				PlayerMoveCount1P = 0;
+			}
+			if ((!diks[DIK_A] && !diks[DIK_D]) && (!prevPad[PadLEFT1P] && !prevPad[PadRIGHT1P])) {
+				PlayerMoveCount1P = 0;
 			}
 		}
 
-		if (diks[DIK_RIGHT] & 0x80|| g_Pad2P.right)
-		{
-			PlayerMode2P = RIGHT_DIRECTION;
-			//RIGHTが前フレームに押されているときの処理
-			if (prevKey[DIK_RIGHT] || prevPad[PadRIGHT2P]) {
+		if (!PlayerStop2P) {
 
-				framecount2P++;
-				accelerationcount2PRight++;
-				if (framecount2P == 3) {
-
-					if (PlayerMoveCount2P < 10) {
-						PlayerMoveCount2P++;
-					}
-					else {
-						PlayerMoveCount2P = 1;
-					}
-
-					framecount2P = 0;
+			//UPを入力した直後だけジャンプのフラグをオンにする処理
+			if (diks[DIK_UP] & 0x80 && !prevKey[DIK_UP] || g_Pad2P.a && !prevPad[PadA2P])
+			{
+				//通常状態のジャンプ処理
+				Jcount2P++;
+				if ((Jcount2P < 3) && (player2PRub == DONT_NEIGHBOR_WALL))
+				{
+					JFlag2P = true;
+					first2P = true;
 				}
-
-				if (PLAYER_RUN_TIPE2_FRAME == accelerationcount2PRight) {
-					acceleration2PRight = ACCELERATION;
+				//壁ジャンプの処理
+				if ((player2PRub == WALL_LEFT) || (player2PRub == WALL_RIGHT)) {
+					wallJump2PFlag = true;
 				}
-
-				if (PLAYER_RUN_TIPE3_FRAME == accelerationcount2PRight) {
-					acceleration2PRight = ACCELERATION * 2;
-				}
-
-			}
-			//RIGHTが離された時の処理
-			if (!prevKey[DIK_RIGHT] && !prevPad[PadRIGHT2P]) {
-				acceleration2PRight = 0;
-				accelerationcount2PRight = 0;
 			}
 
-			//右端まで行ってなくて、右に移動するときの処理
-			if (g_Player2P.x < 1200) {
-				if (speedRises2P == true) {
-					g_Player2P.x += MOVE_SPEED_UP;
-					prevFrameMovement2P += MOVE_SPEED_UP;
+			if (diks[DIK_LEFT] & 0x80 || g_Pad2P.left)
+			{
+				PlayerMode2P = LEFT_DIRECTION;
+				//前のフレームでもLEFTが押されていた時の処理
+				if (prevKey[DIK_LEFT]|| prevPad[PadLEFT2P]) {
+
+					framecount2P++;
+					accelerationcount2PLeft++;
+					if (framecount2P == 3) {
+
+						if (PlayerMoveCount2P < 10) {
+							PlayerMoveCount2P++;
+						}
+						else {
+							PlayerMoveCount2P = 1;
+						}
+
+						framecount2P = 0;
+					}
+
+					if (PLAYER_RUN_TIPE2_FRAME == accelerationcount2PLeft) {
+						acceleration2PLeft = ACCELERATION;
+					}
+
+					if (PLAYER_RUN_TIPE3_FRAME == accelerationcount2PLeft) {
+						acceleration2PLeft = ACCELERATION * 2;
+					}
 				}
-				else if (speedSlows2P == true) {
-					g_Player2P.x += MOVE_SPEED_DOWN;
-					prevFrameMovement2P += MOVE_SPEED_DOWN;
+				//LEFTが離された時の処理
+				if (!prevKey[DIK_LEFT] && !prevPad[PadLEFT2P]) {
+					acceleration2PLeft = 0;
+					accelerationcount2PLeft = 0;
 				}
-				else {
-					g_Player2P.x += (acceleration2PRight + MOVE_SPEED + SpeedChange2P);
-					prevFrameMovement2P += (acceleration2PRight + MOVE_SPEED + SpeedChange2P);
-				}
-				
-			}//右端まで行って、さらに右に移動するときの処理
-			else if (g_Player2P.x >= 1200) {
-				if (win == PLAYER2P) {
+
+				//左端まで行ってなくて、左に移動するときの処理
+				if(g_Player2P.x >= 100) {
 					if (speedRises2P == true) {
-						movementStageX += MOVE_SPEED_UP;
-						g_Player.x -= MOVE_SPEED_UP;
-						prevFrameMovement2P += MOVE_SPEED_UP;
+						prevFrameMovement2P -= MOVE_SPEED_UP;
+						g_Player2P.x -= MOVE_SPEED_UP;
 					}
 					else if (speedSlows2P == true) {
-						movementStageX += MOVE_SPEED_DOWN;
-						g_Player.x -= MOVE_SPEED_DOWN;
-						prevFrameMovement2P += MOVE_SPEED_DOWN;
+						prevFrameMovement2P -= MOVE_SPEED_DOWN;
+						g_Player2P.x -= MOVE_SPEED_DOWN;
 					}
 					else {
-						movementStageX += acceleration2PRight + MOVE_SPEED + SpeedChange2P;
-						g_Player.x -= acceleration2PRight + MOVE_SPEED + SpeedChange2P;
-						prevFrameMovement2P += (acceleration2PRight + MOVE_SPEED + SpeedChange2P);
+						prevFrameMovement2P -= (acceleration2PLeft + MOVE_SPEED + SpeedChange2P);
+						g_Player2P.x -= (acceleration2PLeft + MOVE_SPEED + SpeedChange2P);
+					}
+				}//左端まで行って、さらに左に移動しようとしたときの処理
+				else if (g_Player2P.x < 100) {
+
+					if (win == PLAYER2P) {
+						if (speedRises2P == true) {
+							movementStageX -= MOVE_SPEED_UP;
+							prevFrameMovement2P -= MOVE_SPEED_UP;
+							g_Player.x += MOVE_SPEED_UP;
+						}
+						else if (speedSlows2P == true) {
+							movementStageX -= MOVE_SPEED_DOWN;
+							prevFrameMovement2P -= MOVE_SPEED_DOWN;
+							g_Player.x += MOVE_SPEED_DOWN;
+						}
+						else {
+							movementStageX -= acceleration2PLeft + MOVE_SPEED + SpeedChange2P;
+							prevFrameMovement2P -= (acceleration2PLeft + MOVE_SPEED + SpeedChange2P);
+							g_Player.x += acceleration2PLeft + MOVE_SPEED + SpeedChange2P;
+						}
+					}
+					else if (win == PLAYER1P) {
+						if (speedRises2P == true) {
+							prevFrameMovement2P -= MOVE_SPEED_UP;
+							g_Player2P.x -= MOVE_SPEED_UP;
+						}
+						else if (speedSlows2P == true) {
+							prevFrameMovement2P -= MOVE_SPEED_DOWN;
+							g_Player2P.x -= MOVE_SPEED_DOWN;
+						}
+						else {
+							prevFrameMovement2P -= (acceleration2PLeft + MOVE_SPEED + SpeedChange2P);
+							g_Player2P.x -= (acceleration2PLeft + MOVE_SPEED + SpeedChange2P);
+						}
 					}
 				}
-				else if (win == PLAYER1P) {
+			}
+
+			if (diks[DIK_RIGHT] & 0x80|| g_Pad2P.right)
+			{
+				PlayerMode2P = RIGHT_DIRECTION;
+				//RIGHTが前フレームに押されているときの処理
+				if (prevKey[DIK_RIGHT] || prevPad[PadRIGHT2P]) {
+
+					framecount2P++;
+					accelerationcount2PRight++;
+					if (framecount2P == 3) {
+
+						if (PlayerMoveCount2P < 10) {
+							PlayerMoveCount2P++;
+						}
+						else {
+							PlayerMoveCount2P = 1;
+						}
+
+						framecount2P = 0;
+					}
+
+					if (PLAYER_RUN_TIPE2_FRAME == accelerationcount2PRight) {
+						acceleration2PRight = ACCELERATION;
+					}
+
+					if (PLAYER_RUN_TIPE3_FRAME == accelerationcount2PRight) {
+						acceleration2PRight = ACCELERATION * 2;
+					}
+
+				}
+				//RIGHTが離された時の処理
+				if (!prevKey[DIK_RIGHT] && !prevPad[PadRIGHT2P]) {
+					acceleration2PRight = 0;
+					accelerationcount2PRight = 0;
+				}
+
+				//右端まで行ってなくて、右に移動するときの処理
+				if (g_Player2P.x < 1200) {
 					if (speedRises2P == true) {
 						g_Player2P.x += MOVE_SPEED_UP;
 						prevFrameMovement2P += MOVE_SPEED_UP;
@@ -1285,38 +1386,57 @@ void CheckKey() {
 						g_Player2P.x += (acceleration2PRight + MOVE_SPEED + SpeedChange2P);
 						prevFrameMovement2P += (acceleration2PRight + MOVE_SPEED + SpeedChange2P);
 					}
+				
+				}//右端まで行って、さらに右に移動するときの処理
+				else if (g_Player2P.x >= 1200) {
+					if (win == PLAYER2P) {
+						if (speedRises2P == true) {
+							movementStageX += MOVE_SPEED_UP;
+							g_Player.x -= MOVE_SPEED_UP;
+							prevFrameMovement2P += MOVE_SPEED_UP;
+						}
+						else if (speedSlows2P == true) {
+							movementStageX += MOVE_SPEED_DOWN;
+							g_Player.x -= MOVE_SPEED_DOWN;
+							prevFrameMovement2P += MOVE_SPEED_DOWN;
+						}
+						else {
+							movementStageX += acceleration2PRight + MOVE_SPEED + SpeedChange2P;
+							g_Player.x -= acceleration2PRight + MOVE_SPEED + SpeedChange2P;
+							prevFrameMovement2P += (acceleration2PRight + MOVE_SPEED + SpeedChange2P);
+						}
+					}
+					else if (win == PLAYER1P) {
+						if (speedRises2P == true) {
+							g_Player2P.x += MOVE_SPEED_UP;
+							prevFrameMovement2P += MOVE_SPEED_UP;
+						}
+						else if (speedSlows2P == true) {
+							g_Player2P.x += MOVE_SPEED_DOWN;
+							prevFrameMovement2P += MOVE_SPEED_DOWN;
+						}
+						else {
+							g_Player2P.x += (acceleration2PRight + MOVE_SPEED + SpeedChange2P);
+							prevFrameMovement2P += (acceleration2PRight + MOVE_SPEED + SpeedChange2P);
+						}
+					}
 				}
 			}
-		}
 
-		if ((diks[DIK_Q] & 0x80 || g_Pad1P.y) && FirstItem1P) {
+			if ((diks[DIK_RCONTROL] & 0x80 || g_Pad2P.y) && FirstItem2P) {
 			
-			if (!prevKey[DIK_Q] && !prevPad[PadY1P]) {
+				if (!prevKey[DIK_RCONTROL] && !prevPad[PadY2P]) {
 
-				UseItem(PLAYER1);
+					UseItem(PLAYER2);
+				}
 			}
-		}
-
-		if ((diks[DIK_RCONTROL] & 0x80 || g_Pad2P.y) && FirstItem2P) {
-			
-			if (!prevKey[DIK_RCONTROL] && !prevPad[PadY2P]) {
-
-				UseItem(PLAYER2);
+		
+			if ((diks[DIK_LEFT] && diks[DIK_RIGHT])&& (prevPad[PadLEFT2P] && prevPad[PadRIGHT2P])) {
+				PlayerMoveCount2P = 0;
 			}
-		}
-
-		//両方向の移動キーを同時に入力されている時、同時に入力されていない時、アニメーションしない
-		if ((diks[DIK_A] && diks[DIK_D]) && (prevPad[PadLEFT1P] && prevPad[PadRIGHT1P])) {
-			PlayerMoveCount1P = 0;
-		}
-		if ((!diks[DIK_A] && !diks[DIK_D]) && (!prevPad[PadLEFT1P] && !prevPad[PadRIGHT1P])) {
-			PlayerMoveCount1P = 0;
-		}
-		if ((diks[DIK_LEFT] && diks[DIK_RIGHT])&& (prevPad[PadLEFT2P] && prevPad[PadRIGHT2P])) {
-			PlayerMoveCount2P = 0;
-		}
-		if ((!diks[DIK_LEFT] && !diks[DIK_RIGHT]) && (!prevPad[PadLEFT2P] && !prevPad[PadRIGHT2P])) {
-			PlayerMoveCount2P = 0;
+			if ((!diks[DIK_LEFT] && !diks[DIK_RIGHT]) && (!prevPad[PadLEFT2P] && !prevPad[PadRIGHT2P])) {
+				PlayerMoveCount2P = 0;
+			}
 		}
 
 		//ホールドされてるかどうかを確認するために前のキー入力を保存している
@@ -1339,7 +1459,7 @@ void CheckKey() {
 	}
 }
 
-BOOL PlayerDecision(int count, OBJECT_POSITION* pposition, OBJECT_STATE gstate, OBJECT_STATE Player) {
+BOOL PlayerGimmickDecision(int count, OBJECT_POSITION* pposition, OBJECT_STATE gstate, OBJECT_STATE Player) {
 
 	for (int i = 0; i < count; i++) {
 
@@ -1349,6 +1469,17 @@ BOOL PlayerDecision(int count, OBJECT_POSITION* pposition, OBJECT_STATE gstate, 
 				(pposition[i].y + gstate.scale_y > Player.y)) {
 				return true;
 			}
+	}
+	return false;
+}
+
+BOOL PlayerItemDecision(OBJECT_STATE Player,OBJECT_STATE ItemRect) {
+
+	if ((ItemRect.x < Player.x + Player.scale_x) &&
+		(ItemRect.x + ItemRect.scale_x > Player.x) &&
+		(ItemRect.y < Player.y + Player.scale_y) &&
+		(ItemRect.y + ItemRect.scale_y > Player.y)) {
+		return true;
 	}
 	return false;
 }
@@ -1393,35 +1524,47 @@ BOOL ItemDecision2P(int count, OBJECT_POSITION* pposition, OBJECT_STATE gstate, 
 void CreatePerDecision(void) {
 
 	//トランポリンの処理
-	if (PlayerDecision(trampolinecount, trampoline, g_Trampoline, g_Player)) {
+	if (PlayerGimmickDecision(trampolinecount, trampoline, g_Trampoline, g_Player)) {
 		time1P = 0;
 		syosokudo1P = TRAMPOLINE_SYOSOKUDO;
 		bool isSuccess = soundsManager.Start(_T("gameTrampoline"));
 	}
-	if (PlayerDecision(trampolinecount, trampoline, g_Trampoline, g_Player2P)) {
+	if (PlayerGimmickDecision(trampolinecount, trampoline, g_Trampoline, g_Player2P)) {
 		time2P = 0;
 		syosokudo2P = TRAMPOLINE_SYOSOKUDO;
 		bool isSuccess = soundsManager.Start(_T("gameTrampoline2"));
 	}
 
 	//トランポリン(右側)の処理
-	if (PlayerDecision(trampolineleftcount, trampolineleft, g_TrampolineLeft, g_Player)) {
+	if (PlayerGimmickDecision(trampolineleftcount, trampolineleft, g_TrampolineLeft, g_Player)) {
 		time1P = 0;
 		syosokudo1P = TRAMPOLINE_SYOSOKUDO;
 		bool isSuccess = soundsManager.Start(_T("gameTrampoline"));
 	}
-	if (PlayerDecision(trampolineleftcount, trampolineleft, g_TrampolineLeft, g_Player2P)) {
+	if (PlayerGimmickDecision(trampolineleftcount, trampolineleft, g_TrampolineLeft, g_Player2P)) {
 		time2P = 0;
 		syosokudo2P = TRAMPOLINE_SYOSOKUDO;
 		bool isSuccess = soundsManager.Start(_T("gameTrampoline2"));
 	}
 
 	//マンホールの処理
-	if (PlayerDecision(manholecount, manhole, g_Manhole, g_Player)) {
+	if (PlayerGimmickDecision(manholecount, manhole, g_Manhole, g_Player)) {
 		g_Player.y = 100;
 	}
-	if (PlayerDecision(manholecount, manhole, g_Manhole, g_Player2P)) {
+	if (PlayerGimmickDecision(manholecount, manhole, g_Manhole, g_Player2P)) {
 		g_Player2P.y = 100;
+	}
+
+	if (PlayerItemDecision(g_Player2P, g_Beam1P) && Beamtutv1P >= 380.f) {
+		
+		BeamHitcount2P = 0;
+		BeamHitFlag2P = true;
+	}
+
+	if (PlayerItemDecision(g_Player, g_Beam2P) && Beamtutv2P >= 380.f) {
+		
+		BeamHitcount1P = 0;
+		BeamHitFlag1P = true;
 	}
 
 	//アイテムボックスの処理
@@ -1448,7 +1591,7 @@ void CreatePerDecision(void) {
 	}
 
 	//ゴールの処理
-	if (PlayerDecision(goalCount, goal, g_Goal, g_Player)) {
+	if (PlayerGimmickDecision(goalCount, goal, g_Goal, g_Player)) {
 		//プレイヤー1の勝利
 		win = PLAYER1P;
 		gameState = FINISH;
@@ -1458,7 +1601,7 @@ void CreatePerDecision(void) {
 		isSuccess = soundsManager.Stop(_T("gameBGM"));
 
 	}
-	if (PlayerDecision(goalCount, goal, g_Goal, g_Player2P)) {
+	if (PlayerGimmickDecision(goalCount, goal, g_Goal, g_Player2P)) {
 		//プレイヤー2の勝利
 		win = PLAYER2P;
 		gameState = FINISH;
@@ -2246,7 +2389,6 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 				}
 			}
 		}
-
 	}
 	else if (player1POr2P == PLAYER2P) {
 		if (gravity2P > 0) {
@@ -2443,7 +2585,6 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 				}
 			}
 		}
-
 	}
 }
 

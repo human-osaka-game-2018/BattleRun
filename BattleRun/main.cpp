@@ -335,11 +335,6 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/RuleSelect–îˆó.png",
-		&g_pTexture[RuleSelect_mark_TEX]);
-
-	D3DXCreateTextureFromFile(
-		g_pD3Device,
 		"texture/RuleDscription1.png",
 		&g_pTexture[RuleDscription1_TEX]);
 
@@ -361,22 +356,27 @@ void ReadTexture(void) {
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/itembreak.png",
-		&g_pTexture[ITEMA_TEX]);
+		&g_pTexture[ITEMBREAK_ICON_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/jumpup.jpg",
-		&g_pTexture[ITEMB_TEX]);
+		&g_pTexture[JUMPUP_ICON_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/speedup.jpg",
-		&g_pTexture[ITEMC_TEX]);
+		&g_pTexture[SPEEDUP_ICON_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/speeddown.jpg",
-		&g_pTexture[ITEMD_TEX]);
+		"texture/fettersicon.png",
+		&g_pTexture[FETTERS_ICON_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/beamicon.png",
+		&g_pTexture[BEAM_ICON_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
@@ -387,6 +387,16 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/beamicon.png",
 		&g_pTexture[BEAM_ICON_TEX]);
+		
+		D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/barrier.png",
+		&g_pTexture[BARRIER_ICON_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/effect.png",
+		&g_pTexture[EFFECT_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
@@ -703,7 +713,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 					RenderTutorial();
 					break;*/
 				case GAME_SCENE:
-
 					GameControl();
 					GameRender();
 					break;
