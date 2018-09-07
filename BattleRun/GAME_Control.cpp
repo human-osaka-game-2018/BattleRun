@@ -136,12 +136,12 @@ int SpeedChangeCount1P;
 int SpeedChangeCount2P;
 bool BeamFlag1P;
 bool BeamFlag2P;
-bool FireBoolFlag1P;
-bool FireBoolFlag2P;
-int  FireBool_HEIGHT1P;
-int  FireBool_WIDTH1P;
-int  FireBool_HEIGHT2P;
-int  FireBool_WIDTH2P;
+bool FireBallFlag1P;
+bool FireBallFlag2P;
+int  FireBall_HEIGHT1P;
+int  FireBall_WIDTH1P;
+int  FireBall_HEIGHT2P;
+int  FireBall_WIDTH2P;
 
 //int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];//砂漠
 //int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];//街
@@ -223,8 +223,8 @@ void InitState() {
 		Beamcount2P = 0;
 		BeamFlag1P = false;
 		BeamFlag2P = false;
-		FireBoolFlag1P = false;
-		FireBoolFlag2P = false;
+		FireBallFlag1P = false;
+		FireBallFlag2P = false;
 		time1P = 0;//１Pの重力を計算するための変数
 		time2P = 0;//２Pの重力を計算するための変数
 		syosokudo1P = 0;//１Pジャンプの初速度
@@ -700,31 +700,31 @@ void ItemEffectRelease(void) {
 	BeamEffect(&BeamFlag1P, &Beamcount1P, &Beamtutv1P);
 	BeamEffect(&BeamFlag2P, &Beamcount2P, &Beamtutv2P);
 
-	if (FireBoolFlag1P == true)//ファイアーボール使用FLAG
+	if (FireBallFlag1P == true)//ファイアーボール使用FLAG
 	{
 		FireBallStateXDecision1P = (FireBallStateX1P - FireBallState1P);
-		FireBool_WIDTH1P = (FireBallStateXDecision1P + movementStageX) / CELL_SIZE;
-		FireBool_HEIGHT1P = (FireBallStateY1P + movementStageY) / CELL_SIZE;
+		FireBall_WIDTH1P = (FireBallStateXDecision1P + movementStageX) / CELL_SIZE;
+		FireBall_HEIGHT1P = (FireBallStateY1P + movementStageY) / CELL_SIZE;
 		switch (MapDataSelect)
 		{
 		case Stagedesert:
-			if (MapData01[FireBool_HEIGHT1P][FireBool_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
+			if (MapData01[FireBall_HEIGHT1P][FireBall_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
 			{
-				FireBoolFlag1P = false;
+				FireBallFlag1P = false;
 				FireBallState1P = 100;
 			}
 			break;
 		case StageCity:
-			if (MapData02[FireBool_HEIGHT1P][FireBool_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
+			if (MapData02[FireBall_HEIGHT1P][FireBall_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
 			{
-				FireBoolFlag1P = false;
+				FireBallFlag1P = false;
 				FireBallState1P = 100;
 			}
 			break;
 		case StageForest:
-			if (MapData03[FireBool_HEIGHT1P][FireBool_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
+			if (MapData03[FireBall_HEIGHT1P][FireBall_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
 			{
-				FireBoolFlag1P = false;
+				FireBallFlag1P = false;
 				FireBallState1P = 100;
 			}
 			break;
@@ -732,31 +732,31 @@ void ItemEffectRelease(void) {
 		FireBallState1P += FireBallSpeed;
 	}
 
-	if (FireBoolFlag2P == true)//ファイアーボール使用FLAG
+	if (FireBallFlag2P == true)//ファイアーボール使用FLAG
 	{
 		FireBallStateXDecision2P = (FireBallStateX2P - FireBallState2P);
-		FireBool_WIDTH2P = (FireBallStateXDecision2P + movementStageX) / CELL_SIZE;
-		FireBool_HEIGHT2P = (FireBallStateY2P + movementStageY) / CELL_SIZE;
+		FireBall_WIDTH2P = (FireBallStateXDecision2P + movementStageX) / CELL_SIZE;
+		FireBall_HEIGHT2P = (FireBallStateY2P + movementStageY) / CELL_SIZE;
 		switch (MapDataSelect)
 		{
 		case Stagedesert:
-			if (MapData01[FireBool_HEIGHT2P][FireBool_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
+			if (MapData01[FireBall_HEIGHT2P][FireBall_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
 			{
-				FireBoolFlag2P = false;
+				FireBallFlag2P = false;
 				FireBallState2P = 100;
 			}
 			break;
 			case StageCity:
-			if (MapData02[FireBool_HEIGHT2P][FireBool_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
+			if (MapData02[FireBall_HEIGHT2P][FireBall_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
 			{
-				FireBoolFlag2P = false;
+				FireBallFlag2P = false;
 				FireBallState2P = 100;
 			}
 			break;
 		case StageForest:
-			if (MapData03[FireBool_HEIGHT2P][FireBool_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
+			if (MapData03[FireBall_HEIGHT2P][FireBall_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
 			{
-				FireBoolFlag2P = false;
+				FireBallFlag2P = false;
 				FireBallState2P = 100;
 			}
 			break;
@@ -838,7 +838,7 @@ void FireBool(int Player) {
 			FireBallStateY1P = g_Player.y;
 			FireBallStateFlag1P = false;
 		}
-		FireBoolFlag1P = true;
+		FireBallFlag1P = true;
 		break;
 	case PLAYER2:
 		FireBallStateFlag2P = true;
@@ -848,7 +848,7 @@ void FireBool(int Player) {
 			FireBallStateY2P = g_Player2P.y;
 			FireBallStateFlag2P = false;
 		}
-		FireBoolFlag2P = true;
+		FireBallFlag2P = true;
 		break;
 	}
 }

@@ -84,7 +84,7 @@ extern int FirstItem2P;
 extern int SecondItem2P;
 extern bool BeamFlag1P;
 extern bool BeamFlag2P;
-extern bool FireBoolFlag1P;
-extern bool FireBoolFlag2P;
+extern bool FireBallFlag1P;
+extern bool FireBallFlag2P;
 
 #endif // !GAME_CONTROL_

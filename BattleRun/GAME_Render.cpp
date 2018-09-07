@@ -415,12 +415,12 @@ void GameRender(void)
 		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, BEAM2P, sizeof(CUSTOMVERTEX));
 	}
 
-	if (FireBoolFlag1P) {
+	if (FireBallFlag1P) {
 		g_pD3Device->SetTexture(0, g_pTexture[ITEMINTEGRATION_TEX]);
 		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, FIREBOOL1P, sizeof(CUSTOMVERTEX));
 	}
 
-	if (FireBoolFlag2P) {
+	if (FireBallFlag2P) {
 		g_pD3Device->SetTexture(0, g_pTexture[ITEMINTEGRATION_TEX]);
 		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, FIREBOOL2P, sizeof(CUSTOMVERTEX));
 	}
