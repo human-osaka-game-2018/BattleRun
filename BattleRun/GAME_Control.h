@@ -41,7 +41,7 @@ enum ITEM_NUM
 	SPEEDDOWN,
 	BEAM,
 	BARRIER,
-	FIREBOOL,
+	FIREBALL,
 	ITEM_MAX
 };
 
@@ -57,6 +57,8 @@ extern OBJECT_STATE g_Itembox;
 extern OBJECT_STATE g_Goal;
 extern OBJECT_STATE g_Beam1P;
 extern OBJECT_STATE g_Beam2P;
+extern OBJECT_STATE g_Fire1P;
+extern OBJECT_STATE g_Fire2P;
 extern unsigned long countDownARGB;//カウントダウンの数字のARGBを変更する変数
 extern int countDownNum;//カウントダウンで今何が表示されてるかどうかを確認する変数
 extern OBJECT_STATE g_FirstItem1P;
@@ -97,5 +99,7 @@ extern bool BarrierFlag1P;
 extern bool BarrierFlag2P;
 extern bool FireBallFlag1P;
 extern bool FireBallFlag2P;
+extern unsigned long Player1ARGB;
+extern unsigned long Player2ARGB;
 
 #endif // !GAME_CONTROL_

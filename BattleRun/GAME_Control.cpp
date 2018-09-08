@@ -159,6 +159,16 @@ int BeamHitcount1P;
 int BeamHitcount2P;
 bool PlayerStop1P;
 bool PlayerStop2P;
+unsigned long Player1ARGB;
+unsigned long Player2ARGB;
+bool FireHitFlag1P;
+bool FireHitFlag2P;
+int FireHitCount1P;
+int FireHitCount2P;
+bool ManholeHitFlag1P;
+bool ManholeHitFlag2P;
+int ManholeHitCount1P;
+int ManholeHitCount2P;
 
 OBJECT_STATE g_Player;
 OBJECT_STATE g_Player2P;
@@ -174,8 +184,10 @@ OBJECT_STATE g_Itembox;
 OBJECT_STATE g_Goal;
 OBJECT_STATE g_Beam1P;
 OBJECT_STATE g_Beam2P;
+OBJECT_STATE g_Fire1P;
+OBJECT_STATE g_Fire2P;
 OBJECT_POSITION oldPlayer1P;//プレイヤー1の前の座標を保存し、差分を出すために使う
-OBJECT_POSITION oldPlayer2P;//プレイヤー2の前の座標を保存し、さ分を出すために使う
+OBJECT_POSITION oldPlayer2P;//プレイヤー2の前の座標を保存し、差分を出すために使う
 OBJECT_POSITION sabun1P;
 OBJECT_POSITION sabun2P;
 OBJECT_POSITION checkPoint[FINAL_CHECK_POINT - FIRST_CHECK_POINT];
@@ -194,12 +206,13 @@ void GameControl(void)
 		CheckWhetherPlayerIsJamping();
 		GiveGravity();
 		CheckWheterTheHit();
+		ItemEffectRelease();
 		CreatePerDecision();
 		CalculateDistanceCheckPoint(itIsPlayer1P);
 		CalculateDistanceCheckPoint(itIsPlayer2P);
 		JudgePlayerRanking();
 		PlayerExists();
-		ItemEffectRelease();
+		
 	}
 	if (gameState == FINISH) {
 		FinishGameOperation();
@@ -209,8 +222,10 @@ void GameControl(void)
 
 void UpDate(void) {
 
-	g_Beam1P = { g_Player.x + g_Player.scale_x, g_Player.y, 1920, g_Player.scale_y };
-	g_Beam2P = { g_Player2P.x + g_Player2P.scale_x, g_Player2P.y, 1920, g_Player2P.scale_y };
+	g_Beam1P = { g_Player.x + g_Player.scale_x, g_Player.y, 1920.f, g_Player.scale_y };
+	g_Beam2P = { g_Player2P.x + g_Player2P.scale_x, g_Player2P.y, 1920.f, g_Player2P.scale_y };
+	g_Fire1P = { FireBallStateXDecision1P,FireBallStateY1P,64.f,64.f };
+	g_Fire2P = { FireBallStateXDecision2P,FireBallStateY2P,64.f,64.f };
 }
 
 	/*関数の実態*/
@@ -309,6 +324,17 @@ void InitState() {
 		BeamHitFlag2P = false;
 		PlayerStop1P = false;
 		PlayerStop2P = false;
+		FireHitFlag1P = false;
+		FireHitFlag2P = false;
+		FireHitCount1P = 0;
+		FireHitCount2P = 0;
+		ManholeHitFlag1P = false;
+		ManholeHitFlag2P = false;
+		ManholeHitCount1P = 0;
+		ManholeHitCount2P = 0;
+	
+		Player1ARGB = 0xFFFFFFFF;
+		Player2ARGB = 0xFFFFFFFF;
 
 		srand((unsigned int)time(NULL));
 
@@ -736,7 +762,7 @@ void PlayerMovement(int PlayerMoveCount,float *Playertutv,bool* FettersFlag,floa
 	}
 }
 
-void BeamHit(bool* BeamHitFlag, int* BeamHitCount, bool* PlayerStop) {
+void BeamHit(bool* BeamHitFlag, int* BeamHitCount, bool* PlayerStop,unsigned long* PlayerARGB) {
 
 	if (*BeamHitFlag) {
 		(*BeamHitCount)++;
@@ -745,11 +771,170 @@ void BeamHit(bool* BeamHitFlag, int* BeamHitCount, bool* PlayerStop) {
 	switch (*BeamHitCount) {
 	case 1:
 		*PlayerStop = true;
+		*PlayerARGB = 0x44444444;
+		break;
+	case 6:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 11:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 16:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 21:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 26:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 31:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 36:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 41:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 46:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 51:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 56:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 61:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 66:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 71:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 76:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 81:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 86:
+		*PlayerARGB = 0x99999999;
 		break;
 	case 90:
 		*PlayerStop = false;
 		*BeamHitFlag = false;
 		*BeamHitCount = 0;
+		*PlayerARGB = 0xFFFFFFFF;
+		break;
+	}
+}
+
+void FireHit(bool* FireHitFlag,int* FireHitCount,bool* PlayerStop,unsigned long* PlayerARGB) {
+
+	if (*FireHitFlag) {
+		(*FireHitCount)++;
+	}
+
+	switch (*FireHitCount) {
+	case 1:
+		*PlayerStop = true;
+		*PlayerARGB = 0x44444444;
+		break;
+	case 6:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 11:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 16:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 21:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 26:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 31:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 36:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 41:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 46:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 51:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 56:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 60:
+		*PlayerStop = false;
+		*FireHitFlag = false;
+		*FireHitCount = 0;
+		*PlayerARGB = 0xFFFFFFFF;
+		break;
+	}
+}
+
+void ManholeHit(bool* ManholeHitFlag,int* ManholeHitCount,int* SpeedChange,unsigned long* PlayerARGB) {
+
+	if (*ManholeHitFlag) {
+		(*ManholeHitCount)++;
+	}
+
+	switch (*ManholeHitCount) {
+	case 1:
+		*SpeedChange = SPEEDDOWNVALUE;
+		*PlayerARGB = 0x44444444;
+		break;
+	case 6:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 11:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 16:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 21:
+		*PlayerARGB = 0x44444444; 
+		break;
+	case 26:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 31:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 36:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 41:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 46:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 51:
+		*PlayerARGB = 0x44444444;
+		break;
+	case 56:
+		*PlayerARGB = 0x99999999;
+		break;
+	case 60:
+		*PlayerARGB = 0xFFFFFFFF;
+		*ManholeHitCount = 0;
+		*ManholeHitFlag = false;
+		*SpeedChange = 0;
 		break;
 	}
 }
@@ -779,19 +964,23 @@ void ItemEffectRelease(void) {
 		FettersFlag2P = false;
 	}
 
-	UpDate();
-
 	PlayerMovement(PlayerMoveCount1P, &MoveImage, &FettersFlag1P, &Fetterstu1P);
 	PlayerMovement(PlayerMoveCount2P, &MoveImage2P, &FettersFlag2P, &Fetterstu2P);
 
 	BeamEffect(&BeamFlag1P, &Beamcount1P, &Beamtutv1P);
 	BeamEffect(&BeamFlag2P, &Beamcount2P, &Beamtutv2P);
 	
-		BarrierEffect(&BarrierFlag1P, &Barriercount1P, &Barriertu1P);
+	BeamHit(&BeamHitFlag1P, &BeamHitcount1P, &PlayerStop1P,&Player1ARGB);
+	BeamHit(&BeamHitFlag2P, &BeamHitcount2P, &PlayerStop2P,&Player2ARGB);
+	
+	BarrierEffect(&BarrierFlag1P, &Barriercount1P, &Barriertu1P);
 	BarrierEffect(&BarrierFlag2P, &Barriercount2P, &Barriertu2P);
 
-	BeamHit(&BeamHitFlag1P, &BeamHitcount1P, &PlayerStop1P);
-	BeamHit(&BeamHitFlag2P, &BeamHitcount2P, &PlayerStop2P);
+	FireHit(&FireHitFlag1P, &FireHitCount1P, &PlayerStop1P, &Player1ARGB);
+	FireHit(&FireHitFlag2P, &FireHitCount2P, &PlayerStop2P, &Player2ARGB);
+
+	ManholeHit(&ManholeHitFlag1P, &ManholeHitCount1P, &SpeedChange1P, &Player1ARGB);
+	ManholeHit(&ManholeHitFlag2P, &ManholeHitCount2P, &SpeedChange2P, &Player2ARGB);
 
 	if (FireBallFlag1P == true)//ファイアーボール使用FLAG
 	{
@@ -868,6 +1057,7 @@ void ItemEffectRelease(void) {
 		}
 		FireBallState2P += FireBallSpeed;
 	}
+	UpDate();
 }
 
 void ItemBreak(int Player) {
@@ -904,10 +1094,12 @@ void SpeedUp(int Player) {
 	case PLAYER1:
 		SpeedChange1P = SPEEDUPVALUE;
 		SpeedChangeCount1P = 0;
+		FettersFlag1P = false;
 		break;
 	case PLAYER2:
 		SpeedChange2P = SPEEDUPVALUE;
 		SpeedChangeCount2P = 0;
+		FettersFlag2P = false;
 		break;
 	}
 }
@@ -949,7 +1141,7 @@ void Barrier(int Player) {
 	}
 }
 
-void FireBool(int Player) {
+void FireBall(int Player) {
 	switch (Player) {
 	case PLAYER1:
 		FireBallStateFlag1P = true;
@@ -1010,8 +1202,8 @@ void UseItem(int Player) {
 	case BARRIER:
 		Barrier(Player);
 		break;
-	case FIREBOOL:
-		FireBool(Player);
+	case FIREBALL:
+		FireBall(Player);
 		break;
 	}
 }
@@ -1547,31 +1739,11 @@ void CreatePerDecision(void) {
 		bool isSuccess = soundsManager.Start(_T("gameTrampoline2"));
 	}
 
-	//マンホールの処理
-	if (PlayerGimmickDecision(manholecount, manhole, g_Manhole, g_Player)) {
-		g_Player.y = 100;
-	}
-	if (PlayerGimmickDecision(manholecount, manhole, g_Manhole, g_Player2P)) {
-		g_Player2P.y = 100;
-	}
-
-	if (PlayerItemDecision(g_Player2P, g_Beam1P) && Beamtutv1P >= 380.f) {
-		
-		BeamHitcount2P = 0;
-		BeamHitFlag2P = true;
-	}
-
-	if (PlayerItemDecision(g_Player, g_Beam2P) && Beamtutv2P >= 380.f) {
-		
-		BeamHitcount1P = 0;
-		BeamHitFlag1P = true;
-	}
-
 	//アイテムボックスの処理
 	if (ItemDecision(itemboxcount, itembox, g_Itembox, g_Player)) {
 		
 		if (FirstItem1P && !SecondItem1P) {
-		    SecondItem1P = (rand() % (ITEM_MAX - 1)) + 1;
+			SecondItem1P = (rand() % (ITEM_MAX - 1)) + 1;
 		}
 
 		if (!FirstItem1P) {
@@ -1587,6 +1759,52 @@ void CreatePerDecision(void) {
 		
 		if (!FirstItem2P) {
 			FirstItem2P = (rand() % (ITEM_MAX - 1)) + 1;
+		}
+	}
+
+	if (!BarrierFlag1P) {
+
+		//マンホールの処理
+		if (PlayerGimmickDecision(manholecount, manhole, g_Manhole, g_Player)) {
+			ManholeHitFlag1P = true;
+		}
+		
+		//ビームとプレイヤーの当たり判定
+		if (PlayerItemDecision(g_Player, g_Beam2P) && Beamtutv2P >= 380.f) {
+		
+			BeamHitFlag1P = true;
+		}
+
+		if (PlayerItemDecision(g_Player, g_Fire2P) && FireBallFlag2P) {
+
+			FireHitFlag1P = true;
+			FireBallFlagEfect2P = true;
+			FireBallFlag2P = false;
+			FireBallFlagEfectCount2P = 0;
+			FireBallState2P = 100;
+		}
+	}
+
+	if (!BarrierFlag2P) {
+
+		//マンホールの処理
+		if (PlayerGimmickDecision(manholecount, manhole, g_Manhole, g_Player2P)) {
+			ManholeHitFlag2P = true;
+		}
+
+		//ビームとプレイヤーの当たり判定
+		if (PlayerItemDecision(g_Player2P, g_Beam1P) && Beamtutv1P >= 380.f) {
+		
+			BeamHitFlag2P = true;
+		}
+
+		if (PlayerItemDecision(g_Player2P, g_Fire1P) && FireBallFlag1P) {
+
+			FireHitFlag2P = true;
+			FireBallFlagEfect1P = true;
+			FireBallFlag1P = false;
+			FireBallFlagEfectCount1P = 0;
+			FireBallState1P = 100;
 		}
 	}
 

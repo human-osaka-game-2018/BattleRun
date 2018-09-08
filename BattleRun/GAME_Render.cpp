@@ -17,11 +17,11 @@ float FettersRighttu2P;
 float FettersLefttu2P;
 float Fettersscale1P;
 float Fettersscale2P;
-float FireBall1Ptu14=0;//ファイアーボールに使う１と4のtu
-float FireBall1Ptv12=0.064;//ファイアーボールに使う１と２のtv
-float FireBall1Ptu23=0.064;//ファイアーボールに使う２と３のtu
-float FireBall1Ptv34=0.128;//ファイアーボールに使う３と４のtv
-float FireBall2Ptu14=0;//ファイアーボールに使う１と4のtu
+float FireBall1Ptu14 = 0;//ファイアーボールに使う１と4のtu
+float FireBall1Ptv12 = 0.064;//ファイアーボールに使う１と２のtv
+float FireBall1Ptu23 = 0.064;//ファイアーボールに使う２と３のtu
+float FireBall1Ptv34 = 0.128;//ファイアーボールに使う３と４のtv
+float FireBall2Ptu14 = 0;//ファイアーボールに使う１と4のtu
 float FireBall2Ptv12 = 0.064;//ファイアーボールに使う１と２のtv
 float FireBall2Ptu23 = 0.064;//ファイアーボールに使う２と３のtu
 float FireBall2Ptv34 = 0.128;//ファイアーボールに使う３と４のtv
@@ -32,12 +32,12 @@ int FireBallFlagEfect2P = false;
 int FireBallState1P = 100;//1Pの火の玉の位置（この値に値を＋するとファイアーボールが動く）
 int FireBallState2P = 100;//2Pの火の玉の位置（この値に値を＋するとファイアーボールが動く）
 int FireBallSpeed = 30;//ファイアーボールの速度
-int FireBallStateX1P;//発射時のファイアーボールのX座標
-int FireBallStateY1P;//発射時のファイアーボールのY座標
-int FireBallStateX2P;//発射時のファイアーボールのX座標
-int FireBallStateY2P;//発射時のファイアーボールのY座標
-int FireBallStateXDecision1P;//1Pが出すFireBoolStateX-FireBoolStateの計算結果を入れる変数
-int FireBallStateXDecision2P;//2Pが出すFireBoolStateX-FireBoolStateの計算結果を入れる変数
+float FireBallStateX1P;//発射時のファイアーボールのX座標
+float FireBallStateY1P;//発射時のファイアーボールのY座標
+float FireBallStateX2P;//発射時のファイアーボールのX座標
+float FireBallStateY2P;//発射時のファイアーボールのY座標
+float FireBallStateXDecision1P;//1Pが出すFireBoolStateX-FireBoolStateの計算結果を入れる変数
+float FireBallStateXDecision2P;//2Pが出すFireBoolStateX-FireBoolStateの計算結果を入れる変数
 int FireBallStateFlag1P = false;//ファイアーボールのXY座標を変数に入れるFLAG
 int FireBallStateFlag2P = false;//ファイアーボールのXY座標を変数に入れるFLAG
 OBJECT_POSITION trampoline[50];//トランポリンの座標を保存する構造体配列、10個まで
@@ -69,7 +69,7 @@ void ItemIconRender(int ItemNumber,CUSTOMVERTEX *vertices) {
 	case BARRIER:
 		TextureID = BARRIER_ICON_TEX;
 		break;
-	case FIREBOOL:
+	case FIREBALL:
 		TextureID = FIREBOOl_ICON_TEX;
 		break;
 	}
@@ -121,42 +121,42 @@ void GameRender(void)
 
 	CUSTOMVERTEX vertexGameBKG[4]
 	{
-		{ 0.f,                          0.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ DISPLAY_WIDTH,                0.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ DISPLAY_WIDTH,      DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 0.f,                DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 0.f,                     0.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ DISPLAY_WIDTH,           0.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ DISPLAY_WIDTH, DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 0.f,           DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX vertexPlayer1PStateSpace[4]
 	{
-		{ 50.f,      10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 400,       10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 400,       60, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 50.f,      60, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 50.f,  10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 400.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 400.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 50.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX vertexPlayer2PStateSpace[4]
 	{
-		{ 550.f,             10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 950,               10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 950,               60, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 550.f,             60, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 550.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 950.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 950.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 550.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX  vertexPlayer1P[4]
 	{
-		{ g_Player.x,                                       g_Player.y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage + Lefttu1P) / 1024.f, 0.f },
-		{ g_Player.x + g_Player.scale_x,                    g_Player.y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage + Righttu1P) / 1024.f, 0.f },
-		{ g_Player.x + g_Player.scale_x, g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage + Righttu1P) / 1024.f, 70.f / 1024.f },
-		{ g_Player.x,                    g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage + Lefttu1P) / 1024.f, 70.f / 1024.f }
+		{ g_Player.x,                                       g_Player.y, 1.f, 1.f, Player1ARGB, (MoveImage + Lefttu1P) / 1024.f, 0.f },
+		{ g_Player.x + g_Player.scale_x,                    g_Player.y, 1.f, 1.f, Player1ARGB, (MoveImage + Righttu1P) / 1024.f, 0.f },
+		{ g_Player.x + g_Player.scale_x, g_Player.y + g_Player.scale_y, 1.f, 1.f, Player1ARGB, (MoveImage + Righttu1P) / 1024.f, 70.f / 1024.f },
+		{ g_Player.x,                    g_Player.y + g_Player.scale_y, 1.f, 1.f, Player1ARGB, (MoveImage + Lefttu1P) / 1024.f, 70.f / 1024.f }
 	};
 
 	CUSTOMVERTEX  vertexPlayer2P[4]
 	{
-		{ g_Player2P.x,                      g_Player2P.y,                      1.f, 1.f, 0xFFFFFFFF, (MoveImage2P + Lefttu2P) / 1024.f, 0.f },
-		{ g_Player2P.x + g_Player2P.scale_x, g_Player2P.y,                      1.f, 1.f, 0xFFFFFFFF, (MoveImage2P + Righttu2P) / 1024.f, 0.f },
-		{ g_Player2P.x + g_Player2P.scale_x, g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage2P + Righttu2P) / 1024.f, 70.f / 1024.f },
-		{ g_Player2P.x,                      g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, (MoveImage2P + Lefttu2P) / 1024.f, 70.f / 1024.f }
+		{ g_Player2P.x,                      g_Player2P.y,                      1.f, 1.f, Player2ARGB, (MoveImage2P + Lefttu2P) / 1024.f, 0.f },
+		{ g_Player2P.x + g_Player2P.scale_x, g_Player2P.y,                      1.f, 1.f, Player2ARGB, (MoveImage2P + Righttu2P) / 1024.f, 0.f },
+		{ g_Player2P.x + g_Player2P.scale_x, g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, Player2ARGB, (MoveImage2P + Righttu2P) / 1024.f, 70.f / 1024.f },
+		{ g_Player2P.x,                      g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, Player2ARGB, (MoveImage2P + Lefttu2P) / 1024.f, 70.f / 1024.f }
 	};
 
 	CUSTOMVERTEX  CELL[4]
@@ -169,18 +169,18 @@ void GameRender(void)
 
 	CUSTOMVERTEX vertexPlayer1PRankingSpace[4]
 	{
-		{ 430.f,      10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 520,       10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 520,       60, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 430.f,      60, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 430.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 520.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 520.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 430.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX vertexPlayer2PRankingSpace[4]
 	{
-		{ 980.f,             10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 1070,               10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 1070,               60, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 980.f,             60, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 980.f,  10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 1070.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 1070.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 980.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX FIRSTITEM1P[4]
@@ -233,21 +233,21 @@ void GameRender(void)
 
 	CUSTOMVERTEX FETTERS1P[4]
 	{
-		{ g_Player.x + Fettersscale1P,	    g_Player.y,					 1.f, 1.f, 0xFFFFFFFF,(Fetterstu1P + FettersLefttu1P) / 1024.f, 0.f },
-		{ g_Player.x + Fettersscale1P + 64, g_Player.y,					 1.f, 1.f, 0xFFFFFFFF,(Fetterstu1P + FettersRighttu1P) / 1024.f, 0.f },
-		{ g_Player.x + Fettersscale1P + 64, g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF,(Fetterstu1P + FettersRighttu1P) / 1024.f, 64.f / 1024.f },
-		{ g_Player.x + Fettersscale1P,      g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF,(Fetterstu1P + FettersLefttu1P) / 1024.f, 64.f / 1024.f }
+		{ g_Player.x + Fettersscale1P,	      g_Player.y,					 1.f, 1.f, 0xFFFFFFFF,(Fetterstu1P + FettersLefttu1P) / 1024.f, 0.f },
+		{ g_Player.x + Fettersscale1P + 64.f, g_Player.y,					 1.f, 1.f, 0xFFFFFFFF,(Fetterstu1P + FettersRighttu1P) / 1024.f, 0.f },
+		{ g_Player.x + Fettersscale1P + 64.f, g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF,(Fetterstu1P + FettersRighttu1P) / 1024.f, 64.f / 1024.f },
+		{ g_Player.x + Fettersscale1P,        g_Player.y + g_Player.scale_y, 1.f, 1.f, 0xFFFFFFFF,(Fetterstu1P + FettersLefttu1P) / 1024.f, 64.f / 1024.f }
 	};
 
 	CUSTOMVERTEX FETTERS2P[4]
 	{
-		{ g_Player2P.x + Fettersscale2P,	  g_Player2P.y,					     1.f, 1.f, 0xFFFFFFFF, (Fetterstu2P + FettersLefttu2P) / 1024.f, 0.f },
-		{ g_Player2P.x + Fettersscale2P + 64, g_Player2P.y,					     1.f, 1.f, 0xFFFFFFFF, (Fetterstu2P + FettersRighttu2P) / 1024.f, 0.f },
-		{ g_Player2P.x + Fettersscale2P + 64, g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, (Fetterstu2P + FettersRighttu2P) / 1024.f, 64.f / 1024.f },
-		{ g_Player2P.x + Fettersscale2P,      g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, (Fetterstu2P + FettersLefttu2P) / 1024.f, 64.f / 1024.f }
+		{ g_Player2P.x + Fettersscale2P,	    g_Player2P.y,					     1.f, 1.f, 0xFFFFFFFF, (Fetterstu2P + FettersLefttu2P) / 1024.f, 0.f },
+		{ g_Player2P.x + Fettersscale2P + 64.f, g_Player2P.y,					     1.f, 1.f, 0xFFFFFFFF, (Fetterstu2P + FettersRighttu2P) / 1024.f, 0.f },
+		{ g_Player2P.x + Fettersscale2P + 64.f, g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, (Fetterstu2P + FettersRighttu2P) / 1024.f, 64.f / 1024.f },
+		{ g_Player2P.x + Fettersscale2P,        g_Player2P.y + g_Player2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, (Fetterstu2P + FettersLefttu2P) / 1024.f, 64.f / 1024.f }
 	};
 
-	int SizeUp = 15;
+	float SizeUp = 15;
 
 	CUSTOMVERTEX BARRIER1P[4]
 	{
@@ -267,18 +267,18 @@ void GameRender(void)
 
 	CUSTOMVERTEX FIREBALL1P[4]
 	{
-		{ FireBallStateXDecision1P ,	   FireBallStateY1P,	  1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu14, FireBall1Ptv12 },
-		{ FireBallStateXDecision1P + 64,   FireBallStateY1P,	  1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu23,  FireBall1Ptv12 },
-		{ FireBallStateXDecision1P + 64,   FireBallStateY1P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu23,  FireBall1Ptv34 },
-		{ FireBallStateXDecision1P ,       FireBallStateY1P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu14, FireBall1Ptv34 }
+		{ g_Fire1P.x ,					 g_Fire1P.y,					1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu14, FireBall1Ptv12 },
+		{ g_Fire1P.x + g_Fire1P.scale_x, g_Fire1P.y,					1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu23, FireBall1Ptv12 },
+		{ g_Fire1P.x + g_Fire1P.scale_x, g_Fire1P.y + g_Fire1P.scale_y, 1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu23, FireBall1Ptv34 },
+		{ g_Fire1P.x ,					 g_Fire1P.y + g_Fire1P.scale_y, 1.f, 1.f, 0xFFFFFFFF, FireBall1Ptu14, FireBall1Ptv34 }
 	};
 
 	CUSTOMVERTEX FIREBALL2P[4]
 	{
-		{ FireBallStateXDecision2P ,	  FireBallStateY2P,	   	 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu14,  FireBall2Ptv12 },
-		{ FireBallStateXDecision2P + 64,  FireBallStateY2P,		 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu23,  FireBall2Ptv12 },
-		{ FireBallStateXDecision2P + 64,  FireBallStateY2P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu23,  FireBall2Ptv34 },
-		{ FireBallStateXDecision2P ,      FireBallStateY2P + 64, 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu14,  FireBall2Ptv34 }
+		{ g_Fire2P.x ,					 g_Fire2P.y,					1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu14, FireBall2Ptv12 },
+		{ g_Fire2P.x + g_Fire2P.scale_x, g_Fire2P.y,					1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu23, FireBall2Ptv12 },
+		{ g_Fire2P.x + g_Fire2P.scale_x, g_Fire2P.y + g_Fire2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu23, FireBall2Ptv34 },
+		{ g_Fire2P.x ,					 g_Fire2P.y + g_Fire2P.scale_y, 1.f, 1.f, 0xFFFFFFFF, FireBall2Ptu14, FireBall2Ptv34 }
 	};
 
 	CUSTOMVERTEX win1PCountFlag1[4]//1P(赤)の1勝目
