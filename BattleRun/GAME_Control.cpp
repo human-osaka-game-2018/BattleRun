@@ -332,9 +332,17 @@ void InitState() {
 		ManholeHitFlag2P = false;
 		ManholeHitCount1P = 0;
 		ManholeHitCount2P = 0;
+		PlayerMoveCount1P = 0;
+		PlayerMoveCount2P = 0;
 	
 		Player1ARGB = 0xFFFFFFFF;
 		Player2ARGB = 0xFFFFFFFF;
+
+		for (int i = 0; i < itemboxcount; i++) {
+
+			itembox[i].ItemGetFlag1P = 0;
+			itembox[i].ItemGetFlag2P = 0;
+		}
 
 		srand((unsigned int)time(NULL));
 

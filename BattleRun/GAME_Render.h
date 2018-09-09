@@ -27,10 +27,10 @@ extern float FireBallStateXDecision1P;//1Pが出すFireBoolStateX-FireBoolStateの計
 extern float FireBallStateXDecision2P;//2Pが出すFireBoolStateX-FireBoolStateの計算結果を入れる変数
 extern int FireBallStateFlag1P;
 extern int FireBallStateFlag2P;
-extern OBJECT_POSITION trampoline[50];
-extern OBJECT_POSITION trampolineleft[50];
-extern OBJECT_POSITION manhole[50];
-extern OBJECT_POSITION itembox[50];
+extern OBJECT_POSITION trampoline[100];
+extern OBJECT_POSITION trampolineleft[100];
+extern OBJECT_POSITION manhole[100];
+extern OBJECT_POSITION itembox[100];
 extern OBJECT_POSITION goal[100];
 
 void GameRender();

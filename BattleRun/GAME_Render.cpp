@@ -40,10 +40,10 @@ float FireBallStateXDecision1P;//1P‚ªo‚·FireBoolStateX-FireBoolState‚ÌŒvŽZŒ‹‰Ê‚
 float FireBallStateXDecision2P;//2P‚ªo‚·FireBoolStateX-FireBoolState‚ÌŒvŽZŒ‹‰Ê‚ð“ü‚ê‚é•Ï”
 int FireBallStateFlag1P = false;//ƒtƒ@ƒCƒA[ƒ{[ƒ‹‚ÌXYÀ•W‚ð•Ï”‚É“ü‚ê‚éFLAG
 int FireBallStateFlag2P = false;//ƒtƒ@ƒCƒA[ƒ{[ƒ‹‚ÌXYÀ•W‚ð•Ï”‚É“ü‚ê‚éFLAG
-OBJECT_POSITION trampoline[50];//ƒgƒ‰ƒ“ƒ|ƒŠƒ“‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñA10ŒÂ‚Ü‚Å
-OBJECT_POSITION trampolineleft[50];
-OBJECT_POSITION manhole[50];//ƒ}ƒ“ƒz[ƒ‹‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñ
-OBJECT_POSITION itembox[50];
+OBJECT_POSITION trampoline[100];//ƒgƒ‰ƒ“ƒ|ƒŠƒ“‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñA10ŒÂ‚Ü‚Å
+OBJECT_POSITION trampolineleft[100];
+OBJECT_POSITION manhole[100];//ƒ}ƒ“ƒz[ƒ‹‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñ
+OBJECT_POSITION itembox[100];
 OBJECT_POSITION goal[100];//ƒS[ƒ‹‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñA10ŒÂ‚Ü‚Å
 
 void ItemIconRender(int ItemNumber,CUSTOMVERTEX *vertices) {
@@ -378,7 +378,7 @@ void GameRender(void)
 				{
 					continue;
 				}
-				else if ((MapData02[j][i] >= FIRST_CHECK_POINT) && (MapData01[j][i] < FINAL_CHECK_POINT)) {
+				else if ((MapData02[j][i] >= FIRST_CHECK_POINT) && (MapData02[j][i] < FINAL_CHECK_POINT)) {
 					continue;
 				}
 			}
@@ -387,7 +387,7 @@ void GameRender(void)
 				{
 					continue;
 				}
-				else if ((MapData03[j][i] >= FIRST_CHECK_POINT) && (MapData01[j][i] < FINAL_CHECK_POINT)) {
+				else if ((MapData03[j][i] >= FIRST_CHECK_POINT) && (MapData03[j][i] < FINAL_CHECK_POINT)) {
 					continue;
 				}
 			}
