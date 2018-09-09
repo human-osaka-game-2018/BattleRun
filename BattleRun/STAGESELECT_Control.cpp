@@ -97,6 +97,7 @@ void StageselectControl()
 					StageRandomLoop = true;
 				}
 				firstTime = true;
+				bool isSuccess = soundsManager.Start(_T("buttonSelect1SE"));
 			}
 		}
 		if (StageRandomLoop == true)

@@ -5,17 +5,46 @@ struct OBJECT_STATE
 	float x, y, scale_x, scale_y;
 };
 
-struct OBJECT_POSITION
+struct OBJECT_INFO_ROTATE//主にかぎづめロープの時に使う構造体
+{
+	float reference_x,reference_y,scale_x, scale_y;
+};
+
+struct OBJECT_POSITION_UNDELETABLE
+{
+	float x, y;
+};
+
+struct OBJECT_POSITION_DELETABLE
 {
 	float x, y;
 	bool ItemGetFlag1P;
 	bool ItemGetFlag2P;
 };
 
+struct ROTATE_VERTEX//回転させた数値を代入するための構造体
+{
+	float leftTopX;
+	float leftTopY;
+	float leftBottomX;
+	float leftBottomY;
+	float rightTopX;
+	float rightTopY;
+	float rightBottomX;
+	float rightBottomY;
+
+};
+
 enum PLAYER_NUM
 {
 	PLAYER1P,
 	PLAYER2P
+};
+
+enum BUTTON_INFORMATION
+{
+	X_BUTTON = 1,
+	Y_BUTTON
 };
 
 enum PLAYER_WALL_SIDE
@@ -42,7 +71,17 @@ enum ITEM_NUM
 	BEAM,
 	BARRIER,
 	FIREBALL,
+	CLAWROPE,
 	ITEM_MAX
+};
+
+enum CLAWROPE_USING_STATE
+{
+	NOT_USE,
+	TARGET_MODE,
+	CHECK_MODE,
+	MOVE_MODE,
+	SWAP_MODE
 };
 
 void GameControl();
@@ -101,5 +140,15 @@ extern bool FireBallFlag1P;
 extern bool FireBallFlag2P;
 extern unsigned long Player1ARGB;
 extern unsigned long Player2ARGB;
+extern ROTATE_VERTEX targetRay1P;//かぎづめロープのターゲットの線の座標を保存するための構造体
+extern ROTATE_VERTEX target1P;//かぎづめロープのターゲットの座標を保存するための構造体
+extern ROTATE_VERTEX targetRay2P;//かぎづめロープのターゲットの線の座標を保存するための構造体
+extern ROTATE_VERTEX target2P;//かぎづめロープのターゲットの座標を保存するための構造体
+extern int clawRopeState1P;
+extern int clawRopeState2P;
+extern ROTATE_VERTEX claw1P;
+extern ROTATE_VERTEX claw2P;
+extern ROTATE_VERTEX rope1P;
+extern ROTATE_VERTEX rope2P;
 
 #endif // !GAME_CONTROL_

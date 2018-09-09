@@ -40,17 +40,20 @@ float FireBallStateXDecision1P;//1P‚ªo‚·FireBoolStateX-FireBoolState‚ÌŒvŽZŒ‹‰Ê‚
 float FireBallStateXDecision2P;//2P‚ªo‚·FireBoolStateX-FireBoolState‚ÌŒvŽZŒ‹‰Ê‚ð“ü‚ê‚é•Ï”
 int FireBallStateFlag1P = false;//ƒtƒ@ƒCƒA[ƒ{[ƒ‹‚ÌXYÀ•W‚ð•Ï”‚É“ü‚ê‚éFLAG
 int FireBallStateFlag2P = false;//ƒtƒ@ƒCƒA[ƒ{[ƒ‹‚ÌXYÀ•W‚ð•Ï”‚É“ü‚ê‚éFLAG
-OBJECT_POSITION trampoline[100];//ƒgƒ‰ƒ“ƒ|ƒŠƒ“‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñA10ŒÂ‚Ü‚Å
-OBJECT_POSITION trampolineleft[100];
-OBJECT_POSITION manhole[100];//ƒ}ƒ“ƒz[ƒ‹‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñ
-OBJECT_POSITION itembox[100];
-OBJECT_POSITION goal[100];//ƒS[ƒ‹‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñA10ŒÂ‚Ü‚Å
+OBJECT_POSITION_UNDELETABLE trampoline[100];//ƒgƒ‰ƒ“ƒ|ƒŠƒ“‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñA10ŒÂ‚Ü‚Å
+OBJECT_POSITION_UNDELETABLE trampolineleft[100];
+OBJECT_POSITION_UNDELETABLE manhole[100];//ƒ}ƒ“ƒz[ƒ‹‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñ
+OBJECT_POSITION_DELETABLE itembox[100];
+OBJECT_POSITION_UNDELETABLE goal[100];//ƒS[ƒ‹‚ÌÀ•W‚ð•Û‘¶‚·‚é\‘¢‘Ì”z—ñA10ŒÂ‚Ü‚Å
 
 void ItemIconRender(int ItemNumber,CUSTOMVERTEX *vertices) {
 
 	TextureID = 0;
 
 	switch (ItemNumber) {
+	case NO_ITEM:
+		TextureID = ITEM_NO_ITEM_TEX;
+		break;
 	case ITEMBREAK:
 		TextureID = ITEMBREAK_ICON_TEX;
 		break;
@@ -71,6 +74,9 @@ void ItemIconRender(int ItemNumber,CUSTOMVERTEX *vertices) {
 		break;
 	case FIREBALL:
 		TextureID = FIREBOOl_ICON_TEX;
+		break;
+	case CLAWROPE:
+		TextureID = ITEM_CLAWROPE_TEX;
 		break;
 	}
 
@@ -311,6 +317,70 @@ void GameRender(void)
 		{ 790.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
 		{ 790.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
 		{ 720.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+	
+	CUSTOMVERTEX vertexClawRopeTarget1P[4]
+	{
+		{ target1P.leftTopX,      target1P.leftTopY,       1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ target1P.rightTopX,     target1P.rightTopY,      1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ target1P.rightBottomX,  target1P.rightBottomY,   1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ target1P.leftBottomX,   target1P.leftBottomY,    1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+
+	CUSTOMVERTEX vertexClawRopeTargetRay1P[4]
+	{
+		{ targetRay1P.leftTopX,      targetRay1P.leftTopY,       1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ targetRay1P.rightTopX,     targetRay1P.rightTopY,      1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ targetRay1P.rightBottomX,  targetRay1P.rightBottomY,   1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ targetRay1P.leftBottomX,   targetRay1P.leftBottomY,    1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+
+	CUSTOMVERTEX vertexClawRopeTarget2P[4]
+	{
+		{ target2P.leftTopX,      target2P.leftTopY,       1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ target2P.rightTopX,     target2P.rightTopY,      1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ target2P.rightBottomX,  target2P.rightBottomY,   1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ target2P.leftBottomX,   target2P.leftBottomY,    1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+
+	CUSTOMVERTEX vertexClawRopeTargetRay2P[4]
+	{
+		{ targetRay2P.leftTopX,      targetRay2P.leftTopY,       1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ targetRay2P.rightTopX,     targetRay2P.rightTopY,      1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ targetRay2P.rightBottomX,  targetRay2P.rightBottomY,   1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ targetRay2P.leftBottomX,   targetRay2P.leftBottomY,    1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+
+	CUSTOMVERTEX vertexClaw1P[4]
+	{
+		{ claw1P.leftTopX,      claw1P.leftTopY,       1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ claw1P.rightTopX,     claw1P.rightTopY,      1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ claw1P.rightBottomX,  claw1P.rightBottomY,   1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ claw1P.leftBottomX,   claw1P.leftBottomY,    1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+
+	CUSTOMVERTEX vertexRope1P[4]
+	{
+		{ rope1P.leftTopX,      rope1P.leftTopY,       1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ rope1P.rightTopX,     rope1P.rightTopY,      1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ rope1P.rightBottomX,  rope1P.rightBottomY,   1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ rope1P.leftBottomX,   rope1P.leftBottomY,    1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+
+	CUSTOMVERTEX vertexClaw2P[4]
+	{
+		{ claw2P.leftTopX,     claw2P.leftTopY,       1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ claw2P.rightTopX,    claw2P.rightTopY,      1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ claw2P.rightBottomX, claw2P.rightBottomY,   1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ claw2P.leftBottomX,  claw2P.leftBottomY,    1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
+	};
+
+	CUSTOMVERTEX vertexRope2P[4]
+	{
+		{ rope2P.leftTopX,      rope2P.leftTopY,       1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ rope2P.rightTopX,     rope2P.rightTopY,      1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ rope2P.rightBottomX,  rope2P.rightBottomY,   1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ rope2P.leftBottomX,   rope2P.leftBottomY,    1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 	//‰æ–Ê‚ÌÁ‹Ž
 	g_pD3Device->Clear(
@@ -592,6 +662,34 @@ void GameRender(void)
 	}
 
 	
+	
+	//‚©‚¬‚Ã‚ßƒ[ƒv‚Ìƒ^[ƒQƒbƒgƒ‚[ƒh‚È‚çƒ^[ƒQƒbƒg‚ð•`‰æ‚·‚é
+	if (clawRopeState1P == TARGET_MODE) {
+		g_pD3Device->SetTexture(0, g_pTexture[TARGET_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexClawRopeTarget1P, sizeof(CUSTOMVERTEX));
+		g_pD3Device->SetTexture(0, g_pTexture[TARGET_RAY_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexClawRopeTargetRay1P, sizeof(CUSTOMVERTEX));
+	}
+	if (clawRopeState2P == TARGET_MODE) {
+		g_pD3Device->SetTexture(0, g_pTexture[TARGET_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexClawRopeTarget2P, sizeof(CUSTOMVERTEX));
+		g_pD3Device->SetTexture(0, g_pTexture[TARGET_RAY_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexClawRopeTargetRay2P, sizeof(CUSTOMVERTEX));
+	}
+	//‚©‚¬‚Ã‚ßƒ[ƒv‚ðŽg—p‚µ‚½‚ç‚©‚¬‚Ã‚ßƒ[ƒv‚ð•`‰æ‚·‚é
+	if ((clawRopeState1P == CHECK_MODE) || (clawRopeState1P == MOVE_MODE) || (clawRopeState1P == SWAP_MODE)) {
+		g_pD3Device->SetTexture(0, g_pTexture[CLAW_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexClaw1P, sizeof(CUSTOMVERTEX));
+		g_pD3Device->SetTexture(0, g_pTexture[CLAWROPE_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexRope1P, sizeof(CUSTOMVERTEX));
+	}
+	if ((clawRopeState2P == CHECK_MODE) || (clawRopeState2P == MOVE_MODE) || (clawRopeState1P == SWAP_MODE)) {
+		g_pD3Device->SetTexture(0, g_pTexture[CLAW_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexClaw2P, sizeof(CUSTOMVERTEX));
+		g_pD3Device->SetTexture(0, g_pTexture[CLAWROPE_TEX]);
+		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexRope2P, sizeof(CUSTOMVERTEX));
+	}
+
 
 	g_pD3Device->SetTexture(0, g_pTexture[GAME_PLAYER1P_STATE_SPACE_TEX]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexPlayer1PStateSpace, sizeof(CUSTOMVERTEX));

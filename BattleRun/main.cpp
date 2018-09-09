@@ -12,7 +12,6 @@
 #include"RESULT_Control.h"
 #include"RESULT_Render.h"
 
-
 //Directx関係----------------------------
 LPDIRECT3DTEXTURE9	  g_pTexture[TEXMAX];	//	画像の情報を入れておく為のポインタ配列
 IDirect3DDevice9*	  g_pD3Device;		//	Direct3Dのデバイス
@@ -395,6 +394,42 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
+		"texture/item_itemBreak.png",
+		&g_pTexture[ITEM_ITEMBREAK_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/item_jumpUp.png",
+		&g_pTexture[ITEM_JUMP_UP_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/item_speedUp.png",
+		&g_pTexture[ITEM_SPEED_UP_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/item_speedDown.png",
+		&g_pTexture[ITEM_SPEED_DOWN_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/item_clawRope.png",
+		&g_pTexture[ITEM_CLAWROPE_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/target.png",
+		&g_pTexture[TARGET_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/targetRay.png",
+		&g_pTexture[TARGET_RAY_TEX]);
+
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
 		"texture/effect.png",
 		&g_pTexture[EFFECT_TEX]);
 
@@ -529,7 +564,7 @@ void SoundConfiguration(void) {
 	isSuccess = soundsManager.AddFile(filePath, _T("gameBGM"));
 	const TCHAR* filePath2 = _T("music/titleBGM2.mp3");
 	isSuccess = soundsManager.AddFile(filePath2, _T("titleBGM"));
-	const TCHAR* filePath3 = _T("music/attack03.mp3");
+	const TCHAR* filePath3 = _T("music/bottomSelect3.mp3");
 	isSuccess = soundsManager.AddFile(filePath3, _T("titleBotton"));
 	const TCHAR* filePath4 = _T("music/jump01.mp3");
 	isSuccess = soundsManager.AddFile(filePath4, _T("gamePlayerJump"));
@@ -547,6 +582,60 @@ void SoundConfiguration(void) {
 	isSuccess = soundsManager.AddFile(filePath10, _T("clappingSE"));
 	const TCHAR* filePath11 = _T("music/cheers2.mp3");
 	isSuccess = soundsManager.AddFile(filePath11, _T("cheersSE"));
+
+	const TCHAR* filePath12 = _T("music/countDown123_1.mp3");
+	isSuccess = soundsManager.AddFile(filePath12, _T("counDown1SE"));
+	const TCHAR* filePath13 = _T("music/countDown123_2.mp3");
+	isSuccess = soundsManager.AddFile(filePath13, _T("counDown2SE"));
+	const TCHAR* filePath14 = _T("music/countDown123_3.mp3");
+	isSuccess = soundsManager.AddFile(filePath14, _T("counDown3SE"));
+	const TCHAR* filePath15 = _T("music/countDownGo.mp3");
+	isSuccess = soundsManager.AddFile(filePath15, _T("countDownGoSE"));
+
+	const TCHAR* filePath16 = _T("music/beam1.mp3");
+	isSuccess = soundsManager.AddFile(filePath16, _T("beamSE"));
+	const TCHAR* filePath17 = _T("music/beam2.mp3");
+	isSuccess = soundsManager.AddFile(filePath17, _T("beam2SE"));
+
+	const TCHAR* filePath18 = _T("music/itemBreak1.mp3");
+	isSuccess = soundsManager.AddFile(filePath18, _T("itemBreakSE"));
+	const TCHAR* filePath19 = _T("music/itemBreak2.mp3");
+	isSuccess = soundsManager.AddFile(filePath19, _T("itemBreak2SE"));
+
+	const TCHAR* filePath20 = _T("music/barrier.mp3");
+	isSuccess = soundsManager.AddFile(filePath20, _T("barrierSE"));
+	const TCHAR* filePath21 = _T("music/barrier2.mp3");
+	isSuccess = soundsManager.AddFile(filePath21, _T("barrier2SE"));
+
+	const TCHAR* filePath22 = _T("music/bottomSelect.mp3");
+	isSuccess = soundsManager.AddFile(filePath22, _T("buttonSelect1SE"));
+	const TCHAR* filePath23 = _T("music/bottomSelec1t.mp3");
+	isSuccess = soundsManager.AddFile(filePath23, _T("buttonSelect2SE"));
+	const TCHAR* filePath24 = _T("music/bottomSelect2.mp3");
+	isSuccess = soundsManager.AddFile(filePath24, _T("buttonSelect3SE"));
+	const TCHAR* filePath25 = _T("music/bottomSelect3.mp3");
+	isSuccess = soundsManager.AddFile(filePath25, _T("buttonSelect4SE"));
+
+	const TCHAR* filePath26 = _T("music/wallJump.mp3");
+	isSuccess = soundsManager.AddFile(filePath26, _T("wallJump1SE"));
+	const TCHAR* filePath27 = _T("music/wallJump.mp3");
+	isSuccess = soundsManager.AddFile(filePath27, _T("wallJump2SE"));
+	const TCHAR* filePath28 = _T("music/wallJump.mp3");
+	isSuccess = soundsManager.AddFile(filePath28, _T("wallJump3SE"));
+	const TCHAR* filePath29 = _T("music/wallJump.mp3");
+	isSuccess = soundsManager.AddFile(filePath29, _T("wallJump4SE"));
+
+	const TCHAR* filePath30 = _T("music/asikase.mp3");
+	isSuccess = soundsManager.AddFile(filePath30, _T("asikaseSE"));
+
+	const TCHAR* filePath31 = _T("music/fireBall.mp3");
+	isSuccess = soundsManager.AddFile(filePath31, _T("fireBallSE"));
+
+	const TCHAR* filePath32 = _T("music/itemGet.mp3");
+	isSuccess = soundsManager.AddFile(filePath32, _T("itemGetSE"));
+
+	const TCHAR* filePath33 = _T("music/clawRope.mp3");
+	isSuccess = soundsManager.AddFile(filePath33, _T("clawRopeSE"));
 
 }
 

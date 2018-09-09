@@ -20,6 +20,11 @@
 #define PREVENTION_PASS_BLOCK (-CELL_SIZE + 10)
 #define SPEEDUPVALUE 3
 #define SPEEDDOWNVALUE -3
+#define CLAWROPE_INCRESE_RAD 0.1
+#define CLAWROPE_CHECK_SPEED 40
+#define CLAWROPE_MOVE_SPEED 30
+#define CLAWROPE_RANGE 1000
+
 	/*ŠÖ”‚Ìƒvƒƒgƒ^ƒCƒvéŒ¾*/
 //void OperatePlayer();//ƒvƒŒƒCƒ„[‚Ì‘€ì‚ğ‚Ü‚Æ‚ß‚½ŠÖ”
 void InitState();//’l‚ğ‰Šú‰»‚·‚éŠÖ”
@@ -37,6 +42,11 @@ void CountDown();//3,2,1,‚Æ”‚¦‚é‚½‚ß‚ÌŠÖ”
 void CheckPlayerAccelerates();//ƒvƒŒƒCƒ„[‚Ì‰Á‘¬‚Ìƒtƒ‰ƒO‚ğŠÔ‚ª‚½‚Â‚ÆƒIƒt‚É‚·‚éŠÖ”
 void ItemEffectRelease();
 void UpDate();
+void CalculateMovementWhenClawRope();//‚©‚¬‚Ã‚ßƒ[ƒv‚Å‚PƒtƒŒ[ƒ€‚ÉˆÚ“®‚·‚é—ÊAƒ`ƒFƒbƒN‚·‚é—Ê‚ğ‚ğŒv‘ª‚·‚éŠÖ”
+void CalculateTargetPosition();//‚©‚¬‚Ã‚ßƒ[ƒv‚Å‰Ò“­‚³‚¹‚éŠÖ”
+void CalculateRopeRad();//‚©‚¬‚Ã‚ßƒ[ƒv‚Ìƒ‰ƒWƒAƒ“‚ğŒvZ‚·‚éŠÖ”
+void CalculateClawRopePosition();//‚©‚¬‚Ã‚ßƒ[ƒv‚ÌˆÊ’u‚ğ
+void CheckCollisionWhenUsingClawRope();//‚©‚¬‚Ã‚ßƒ[ƒv‚Ì‚É“–‚½‚è”»’è‚ğs‚¤ŠÖ”
 
 	/*ƒOƒ[ƒoƒ‹•Ï”*/
 static int wallJump1PCount;//•ÇƒWƒƒƒ“ƒv‚µ‚Ä‚©‚ç‚ÌƒtƒŒ[ƒ€‚ğ”‚¦‚é•Ï”
@@ -100,6 +110,8 @@ static float prevFrameMovement1P;//ƒL[“ü—Í‚É‚æ‚Á‚ÄPLAYER‚ªˆÚ“®‚µ‚½XÀ•W‚ğ–ˆƒtƒŒ
 static float prevFrameMovement2P;//ƒL[“ü—Í‚É‚æ‚Á‚ÄPLAYER‚ªˆÚ“®‚µ‚½XÀ•W‚ğ–ˆƒtƒŒ[ƒ€‹L˜^‚·‚é•Ï”
 static float prevFrameStageMovementX;//ƒL[“ü—Í‚É‚æ‚Á‚Ästage‚ªˆÚ“®‚µ‚½XÀ•W‚ğ–ˆƒtƒŒ[ƒ€‹L˜^‚·‚é•Ï”
 static float prevFrameStageMovementY;//ƒL[“ü—Í‚É‚æ‚Á‚Ästage‚ªˆÚ“®‚µ‚½YÀ•W‚ğ–ˆƒtƒŒ[ƒ€‹L˜^‚·‚é•Ï”
+OBJECT_POSITION_UNDELETABLE clawRopeMovement1P;//‚±‚ÌƒtƒŒ[ƒ€‚ÅˆÚ“®‚µ‚½—Ê‚ğ•Û‘¶‚·‚é•Ï”
+OBJECT_POSITION_UNDELETABLE clawRopeMovement2P;//‚±‚ÌƒtƒŒ[ƒ€‚ÅˆÚ“®‚µ‚½—Ê‚ğ•Û‘¶‚·‚é•Ï”
 static int countDownFrame;//ƒJƒEƒ“ƒgƒ_ƒEƒ“‚Ì•\¦‚ğƒtƒŒ[ƒ€”‚É‚æ‚Á‚ÄŠÇ—‚·‚é‚½‚ß‚Ì•Ï”
 static bool countDownFlag;//ƒJƒEƒ“ƒgƒ_ƒEƒ“‚ğs‚¤‚½‚ß‚Ìƒtƒ‰ƒO
 static bool gameStart;//ƒQ[ƒ€‚ªŠJn‚µ‚½‚©‚Ç‚¤‚©ƒtƒ‰ƒO
@@ -115,6 +127,19 @@ static float distanceToCheckPoint1PX;//‡ˆÊ”»’è‚ğs‚¤Û‚ÉAƒvƒŒƒCƒ„[‚Æƒ`ƒFƒbƒNƒ
 static float distanceToCheckPoint1PY;//‡ˆÊ”»’è‚ğs‚¤Û‚ÉAƒvƒŒƒCƒ„[‚Æƒ`ƒFƒbƒNƒ|ƒCƒ“ƒg‚Ü‚Å‚ÌY‚Ì‹——£‚ğ‹L˜^‚·‚é•Ï”
 static float distanceToCheckPoint2PX;//‡ˆÊ”»’è‚ğs‚¤Û‚ÉAƒvƒŒƒCƒ„[‚Æƒ`ƒFƒbƒNƒ|ƒCƒ“ƒg‚Ü‚Å‚ÌX‚Ì‹——£‚ğ‹L˜^‚·‚é•Ï”
 static float distanceToCheckPoint2PY;//‡ˆÊ”»’è‚ğs‚¤Û‚ÉAƒvƒŒƒCƒ„[‚Æƒ`ƒFƒbƒNƒ|ƒCƒ“ƒg‚Ü‚Å‚ÌY‚Ì‹——£‚ğ‹L˜^‚·‚é•Ï”
+int clawRopeState1P;//‚PP‚ª¡‚©‚¬‚Ã‚ßƒ[ƒv‚ğg—p‚µ‚Ä‚¢‚é‚©AÆ€‚ğ‡‚í‚¹‚Ä‚¢‚é‚©A‚©‚¬‚Ã‚ßƒ[ƒv‚ÅˆÚ“®‚µ‚Ä‚¢‚é‚©‚Ìó‘Ô‚ğ•Û‘¶‚·‚é
+int clawRopeState2P;//‚QP‚ª¡‚©‚¬‚Ã‚ßƒ[ƒv‚ğg—p‚µ‚Ä‚¢‚é‚©AÆ€‚ğ‡‚í‚¹‚Ä‚¢‚é‚©A‚©‚¬‚Ã‚ßƒ[ƒv‚ÅˆÚ“®‚µ‚Ä‚¢‚é‚©‚Ìó‘Ô‚ğ•Û‘¶‚·‚é
+static float clawRopeCheckRad1P;//ƒ`ƒFƒbƒNƒ‚[ƒh‚ÌŠp“x‚ğ•Û‘¶‚·‚é•Ï”
+static float clawRopeCheckRad2P;//ƒ`ƒFƒbƒNƒ‚[ƒh‚ÌŠp“x‚ğ•Û‘¶‚·‚é•Ï”
+static float clawRopeMoveRad1P;//ƒ€[ƒuƒ‚[ƒh‚Ì‚ÌŠp“x‚ğ•Û‘¶‚·‚é•Ï”
+static float clawRopeMoveRad2P;//ƒ€[ƒuƒ‚[ƒh‚Ì‚ÌŠp“x‚ğ•Û‘¶‚·‚é•Ï”
+static float clawRopeSwapRad1P;//ƒXƒƒbƒvƒ‚[ƒh‚Ì‚ÌŠp“x‚ğ•Û‘¶‚·‚é•Ï”
+static float clawRopeSwapRad2P;//ƒXƒƒbƒvƒ‚[ƒh‚Ì‚ÌŠp“x‚ğ•Û‘¶‚·‚é•Ï”
+static int repeatCount1PWhenUsingClawRope;//‚PƒtƒŒ[ƒ€‚É“®‚­—Ê‚ª‘½‚·‚¬‚Ä‚·‚è”²‚¯‚ª‹N‚±‚é‚Ì‚ÅA‚»‚ê‚ğ–h‚®‚½‚ß‚É“®‚­—Ê‚ğ‹æ•ª‚¯‚µ‚Ä“–‚½‚è”»’è‚ğs‚¤‚ª‚»‚Ì‹æ•ª‚¯‚ª‰½ŒÂ‚©•Û‘¶‚·‚é•Ï”
+static int repeatCount2PWhenUsingClawRope;//‚PƒtƒŒ[ƒ€‚É“®‚­—Ê‚ª‘½‚·‚¬‚Ä‚·‚è”²‚¯‚ª‹N‚±‚é‚Ì‚ÅA‚»‚ê‚ğ–h‚®‚½‚ß‚É“®‚­—Ê‚ğ‹æ•ª‚¯‚µ‚Ä“–‚½‚è”»’è‚ğs‚¤‚ª‚»‚Ì‹æ•ª‚¯‚ª‰½ŒÂ‚©•Û‘¶‚·‚é•Ï”
+static int infoButton;//Xƒ{ƒ^ƒ“iƒAƒCƒeƒ€˜g‚PŒÂ–Új‚©Yƒ{ƒ^ƒ“iƒAƒCƒeƒ€˜g‚QŒÂ–Új‚©‚ğ‰Ÿ‚³‚ê‚½‚Éˆø”‚É“n‚·•Ï”
+static float adjustCollision1P;//ƒvƒŒƒCƒ„[‚Æƒ}ƒbƒv‚Æ‚Ì“–‚½‚è”»’è‚Ì‚¸‚ê‚ğ’²®‚·‚é”’l‚ğ•Û‘¶‚·‚é•Ï”
+static float adjustCollision2P;//ƒvƒŒƒCƒ„[‚Æƒ}ƒbƒv‚Æ‚Ì“–‚½‚è”»’è‚Ì‚¸‚ê‚ğ’²®‚·‚é”’l‚ğ•Û‘¶‚·‚é•Ï”
 static float arrayToCheckRightCollision1P[6];
 static float arrayToCheckLeftCollision1P[6];
 static float arrayToCheckTopCollision1P[6];
@@ -173,10 +198,10 @@ int ManholeHitCount2P;
 OBJECT_STATE g_Player;
 OBJECT_STATE g_Player2P;
 OBJECT_STATE g_CountDownNum;
-OBJECT_STATE g_FirstItem1P = { 230.f,760.f,90.f,70.f };
-OBJECT_STATE g_SecondItem1P = { 330.f,760.f,90.f,70.f };
-OBJECT_STATE g_FirstItem2P = { 930.f,760.f,90.f,70.f };
-OBJECT_STATE g_SecondItem2P = { 1030.f,760.f,90.f,70.f };
+OBJECT_STATE g_FirstItem1P = { 280.f,10.f,50.f,50.f };
+OBJECT_STATE g_SecondItem1P = { 330.f,10.f,50.f,50.f };
+OBJECT_STATE g_FirstItem2P = { 830.f,10.f,50.f,50.f };
+OBJECT_STATE g_SecondItem2P = { 880.f,10.f,50.f,50.f };
 OBJECT_STATE g_Trampoline;
 OBJECT_STATE g_TrampolineLeft;
 OBJECT_STATE g_Manhole;
@@ -186,11 +211,30 @@ OBJECT_STATE g_Beam1P;
 OBJECT_STATE g_Beam2P;
 OBJECT_STATE g_Fire1P;
 OBJECT_STATE g_Fire2P;
-OBJECT_POSITION oldPlayer1P;//ƒvƒŒƒCƒ„[1‚Ì‘O‚ÌÀ•W‚ğ•Û‘¶‚µA·•ª‚ğo‚·‚½‚ß‚Ég‚¤
-OBJECT_POSITION oldPlayer2P;//ƒvƒŒƒCƒ„[2‚Ì‘O‚ÌÀ•W‚ğ•Û‘¶‚µA·•ª‚ğo‚·‚½‚ß‚Ég‚¤
-OBJECT_POSITION sabun1P;
-OBJECT_POSITION sabun2P;
-OBJECT_POSITION checkPoint[FINAL_CHECK_POINT - FIRST_CHECK_POINT];
+OBJECT_INFO_ROTATE targetRay = { 0,0,140,50 };
+OBJECT_INFO_ROTATE target = { -10,-10,30,30 };
+OBJECT_INFO_ROTATE claw = {-10,-10,30,30};
+OBJECT_INFO_ROTATE rope = { 0,0,0,0 };
+OBJECT_POSITION_UNDELETABLE oldPlayer1P;//ƒvƒŒƒCƒ„[1‚Ì‘O‚ÌÀ•W‚ğ•Û‘¶‚µA·•ª‚ğo‚·‚½‚ß‚Ég‚¤
+OBJECT_POSITION_UNDELETABLE oldPlayer2P;//ƒvƒŒƒCƒ„[2‚Ì‘O‚ÌÀ•W‚ğ•Û‘¶‚µA‚³•ª‚ğo‚·‚½‚ß‚Ég‚¤
+OBJECT_POSITION_UNDELETABLE oldClaw1P;
+OBJECT_POSITION_UNDELETABLE oldClaw2P;
+OBJECT_POSITION_UNDELETABLE sabun1P;
+OBJECT_POSITION_UNDELETABLE sabun2P;
+OBJECT_POSITION_UNDELETABLE movement1PWhenClawRope;
+OBJECT_POSITION_UNDELETABLE movement2PWhenClawRope;
+OBJECT_POSITION_UNDELETABLE checkPoint[FINAL_CHECK_POINT - FIRST_CHECK_POINT];
+ROTATE_VERTEX targetRay1P;//‚©‚¬‚Ã‚ßƒ[ƒv‚Ìƒ^[ƒQƒbƒg‚Ìü‚ÌÀ•W‚ğ•Û‘¶‚·‚é‚½‚ß‚Ì\‘¢‘Ì
+ROTATE_VERTEX target1P;//‚©‚¬‚Ã‚ßƒ[ƒv‚Ìƒ^[ƒQƒbƒg‚ÌÀ•W‚ğ•Û‘¶‚·‚é‚½‚ß‚Ì\‘¢‘Ì
+ROTATE_VERTEX targetRay2P;//‚©‚¬‚Ã‚ßƒ[ƒv‚Ìƒ^[ƒQƒbƒg‚Ìü‚ÌÀ•W‚ğ•Û‘¶‚·‚é‚½‚ß‚Ì\‘¢‘Ì
+ROTATE_VERTEX target2P;//‚©‚¬‚Ã‚ßƒ[ƒv‚Ìƒ^[ƒQƒbƒg‚ÌÀ•W‚ğ•Û‘¶‚·‚é‚½‚ß‚Ì\‘¢‘Ì
+OBJECT_POSITION_UNDELETABLE clawPosition1P;
+OBJECT_POSITION_UNDELETABLE clawPosition2P;
+ROTATE_VERTEX claw1P;
+ROTATE_VERTEX claw2P;
+ROTATE_VERTEX rope1P;
+ROTATE_VERTEX rope2P;
+
 
 	/*§Œäˆ—*/
 void GameControl(void)
@@ -206,8 +250,14 @@ void GameControl(void)
 		CheckWhetherPlayerIsJamping();
 		GiveGravity();
 		CheckWheterTheHit();
+		CalculateTargetPosition();
 		ItemEffectRelease();
 		CreatePerDecision();
+		//‚»‚Ì“®‚©‚µ‚½’l‚ğARRAYCOLLISION‚É‰Šú‰»‚µ‚ÄA“–‚½‚è”»’è‚ğs‚¤@IF•ª‚ÅCHECK‚©MOVE‚È‚Ì‚©‚Åˆ—‚ğ•Ï‚¦‚é
+		CheckCollisionWhenUsingClawRope();
+		CalculateRopeRad();
+		CalculateMovementWhenClawRope();
+		CalculateClawRopePosition();
 		CalculateDistanceCheckPoint(itIsPlayer1P);
 		CalculateDistanceCheckPoint(itIsPlayer2P);
 		JudgePlayerRanking();
@@ -229,7 +279,6 @@ void UpDate(void) {
 }
 
 	/*ŠÖ”‚ÌÀ‘Ô*/
-
 //’l‚ğ‰Šú‰»‚·‚éŠÖ”
 void InitState() {
 	if (firstTime) {
@@ -302,6 +351,17 @@ void InitState() {
 		distanceToCheckPoint1PY = 0;//‡ˆÊ”»’è‚ğs‚¤Û‚ÉAƒvƒŒƒCƒ„[‚Æƒ`ƒFƒbƒNƒ|ƒCƒ“ƒg‚Ü‚Å‚ÌY‚Ì‹——£‚ğ‹L˜^‚·‚é•Ï”
 		distanceToCheckPoint2PX = 0;//‡ˆÊ”»’è‚ğs‚¤Û‚ÉAƒvƒŒƒCƒ„[‚Æƒ`ƒFƒbƒNƒ|ƒCƒ“ƒg‚Ü‚Å‚ÌX‚Ì‹——£‚ğ‹L˜^‚·‚é•Ï”
 		distanceToCheckPoint2PY = 0;//‡ˆÊ”»’è‚ğs‚¤Û‚ÉAƒvƒŒƒCƒ„[‚Æƒ`ƒFƒbƒNƒ|ƒCƒ“ƒg‚Ü‚Å‚ÌY‚Ì‹——£‚ğ‹L˜^‚·‚é•Ï”
+		clawRopeState1P = NOT_USE;//‚PP‚ª¡‚©‚¬‚Ã‚ßƒ[ƒv‚ğg—p‚µ‚Ä‚¢‚é‚©AÆ€‚ğ‡‚í‚¹‚Ä‚¢‚é‚©A‚©‚¬‚Ã‚ßƒ[ƒv‚ÅˆÚ“®‚µ‚Ä‚¢‚é‚©‚Ìó‘Ô‚ğ•Û‘¶‚·‚é
+		clawRopeState2P = NOT_USE;//‚QP‚ª¡‚©‚¬‚Ã‚ßƒ[ƒv‚ğg—p‚µ‚Ä‚¢‚é‚©AÆ€‚ğ‡‚í‚¹‚Ä‚¢‚é‚©A‚©‚¬‚Ã‚ßƒ[ƒv‚ÅˆÚ“®‚µ‚Ä‚¢‚é‚©‚Ìó‘Ô‚ğ•Û‘¶‚·‚é
+		infoButton = 0;//Xƒ{ƒ^ƒ“iƒAƒCƒeƒ€˜g‚PŒÂ–Új‚©Yƒ{ƒ^ƒ“iƒAƒCƒeƒ€˜g‚QŒÂ–Új‚©‚ğ‰Ÿ‚³‚ê‚½‚Éˆø”‚É“n‚·•Ï”
+		clawRopeCheckRad1P = 0;//ƒ`ƒFƒbƒNƒ‚[ƒh‚ÌŠp“x‚ğ•Û‘¶‚·‚é•Ï”
+		clawRopeCheckRad2P = 0;//ƒ`ƒFƒbƒNƒ‚[ƒh‚ÌŠp“x‚ğ•Û‘¶‚·‚é•Ï”
+		clawRopeMoveRad1P = 0;//ƒ€[ƒuƒ‚[ƒh‚Ì‚ÌŠp“x‚ğ•Û‘¶‚·‚é•Ï”
+		clawRopeMoveRad2P = 0;//ƒ€[ƒuƒ‚[ƒh‚Ì‚ÌŠp“x‚ğ•Û‘¶‚·‚é•Ï”
+		clawRopeSwapRad1P = 0;//ƒXƒƒbƒvƒ‚[ƒh‚Ì‚ÌŠp“x‚ğ•Û‘¶‚·‚é•Ï”
+		clawRopeSwapRad2P = 0;//ƒXƒƒbƒvƒ‚[ƒh‚Ì‚ÌŠp“x‚ğ•Û‘¶‚·‚é•Ï”
+		clawRopeMovement1P = { 0,0 };//‚±‚ÌƒtƒŒ[ƒ€‚ÅˆÚ“®‚µ‚½—Ê‚ğ•Û‘¶‚·‚é•Ï”
+		clawRopeMovement2P = { 0,0 };//‚±‚ÌƒtƒŒ[ƒ€‚ÅˆÚ“®‚µ‚½—Ê‚ğ•Û‘¶‚·‚é•Ï”
 		FirstItem1P = 0;
 		SecondItem1P = 0;
 		FirstItem2P = 0;
@@ -354,10 +414,23 @@ void InitState() {
 		g_Manhole = { 0.f,0.f,32.f,64.f };
 		g_Itembox = { 0.f,0.f,64.f,64.f };
 		g_Goal = { 0.f,0.f,32.f,32.f };
+		clawPosition1P = {0,0};
+		clawPosition2P = {0,0};
+		claw1P = {0,0,0,0,0,0,0,0};
+		claw2P = {0,0,0,0,0,0,0,0};
+		rope1P = { 0,0,0,0,0,0,0,0 };
+		rope2P = { 0,0,0,0,0,0,0,0 };
+		targetRay1P = {0,0,0,0,0,0,0,0};//‚©‚¬‚Ã‚ßƒ[ƒv‚Ìƒ^[ƒQƒbƒg‚Ìü‚ÌÀ•W‚ğ•Û‘¶‚·‚é‚½‚ß‚Ì\‘¢‘Ì
+		target1P = { 0,0,0,0,0,0,0,0 };//‚©‚¬‚Ã‚ßƒ[ƒv‚Ìƒ^[ƒQƒbƒg‚ÌÀ•W‚ğ•Û‘¶‚·‚é‚½‚ß‚Ì\‘¢‘Ì
+		targetRay2P = { 0,0,0,0,0,0,0,0 };//‚©‚¬‚Ã‚ßƒ[ƒv‚Ìƒ^[ƒQƒbƒg‚Ìü‚ÌÀ•W‚ğ•Û‘¶‚·‚é‚½‚ß‚Ì\‘¢‘Ì
+		target2P = { 0,0,0,0,0,0,0,0 };//‚©‚¬‚Ã‚ßƒ[ƒv‚Ìƒ^[ƒQƒbƒg‚ÌÀ•W‚ğ•Û‘¶‚·‚é‚½‚ß‚Ì\‘¢‘Ì
 		oldPlayer1P = { 0,0 };//ƒvƒŒƒCƒ„[1‚Ì‘O‚ÌÀ•W‚ğ•Û‘¶‚µA·•ª‚ğo‚·‚½‚ß‚Ég‚¤
 		oldPlayer2P = { 0,0 };//ƒvƒŒƒCƒ„[2‚Ì‘O‚ÌÀ•W‚ğ•Û‘¶‚µA·•ª‚ğo‚·‚½‚ß‚Ég‚¤
 		sabun1P = { 0,0 };
 		sabun2P = { 0,0 };
+		movement1PWhenClawRope = { 0,0 };//‚PƒtƒŒ[ƒ€‚É‚©‚¬‚Ã‚ßƒ[ƒv‚Å‚Ç‚ñ‚È‚¯XÀ•Wi‚ñ‚¾‚©‚ğ•Û‘¶‚·‚é•Ï”
+		movement2PWhenClawRope = { 0,0 };//‚PƒtƒŒ[ƒ€‚É‚©‚¬‚Ã‚ßƒ[ƒv‚Å‚Ç‚ñ‚È‚¯YÀ•Wi‚ñ‚¾‚©‚ğ•Û‘¶‚·‚é•Ï”
+
 
 
 		//ƒ`ƒFƒbƒNƒ|ƒCƒ“ƒg‚ÌˆÊ’u‚ğ•Û‘¶‚·‚é”z—ñ‚ğ‚¢‚Á‚½‚ñ‚O‚Å‰Šú‰»‚·‚é
@@ -416,8 +489,16 @@ void InitState() {
 	oldPlayer1P.y = g_Player.y;
 	oldPlayer2P.x = g_Player2P.x;
 	oldPlayer2P.y = g_Player2P.y;
+	oldClaw1P.x = clawPosition1P.x;
+	oldClaw1P.y = clawPosition1P.y;
+	oldClaw2P.x = clawPosition2P.x;
+	oldClaw2P.y = clawPosition2P.y;
     prevFrameMovement1P = 0;//ƒL[“ü—Í‚É‚æ‚Á‚ÄPLAYER‚ªˆÚ“®‚µ‚½XÀ•W‚ğ–ˆƒtƒŒ[ƒ€‹L˜^‚·‚é•Ï”
 	prevFrameMovement2P = 0;//ƒL[“ü—Í‚É‚æ‚Á‚ÄPLAYER‚ªˆÚ“®‚µ‚½XÀ•W‚ğ–ˆƒtƒŒ[ƒ€‹L˜^‚·‚é•Ï”
+	adjustCollision1P = 0;//ƒvƒŒƒCƒ„[‚Æƒ}ƒbƒv‚Æ‚Ì“–‚½‚è”»’è‚Ì‚¸‚ê‚ğ’²®‚·‚é”’l‚ğ•Û‘¶‚·‚é•Ï”
+	adjustCollision2P = 0;//ƒvƒŒƒCƒ„[‚Æƒ}ƒbƒv‚Æ‚Ì“–‚½‚è”»’è‚Ì‚¸‚ê‚ğ’²®‚·‚é”’l‚ğ•Û‘¶‚·‚é•Ï”
+	repeatCount1PWhenUsingClawRope = 1;//‚PƒtƒŒ[ƒ€‚É“®‚­—Ê‚ª‘½‚·‚¬‚Ä‚·‚è”²‚¯‚ª‹N‚±‚é‚Ì‚ÅA‚»‚ê‚ğ–h‚®‚½‚ß‚É“®‚­—Ê‚ğ‹æ•ª‚¯‚µ‚Ä“–‚½‚è”»’è‚ğs‚¤‚ª‚»‚Ì‹æ•ª‚¯‚ª‰½ŒÂ‚©•Û‘¶‚·‚é•Ï”
+	repeatCount2PWhenUsingClawRope = 1;//‚PƒtƒŒ[ƒ€‚É“®‚­—Ê‚ª‘½‚·‚¬‚Ä‚·‚è”²‚¯‚ª‹N‚±‚é‚Ì‚ÅA‚»‚ê‚ğ–h‚®‚½‚ß‚É“®‚­—Ê‚ğ‹æ•ª‚¯‚µ‚Ä“–‚½‚è”»’è‚ğs‚¤‚ª‚»‚Ì‹æ•ª‚¯‚ª‰½ŒÂ‚©•Û‘¶‚·‚é•Ï”
 
 	//ƒXƒe[ƒW‚ª“®‚­‚Æ“¯‚ÉAƒ`ƒFƒbƒNƒ|ƒCƒ“ƒg‚à‚¸‚ç‚·ˆ—
 	if ((movementStageX - prevFrameStageMovementX) != 0) {
@@ -441,12 +522,13 @@ void CountDown() {
 		countDownFrame++;
 		unsigned long changeARGB = 0x0F000000;
 		if ((countDownFrame >= 0) && (countDownFrame < FRAME * 1)) {
-
+			
 		}
 		else if ((countDownFrame >= FRAME * 1) && (countDownFrame < FRAME * 2)) {
 			if (countDownFrame == FRAME * 1) {
 				countDownNum = 1;
 				countDownARGB = 0xFFFFFFFF;
+				bool isSuccess = soundsManager.Start(_T("counDown1SE"));
 			}
 			if (countDownFrame >= FRAME * 1 + (FRAME / 2)) {
 				countDownARGB -= changeARGB;
@@ -456,6 +538,7 @@ void CountDown() {
 			if (countDownFrame == FRAME * 2) {
 				countDownNum = 2;
 				countDownARGB = 0xFFFFFFFF;
+				bool isSuccess = soundsManager.Start(_T("counDown2SE"));
 			}
 			if (countDownFrame >= FRAME * 2 + (FRAME / 2)) {
 				countDownARGB -= changeARGB;
@@ -465,6 +548,7 @@ void CountDown() {
 			if (countDownFrame == FRAME * 3) {
 				countDownNum = 3;
 				countDownARGB = 0xFFFFFFFF;
+				bool isSuccess = soundsManager.Start(_T("counDown3SE"));
 			}
 			if (countDownFrame >= FRAME * 3 + (FRAME / 2)) {
 				countDownARGB -= changeARGB;
@@ -474,6 +558,7 @@ void CountDown() {
 			if (countDownFrame == FRAME * 4) {
 				countDownNum = 4;
 				countDownARGB = 0xFFFFFFFF;
+				bool isSuccess = soundsManager.Start(_T("counDownGoSE"));
 				g_CountDownNum = { 550.f,250.f,400.f,400.f };
 				gameStart = true;
 			}
@@ -510,8 +595,10 @@ void CheckWhetherPlayerIsJamping() {
 		syosokudo1P = SYOSOKUDO;
 		if (player1PRub == WALL_LEFT) {
 			wallJump1PMoveRight = true;
+			bool isSuccess = soundsManager.Start(_T("wallJump1SE"));
 		}
 		if (player1PRub == WALL_RIGHT) {
+			bool isSuccess = soundsManager.Start(_T("wallJump2SE"));
 			wallJump1PMoveLeft = true;
 		}
 		//•ÇƒWƒƒƒ“ƒv‚µ‚½‚Æ‚«‚Éˆê’èƒtƒŒ[ƒ€ŠÔA“®‚«‚ª‹­§‚³‚ê‚éˆ—
@@ -550,9 +637,11 @@ void CheckWhetherPlayerIsJamping() {
 		wallJump2PCount++;
 		syosokudo2P = SYOSOKUDO;
 		if (player2PRub == WALL_LEFT) {
+			bool isSuccess = soundsManager.Start(_T("wallJump3SE"));
 			wallJump2PMoveRight = true;
 		}
 		if (player2PRub == WALL_RIGHT) {
+			bool isSuccess = soundsManager.Start(_T("wallJump4SE"));
 			wallJump2PMoveLeft = true;
 		}
 		//•ÇƒWƒƒƒ“ƒv‚µ‚½‚Æ‚«‚Éˆê’èƒtƒŒ[ƒ€ŠÔA“®‚«‚ª‹­§‚³‚ê‚éˆ—
@@ -575,7 +664,7 @@ void CheckWhetherPlayerIsJamping() {
 }
 
 //d—Í‚Ìd‘g‚İ‚Ìˆ—‚ÌŠÖ”
-void GiveGravity() 
+void GiveGravity()
 {
 	//•ÇƒWƒƒƒ“ƒv‚Ì•Ç“`‚¢‚É‚¸‚é‚¸‚é—‚¿‚³‚¹‚é‚½‚ß‚É§ŒÀ‚ğ‚©‚¯‚éˆ—
 	if ((player1PRub == WALL_RIGHT) || (player1PRub == WALL_LEFT)) {
@@ -599,47 +688,239 @@ void GiveGravity()
 		gravity2P = (PREVENTION_PASS_BLOCK);
 	}
 	//‚PP‚Ìd—Í‚Ìˆ—•cƒXƒNƒ[ƒ‹‚Ìˆ—
-	if (win == PLAYER1P) {
-		if ((g_Player.y > 700) && (gravity1P < 0)) {//æsƒvƒŒƒCƒ„[‚ª‚ ‚é‚‚³‚Å‰º‚ÉˆÚ“®‚µ‚æ‚¤‚Æ‚·‚é‚Æ‚«‚Æ‚«‚ÉAƒXƒe[ƒW‚ğã‚ÉƒXƒNƒ[ƒ‹‚³‚¹‚éˆ—
-			movementStageY -= gravity1P;
-			g_Player2P.y += gravity1P;
+	if (clawRopeState2P != SWAP_MODE) {
+		if ((clawRopeState1P == CHECK_MODE || clawRopeState1P == NOT_USE) || (clawRopeState1P == TARGET_MODE)) {
+			if (win == PLAYER1P) {
+				if ((g_Player.y > 700) && (gravity1P < 0)) {//æsƒvƒŒƒCƒ„[‚ª‚ ‚é‚‚³‚Å‰º‚ÉˆÚ“®‚µ‚æ‚¤‚Æ‚·‚é‚Æ‚«‚Æ‚«‚ÉAƒXƒe[ƒW‚ğã‚ÉƒXƒNƒ[ƒ‹‚³‚¹‚éˆ—
+					movementStageY -= gravity1P;
+					g_Player2P.y += gravity1P;
+					adjustCollision2P += gravity1P;
+
+				}
+				else if ((g_Player.y > 700) && (gravity1P > 0)) {//æsƒvƒŒƒCƒ„[‚ª‚ ‚é‚‚³‚ÅƒWƒƒƒ“ƒv‚Å‚«‚È‚­‚È‚é‚Ì‚ğ–h‚®ğŒˆ—
+					g_Player.y -= gravity1P;
+				}
+				else if ((g_Player.y < 150) && (gravity1P > 0)) { //æsƒvƒŒƒCƒ„[‚ª‚ ‚é‚‚³‚Åã‚ÉˆÚ“®‚µ‚æ‚¤‚Æ‚·‚é‚Æ‚«AƒXƒe[ƒW‚ğ‰º‚ÉƒXƒNƒ[ƒ‹‚³‚¹‚éˆ—
+					movementStageY -= gravity1P;
+					g_Player2P.y += gravity1P;
+					adjustCollision2P += gravity1P;
+				}
+				else {//‚»‚êˆÈŠO‚Ì’Êí‚Ì‚ÍA’Êí‚Éd—Í‚ğ—^‚¦‚éˆ—
+					g_Player.y -= gravity1P;
+				}
+			}
+			else if (win == PLAYER2P) {
+				g_Player.y -= gravity1P;
+			}
 		}
-		else if ((g_Player.y > 700) && (gravity1P > 0)) {//æsƒvƒŒƒCƒ„[‚ª‚ ‚é‚‚³‚ÅƒWƒƒƒ“ƒv‚Å‚«‚È‚­‚È‚é‚Ì‚ğ–h‚®ğŒˆ—
-			g_Player.y -= gravity1P;
-		}
-		else if ((g_Player.y < 150) && (gravity1P > 0)) { //æsƒvƒŒƒCƒ„[‚ª‚ ‚é‚‚³‚Åã‚ÉˆÚ“®‚µ‚æ‚¤‚Æ‚·‚é‚Æ‚«AƒXƒe[ƒW‚ğ‰º‚ÉƒXƒNƒ[ƒ‹‚³‚¹‚éˆ—
-			movementStageY -= gravity1P;
-			g_Player2P.y += gravity1P;
-		}
-		else {//‚»‚êˆÈŠO‚Ì’Êí‚Ì‚ÍA’Êí‚Éd—Í‚ğ—^‚¦‚éˆ—
-			g_Player.y -= gravity1P;
-		}
-	}
-	else if (win == PLAYER2P) {
-		g_Player.y -= gravity1P;
 	}
 	//‚QP‚Ìd—Í‚Ìˆ—•cƒXƒNƒ[ƒ‹‚Ìˆ—
-	if (win == PLAYER2P) {
-		if ((g_Player2P.y > 700) && (gravity2P < 0)) {//æsƒvƒŒƒCƒ„[‚ª‚ ‚é‚‚³‚Å‰º‚ÉˆÚ“®‚µ‚æ‚¤‚Æ‚·‚é‚Æ‚«‚Æ‚«‚ÉAƒXƒe[ƒW‚ğã‚ÉƒXƒNƒ[ƒ‹‚³‚¹‚éˆ—
-			movementStageY -= gravity2P;
-			g_Player.y += gravity2P;
+	if (clawRopeState1P != SWAP_MODE) {
+		if ((clawRopeState2P == CHECK_MODE) || (clawRopeState2P == NOT_USE) || (clawRopeState2P == TARGET_MODE)) {
+			if (win == PLAYER2P) {
+				if ((g_Player2P.y > 700) && (gravity2P < 0)) {//æsƒvƒŒƒCƒ„[‚ª‚ ‚é‚‚³‚Å‰º‚ÉˆÚ“®‚µ‚æ‚¤‚Æ‚·‚é‚Æ‚«‚Æ‚«‚ÉAƒXƒe[ƒW‚ğã‚ÉƒXƒNƒ[ƒ‹‚³‚¹‚éˆ—
+					movementStageY -= gravity2P;
+					g_Player.y += gravity2P;
+					adjustCollision1P += gravity2P;
+				}
+				else if ((g_Player2P.y > 700) && (gravity2P > 0)) {//æsƒvƒŒƒCƒ„[‚ª‚ ‚é‚‚³‚ÅƒWƒƒƒ“ƒv‚Å‚«‚È‚­‚È‚é‚Ì‚ğ–h‚®ğŒˆ—
+					g_Player2P.y -= gravity2P;
+				}
+				else if ((g_Player2P.y < 150) && (gravity2P > 0)) {//æsƒvƒŒƒCƒ„[‚ª‚ ‚é‚‚³‚Åã‚ÉˆÚ“®‚µ‚æ‚¤‚Æ‚·‚é‚Æ‚«AƒXƒe[ƒW‚ğ‰º‚ÉƒXƒNƒ[ƒ‹‚³‚¹‚éˆ—
+					movementStageY -= gravity2P;
+					g_Player.y += gravity2P;
+					adjustCollision1P += gravity2P;
+				}
+				else {//‚»‚êˆÈŠO‚Ì’Êí‚Ì‚ÍA’Êí‚Éd—Í‚ğ—^‚¦‚éˆ—
+					g_Player2P.y -= gravity2P;
+				}
+			}
+			else if (win == PLAYER1P) {
+				g_Player2P.y -= gravity2P;
+			}
 		}
-		else if ((g_Player2P.y > 700) && (gravity2P > 0)) {//æsƒvƒŒƒCƒ„[‚ª‚ ‚é‚‚³‚ÅƒWƒƒƒ“ƒv‚Å‚«‚È‚­‚È‚é‚Ì‚ğ–h‚®ğŒˆ—
-			g_Player2P.y -= gravity2P;
-		}
-		else if ((g_Player2P.y < 150) && (gravity2P > 0)) {//æsƒvƒŒƒCƒ„[‚ª‚ ‚é‚‚³‚Åã‚ÉˆÚ“®‚µ‚æ‚¤‚Æ‚·‚é‚Æ‚«AƒXƒe[ƒW‚ğ‰º‚ÉƒXƒNƒ[ƒ‹‚³‚¹‚éˆ—
-			movementStageY -= gravity2P;
-			g_Player.y += gravity2P;
-		}
-		else {//‚»‚êˆÈŠO‚Ì’Êí‚Ì‚ÍA’Êí‚Éd—Í‚ğ—^‚¦‚éˆ—
-			g_Player2P.y -= gravity2P;
-		}
-	}
-	else if (win == PLAYER1P) {
-		g_Player2P.y -= gravity2P;
 	}
 }
 
+
+//‚©‚¬‚Ã‚ßƒ[ƒv‚ÅˆÚ“®‚³‚¹‚é”’l‚ğŒvZ‚·‚éŠÖ”
+void CalculateMovementWhenClawRope() {
+	repeatCount1PWhenUsingClawRope = 1;
+	repeatCount2PWhenUsingClawRope = 1;
+	//ƒ`ƒFƒbƒNƒ‚[ƒh‚Ì‚©‚¬‚Ã‚ßƒ[ƒv‚ªi‚Ş—Ê‚ğŒvZ‚·‚éˆ—
+	if (clawRopeState1P == CHECK_MODE) {
+		movement1PWhenClawRope.x = CLAWROPE_CHECK_SPEED * cos(clawRopeCheckRad1P);
+		movement1PWhenClawRope.y = CLAWROPE_CHECK_SPEED * sin(clawRopeCheckRad1P);
+		while ((movement1PWhenClawRope.x > CELL_SIZE) || (movement1PWhenClawRope.y > CELL_SIZE)) {
+			movement1PWhenClawRope.x = movement1PWhenClawRope.x / 2;
+			movement1PWhenClawRope.y = movement1PWhenClawRope.y / 2;
+			repeatCount1PWhenUsingClawRope = repeatCount1PWhenUsingClawRope * 2;
+		}
+
+	}
+	if (clawRopeState2P == CHECK_MODE) {
+		movement2PWhenClawRope.x = CLAWROPE_CHECK_SPEED * cos(clawRopeCheckRad2P);
+		movement2PWhenClawRope.y = CLAWROPE_CHECK_SPEED * sin(clawRopeCheckRad2P);
+		while((movement2PWhenClawRope.x > CELL_SIZE) || (movement2PWhenClawRope.y > CELL_SIZE)) {
+			movement2PWhenClawRope.x = movement2PWhenClawRope.x / 2;
+			movement2PWhenClawRope.y = movement2PWhenClawRope.y / 2;
+			repeatCount2PWhenUsingClawRope = repeatCount2PWhenUsingClawRope * 2;
+		}
+
+	}
+	//ƒ`ƒFƒbƒN‚ªI‚í‚èAƒ€[ƒuƒ‚[ƒh‚ÌˆÚ“®—Ê‚ğŒvZ‚·‚éˆ—
+	if (clawRopeState1P == MOVE_MODE) {
+		movement1PWhenClawRope.x = CLAWROPE_MOVE_SPEED * cos(clawRopeMoveRad1P);
+		movement1PWhenClawRope.y = CLAWROPE_MOVE_SPEED * sin(clawRopeMoveRad1P);
+		while((movement1PWhenClawRope.x > CELL_SIZE) || (movement1PWhenClawRope.y > CELL_SIZE)) {
+			movement1PWhenClawRope.x = movement1PWhenClawRope.x / 2;
+			movement1PWhenClawRope.y = movement1PWhenClawRope.y / 2;
+			repeatCount1PWhenUsingClawRope = repeatCount1PWhenUsingClawRope * 2;
+		}
+
+	}
+	if (clawRopeState2P == MOVE_MODE) {
+		movement2PWhenClawRope.x = CLAWROPE_MOVE_SPEED * cos(clawRopeMoveRad2P);
+		movement2PWhenClawRope.y = CLAWROPE_MOVE_SPEED * sin(clawRopeMoveRad2P);
+		while((movement2PWhenClawRope.x > CELL_SIZE) || (movement2PWhenClawRope.y > CELL_SIZE)) {
+			movement2PWhenClawRope.x = movement2PWhenClawRope.x / 2;
+			movement2PWhenClawRope.y = movement2PWhenClawRope.y / 2;
+			repeatCount2PWhenUsingClawRope = repeatCount2PWhenUsingClawRope * 2;
+		}
+
+	}
+	//ƒ`ƒFƒbƒN‚ªI‚í‚èAƒXƒƒbƒvƒ‚[ƒh‚ÌˆÚ“®—Ê‚ğŒvZ‚·‚éˆ—
+	if (clawRopeState1P == SWAP_MODE) {
+		movement1PWhenClawRope.x = -(CLAWROPE_MOVE_SPEED * cos(clawRopeSwapRad1P));
+		movement1PWhenClawRope.y = -(CLAWROPE_MOVE_SPEED * sin(clawRopeSwapRad1P));
+		while ((movement1PWhenClawRope.x > CELL_SIZE) || (movement1PWhenClawRope.y > CELL_SIZE)) {
+			movement1PWhenClawRope.x = movement1PWhenClawRope.x / 2;
+			movement1PWhenClawRope.y = movement1PWhenClawRope.y / 2;
+			repeatCount1PWhenUsingClawRope = repeatCount1PWhenUsingClawRope * 2;
+		}
+
+	}
+	if (clawRopeState2P == SWAP_MODE) {
+		movement2PWhenClawRope.x = -(CLAWROPE_MOVE_SPEED * cos(clawRopeSwapRad2P));
+		movement2PWhenClawRope.y = -(CLAWROPE_MOVE_SPEED * sin(clawRopeSwapRad2P));
+		while ((movement2PWhenClawRope.x > CELL_SIZE) || (movement2PWhenClawRope.y > CELL_SIZE)) {
+			movement2PWhenClawRope.x = movement2PWhenClawRope.x / 2;
+			movement2PWhenClawRope.y = movement2PWhenClawRope.y / 2;
+			repeatCount2PWhenUsingClawRope = repeatCount2PWhenUsingClawRope * 2;
+		}
+
+	}
+}
+
+
+//‚©‚¬‚Ã‚ßƒ[ƒv‚Ìƒ[ƒv‚ÌŠp“x‚ğŒvZ‚·‚éŠÖ”
+void CalculateRopeRad() {
+	if (clawRopeState1P == CHECK_MODE) {
+		if ((clawPosition1P.x - g_Player.x) > 0) {
+			clawRopeMoveRad1P = atanf((float)(clawPosition1P.y - g_Player.y) / (float)(clawPosition1P.x - g_Player.x));
+		}
+		else if ((clawPosition1P.x - g_Player.x) < 0) {
+			clawRopeMoveRad1P = -(3.14 - atanf((float)(clawPosition1P.y - g_Player.y) / (float)(clawPosition1P.x - g_Player.x)));
+		}
+
+	}
+	if (clawRopeState2P == CHECK_MODE) {
+		if ((clawPosition2P.x - g_Player2P.x) > 0) {
+			clawRopeMoveRad2P = atanf((float)(clawPosition2P.y - g_Player2P.y) / (float)(clawPosition2P.x - g_Player2P.x));
+		}
+		else if ((clawPosition2P.x - g_Player2P.x) < 0) {
+			clawRopeMoveRad2P = -(3.14 - atanf((float)(clawPosition2P.y - g_Player2P.y) / (float)(clawPosition2P.x - g_Player2P.x)));
+		}
+	}
+	
+	clawRopeSwapRad1P = atanf((g_Player2P.y - g_Player.y) / (g_Player2P.x - g_Player.x));
+	clawRopeSwapRad2P = atanf((g_Player.y - g_Player2P.y) / (g_Player.x - g_Player2P.x));
+}
+
+//‚©‚¬‚Ã‚ßƒ[ƒv‚Ìƒ^[ƒQƒbƒg‚Ì•`‰æˆÊ’u‚ğŒvZ‚·‚éŠÖ”
+void CalculateTargetPosition() {
+	targetRay1P.leftTopX = (targetRay.reference_x)*cos(clawRopeCheckRad1P) - (targetRay.reference_y)*sin(clawRopeCheckRad1P) + g_Player.x + (g_Player.scale_x / 2);
+	targetRay1P.leftTopY = (targetRay.reference_x)*sin(clawRopeCheckRad1P) + (targetRay.reference_y)*cos(clawRopeCheckRad1P) + g_Player.y + (g_Player.scale_y / 2);
+	targetRay1P.rightTopX = (targetRay.reference_x + targetRay.scale_x)*cos(clawRopeCheckRad1P) - (targetRay.reference_y)*sin(clawRopeCheckRad1P) + g_Player.x + (g_Player.scale_x / 2);
+	targetRay1P.rightTopY = (targetRay.reference_x + targetRay.scale_x)*sin(clawRopeCheckRad1P) + (targetRay.reference_y)*cos(clawRopeCheckRad1P) + g_Player.y + (g_Player.scale_y / 2);
+	targetRay1P.rightBottomX = (targetRay.reference_x + targetRay.scale_x)*cos(clawRopeCheckRad1P) - (targetRay.reference_y + targetRay.scale_y)*sin(clawRopeCheckRad1P) + g_Player.x + (g_Player.scale_x / 2);
+	targetRay1P.rightBottomY = (targetRay.reference_x + targetRay.scale_x)*sin(clawRopeCheckRad1P) + (targetRay.reference_y + targetRay.scale_y)*cos(clawRopeCheckRad1P) + g_Player.y + (g_Player.scale_y / 2);
+	targetRay1P.leftBottomX = (targetRay.reference_x)*cos(clawRopeCheckRad1P) - (targetRay.reference_y + targetRay.scale_y)*sin(clawRopeCheckRad1P) + g_Player.x + (g_Player.scale_x / 2);
+	targetRay1P.leftBottomY = (targetRay.reference_x)*sin(clawRopeCheckRad1P) + (targetRay.reference_y + targetRay.scale_y)*cos(clawRopeCheckRad1P) + g_Player.y + (g_Player.scale_y / 2);
+
+	target1P.leftTopX = (target.reference_x)*cos(clawRopeCheckRad1P) - (target.reference_y)*sin(clawRopeCheckRad1P) + (150 * cos(clawRopeCheckRad1P))+ g_Player.x + (g_Player.scale_x / 2);
+	target1P.leftTopY = (target.reference_x)*sin(clawRopeCheckRad1P) + (target.reference_y)*cos(clawRopeCheckRad1P) + (150 * sin(clawRopeCheckRad1P)) + g_Player.y + (g_Player.scale_y / 2);
+	target1P.rightTopX = (target.reference_x + target.scale_x)*cos(clawRopeCheckRad1P) - (target.reference_y)*sin(clawRopeCheckRad1P) + (150 * cos(clawRopeCheckRad1P)) + g_Player.x + (g_Player.scale_x / 2);
+	target1P.rightTopY = (target.reference_x + target.scale_x)*sin(clawRopeCheckRad1P) + (target.reference_y)*cos(clawRopeCheckRad1P) + (150 * sin(clawRopeCheckRad1P)) + g_Player.y + (g_Player.scale_y / 2);
+	target1P.rightBottomX = (target.reference_x + target.scale_x)*cos(clawRopeCheckRad1P) - (target.reference_y + target.scale_y)*sin(clawRopeCheckRad1P) + (150 * cos(clawRopeCheckRad1P)) + g_Player.x + (g_Player.scale_x / 2);
+	target1P.rightBottomY = (target.reference_x + target.scale_x)*sin(clawRopeCheckRad1P) + (target.reference_y + target.scale_y)*cos(clawRopeCheckRad1P) + (150 * sin(clawRopeCheckRad1P)) + g_Player.y + (g_Player.scale_y / 2);
+	target1P.leftBottomX = (target.reference_x)*cos(clawRopeCheckRad1P) - (target.reference_y + target.scale_y)*sin(clawRopeCheckRad1P) + (150 * cos(clawRopeCheckRad1P)) + g_Player.x + (g_Player.scale_x / 2);
+	target1P.leftBottomY = (target.reference_x)*sin(clawRopeCheckRad1P) + (target.reference_y + target.scale_y)*cos(clawRopeCheckRad1P) + (150 * sin(clawRopeCheckRad1P)) + g_Player.y + (g_Player.scale_y / 2);
+
+	targetRay2P.leftTopX = (targetRay.reference_x)*cos(clawRopeCheckRad2P) - (targetRay.reference_y)*sin(clawRopeCheckRad2P) + g_Player2P.x + (g_Player2P.scale_x / 2);
+	targetRay2P.leftTopY = (targetRay.reference_x)*sin(clawRopeCheckRad2P) + (targetRay.reference_y)*cos(clawRopeCheckRad2P) + g_Player2P.y + (g_Player2P.scale_y / 2);
+	targetRay2P.rightTopX = (targetRay.reference_x + targetRay.scale_x)*cos(clawRopeCheckRad2P) - (targetRay.reference_y)*sin(clawRopeCheckRad2P) + g_Player2P.x + (g_Player2P.scale_x / 2);
+	targetRay2P.rightTopY = (targetRay.reference_x + targetRay.scale_x)*sin(clawRopeCheckRad2P) + (targetRay.reference_y)*cos(clawRopeCheckRad2P) + g_Player2P.y + (g_Player2P.scale_y / 2);
+	targetRay2P.rightBottomX = (targetRay.reference_x + targetRay.scale_x)*cos(clawRopeCheckRad2P) - (targetRay.reference_y + targetRay.scale_y)*sin(clawRopeCheckRad2P) + g_Player2P.x + (g_Player2P.scale_x / 2);
+	targetRay2P.rightBottomY = (targetRay.reference_x + targetRay.scale_x)*sin(clawRopeCheckRad2P) + (targetRay.reference_y + targetRay.scale_y)*cos(clawRopeCheckRad2P) + g_Player2P.y + (g_Player2P.scale_y / 2);
+	targetRay2P.leftBottomX = (targetRay.reference_x)*cos(clawRopeCheckRad2P) - (targetRay.reference_y + targetRay.scale_y)*sin(clawRopeCheckRad2P) + g_Player2P.x + (g_Player2P.scale_x / 2);
+	targetRay2P.leftBottomY = (targetRay.reference_x)*sin(clawRopeCheckRad2P) + (targetRay.reference_y + targetRay.scale_y)*cos(clawRopeCheckRad2P) + g_Player2P.y + (g_Player2P.scale_y / 2);
+
+	target2P.leftTopX = (target.reference_x)*cos(clawRopeCheckRad2P) - (target.reference_y)*sin(clawRopeCheckRad2P) + (150 * cos(clawRopeCheckRad2P)) + g_Player2P.x + (g_Player2P.scale_x / 2);
+	target2P.leftTopY = (target.reference_x)*sin(clawRopeCheckRad2P) + (target.reference_y)*cos(clawRopeCheckRad2P) + (150 * sin(clawRopeCheckRad2P)) + g_Player2P.y + (g_Player2P.scale_y / 2);
+	target2P.rightTopX = (target.reference_x + target.scale_x)*cos(clawRopeCheckRad2P) - (target.reference_y)*sin(clawRopeCheckRad2P) + (150 * cos(clawRopeCheckRad2P)) + g_Player2P.x + (g_Player2P.scale_x / 2);
+	target2P.rightTopY = (target.reference_x + target.scale_x)*sin(clawRopeCheckRad2P) + (target.reference_y)*cos(clawRopeCheckRad2P) + (150 * sin(clawRopeCheckRad2P)) + g_Player2P.y + (g_Player2P.scale_y / 2);
+	target2P.rightBottomX = (target.reference_x + target.scale_x)*cos(clawRopeCheckRad2P) - (target.reference_y + target.scale_y)*sin(clawRopeCheckRad2P) + (150 * cos(clawRopeCheckRad2P)) + g_Player2P.x + (g_Player2P.scale_x / 2);
+	target2P.rightBottomY = (target.reference_x + target.scale_x)*sin(clawRopeCheckRad2P) + (target.reference_y + target.scale_y)*cos(clawRopeCheckRad2P) + (150 * sin(clawRopeCheckRad2P)) + g_Player2P.y + (g_Player2P.scale_y / 2);
+	target2P.leftBottomX = (target.reference_x)*cos(clawRopeCheckRad2P) - (target.reference_y + target.scale_y)*sin(clawRopeCheckRad2P) + (150 * cos(clawRopeCheckRad2P)) + g_Player2P.x + (g_Player2P.scale_x / 2);
+	target2P.leftBottomY = (target.reference_x)*sin(clawRopeCheckRad2P) + (target.reference_y + target.scale_y)*cos(clawRopeCheckRad2P) + (150 * sin(clawRopeCheckRad2P)) + g_Player2P.y + (g_Player2P.scale_y / 2);
+
+
+}
+
+//‚©‚¬‚Ã‚ßƒ[ƒv‚Ì•`‰æˆÊ’u‚ğŒvZ‚·‚éŠÖ”
+void CalculateClawRopePosition() {
+	if (clawRopeState1P == MOVE_MODE || clawRopeState1P == SWAP_MODE || clawRopeState1P == CHECK_MODE) {
+		claw1P.leftTopX = (claw.reference_x)*cos(clawRopeCheckRad1P) - (claw.reference_y)*sin(clawRopeCheckRad1P) + clawPosition1P.x;
+		claw1P.leftTopY = (claw.reference_x)*sin(clawRopeCheckRad1P) + (claw.reference_y)*cos(clawRopeCheckRad1P) + clawPosition1P.y;
+		claw1P.rightTopX = (claw.reference_x + claw.scale_x)*cos(clawRopeCheckRad1P) - (claw.reference_y)*sin(clawRopeCheckRad1P) + clawPosition1P.x;
+		claw1P.rightTopY = (claw.reference_x + claw.scale_x)*sin(clawRopeCheckRad1P) + (claw.reference_y)*cos(clawRopeCheckRad1P) + clawPosition1P.y;
+		claw1P.rightBottomX = (claw.reference_x + claw.scale_x)*cos(clawRopeCheckRad1P) - (claw.reference_y + claw.scale_y)*sin(clawRopeCheckRad1P) + clawPosition1P.x;
+		claw1P.rightBottomY = (claw.reference_x + claw.scale_x)*sin(clawRopeCheckRad1P) + (claw.reference_y + claw.scale_y)*cos(clawRopeCheckRad1P) + clawPosition1P.y;
+		claw1P.leftBottomX = (claw.reference_x)*cos(clawRopeCheckRad1P) - (claw.reference_y + claw.scale_y)*sin(clawRopeCheckRad1P) + clawPosition1P.x;
+		claw1P.leftBottomY = (claw.reference_x)*sin(clawRopeCheckRad1P) + (claw.reference_y + claw.scale_y)*cos(clawRopeCheckRad1P) + clawPosition1P.y;
+
+		rope1P.leftTopX = (rope.reference_x)*cos(clawRopeCheckRad1P) - (rope.reference_y)*sin(clawRopeCheckRad1P) + g_Player.x + (g_Player.scale_x / 2);
+		rope1P.leftTopY = (rope.reference_x)*sin(clawRopeCheckRad1P) + (rope.reference_y)*cos(clawRopeCheckRad1P) + g_Player.y + (g_Player.scale_y / 2);
+		rope1P.rightTopX = (rope.reference_x + sqrtf(pow(((float)(clawPosition1P.x - g_Player.x)), 2) + pow(((float)(clawPosition1P.y - g_Player.y)), 2))) *cos(clawRopeCheckRad1P) - (rope.reference_y)*sin(clawRopeCheckRad1P) + g_Player.x + (g_Player.scale_x / 2);
+		rope1P.rightTopY = (rope.reference_x + sqrtf(pow(((float)(clawPosition1P.x - g_Player.x)), 2) + pow(((float)(clawPosition1P.y - g_Player.y)), 2))) *sin(clawRopeCheckRad1P) + (rope.reference_y)*cos(clawRopeCheckRad1P) + g_Player.y + (g_Player.scale_y / 2);
+		rope1P.rightBottomX = (rope.reference_x + sqrtf(pow((clawPosition1P.x - g_Player.x), 2) + pow((clawPosition1P.y - g_Player.y), 2)))*cos(clawRopeCheckRad1P) - (rope.reference_y + rope.scale_y)*sin(clawRopeCheckRad1P) + g_Player.x + (g_Player.scale_x / 2);
+		rope1P.rightBottomY = (rope.reference_x + sqrtf(pow((clawPosition1P.x - g_Player.x), 2) + pow((clawPosition1P.y - g_Player.y), 2)))*sin(clawRopeCheckRad1P) + (rope.reference_y + rope.scale_y)*cos(clawRopeCheckRad1P) + g_Player.y + (g_Player.scale_y / 2);
+		rope1P.leftBottomX = (rope.reference_x)*cos(clawRopeCheckRad1P) - (rope.reference_y + rope.scale_y)*sin(clawRopeCheckRad1P) + g_Player.x + (g_Player.scale_x / 2);
+		rope1P.leftBottomY = (rope.reference_x)*sin(clawRopeCheckRad1P) + (rope.reference_y + rope.scale_y)*cos(clawRopeCheckRad1P) + g_Player.y + (g_Player.scale_y / 2);
+	}
+
+	claw2P.leftTopX = (claw.reference_x)*cos(clawRopeCheckRad2P) - (claw.reference_y)*sin(clawRopeCheckRad2P) + clawPosition2P.x;
+	claw2P.leftTopY = (claw.reference_x)*sin(clawRopeCheckRad2P) + (claw.reference_y)*cos(clawRopeCheckRad2P) + clawPosition2P.y;
+	claw2P.rightTopX = (claw.reference_x + claw.scale_x)*cos(clawRopeCheckRad2P) - (claw.reference_y)*sin(clawRopeCheckRad2P) + clawPosition2P.x;
+	claw2P.rightTopY = (claw.reference_x + claw.scale_x)*sin(clawRopeCheckRad2P) + (claw.reference_y)*cos(clawRopeCheckRad2P) + clawPosition2P.y;
+	claw2P.rightBottomX = (claw.reference_x + claw.scale_x)*cos(clawRopeCheckRad2P) - (claw.reference_y + claw.scale_y)*sin(clawRopeCheckRad2P) + clawPosition2P.x;
+	claw2P.rightBottomY = (claw.reference_x + claw.scale_x)*sin(clawRopeCheckRad2P) + (claw.reference_y + claw.scale_y)*cos(clawRopeCheckRad2P) + clawPosition2P.y;
+	claw2P.leftBottomX = (claw.reference_x)*cos(clawRopeCheckRad2P) - (claw.reference_y + claw.scale_y)*sin(clawRopeCheckRad2P) + clawPosition2P.x;
+	claw2P.leftBottomY = (claw.reference_x)*sin(clawRopeCheckRad2P) + (claw.reference_y + claw.scale_y)*cos(clawRopeCheckRad2P) + clawPosition2P.y;
+
+	rope2P.leftTopX = (rope.reference_x)*cos(clawRopeMoveRad2P) - (rope.reference_y)*sin(clawRopeMoveRad2P) + g_Player2P.x + (g_Player2P.scale_x / 2);
+	rope2P.leftTopY = (rope.reference_x)*sin(clawRopeMoveRad2P) + (rope.reference_y)*cos(clawRopeMoveRad2P) + g_Player2P.y + (g_Player2P.scale_y / 2);
+	rope2P.rightTopX = (rope.reference_x + sqrtf(pow((float)(clawPosition2P.x - g_Player2P.x), 2) + pow((float)(clawPosition2P.y - g_Player2P.y), 2))) *cos(clawRopeMoveRad2P) - (rope.reference_y)*sin(clawRopeMoveRad2P) + g_Player2P.x + (g_Player2P.scale_x / 2);
+	rope2P.rightTopY = (rope.reference_x + sqrtf(pow((float)(clawPosition2P.x - g_Player2P.x), 2) + pow((float)(clawPosition2P.y - g_Player2P.y), 2))) *sin(clawRopeMoveRad2P) + (rope.reference_y)*cos(clawRopeMoveRad2P) + g_Player2P.y + (g_Player2P.scale_y / 2);
+	rope2P.rightBottomX = (rope.reference_x + sqrtf(pow((clawPosition2P.x - g_Player2P.x), 2) + pow((clawPosition2P.y - g_Player2P.y), 2)))*cos(clawRopeMoveRad2P) - (rope.reference_y + rope.scale_y)*sin(clawRopeMoveRad2P) + g_Player2P.x + (g_Player2P.scale_x / 2);
+	rope2P.rightBottomY = (rope.reference_x + sqrtf(pow((clawPosition2P.x - g_Player2P.x), 2) + pow((clawPosition2P.y - g_Player2P.y), 2)))*sin(clawRopeMoveRad2P) + (rope.reference_y + rope.scale_y)*cos(clawRopeMoveRad2P) + g_Player2P.y + (g_Player2P.scale_y / 2);
+	rope2P.leftBottomX = (rope.reference_x)*cos(clawRopeMoveRad2P) - (rope.reference_y + rope.scale_y)*sin(clawRopeMoveRad2P) + g_Player2P.x + (g_Player2P.scale_x / 2);
+	rope2P.leftBottomY = (rope.reference_x)*sin(clawRopeMoveRad2P) + (rope.reference_y + rope.scale_y)*cos(clawRopeMoveRad2P) + g_Player2P.y + (g_Player2P.scale_y / 2);
+
+}
+
+//ƒr[ƒ€‚ÌƒGƒtƒFƒNƒgŠÖ”
 void BeamEffect(bool* BeamFlag,int* BeamCount,float* Beamtv) {
 
 	if (*BeamFlag) {
@@ -697,6 +978,7 @@ void BeamEffect(bool* BeamFlag,int* BeamCount,float* Beamtv) {
 	}
 }
 
+//ƒoƒŠƒA‚ÌƒGƒtƒFƒNƒgŠÖ”
 void BarrierEffect(bool* BarrierFlag, int* BarrierCount, float* Barriertu) {
 
 	if (*BarrierFlag) {
@@ -720,6 +1002,7 @@ void BarrierEffect(bool* BarrierFlag, int* BarrierCount, float* Barriertu) {
 	}
 }
 
+//ƒvƒŒƒCƒ„[‚ÌTUTV‚ğ‚¢‚¶‚éŠÖ”
 void PlayerMovement(int PlayerMoveCount,float *Playertutv,bool* FettersFlag,float* Fetterstutv) {
 
 	switch (PlayerMoveCount) {
@@ -1068,20 +1351,44 @@ void ItemEffectRelease(void) {
 	UpDate();
 }
 
-void ItemBreak(int Player) {
-	switch (Player) {
+void ItemBreak(int Player,int plessButton) {
+	bool isSuccess = soundsManager.Start(_T("itemBreakSE"));
+		switch (Player) {
 	case PLAYER1:
-		FirstItem2P = NO_ITEM;
-		SecondItem2P = NO_ITEM;
+		if (win == PLAYER1P) {
+			FirstItem2P = NO_ITEM;
+		}
+		else if (win == PLAYER2P) {
+			FirstItem2P = NO_ITEM;
+			SecondItem2P = NO_ITEM;
+		}
+		if (plessButton == X_BUTTON) {
+			FirstItem1P = NO_ITEM;
+		}
+		else if (plessButton == Y_BUTTON) {
+			SecondItem1P = NO_ITEM;
+		}
+		
 		break;
 	case PLAYER2:
-		FirstItem1P = NO_ITEM;
-		SecondItem1P = NO_ITEM;
+		if (win == PLAYER2P) {
+			FirstItem1P = NO_ITEM;
+		}
+		else if (win == PLAYER1P) {
+			FirstItem1P = NO_ITEM;
+			SecondItem1P = NO_ITEM;
+		}
+		if (plessButton == X_BUTTON) {
+			FirstItem2P = NO_ITEM;
+		}
+		else if (plessButton == Y_BUTTON) {
+			SecondItem2P = NO_ITEM;
+		}
 		break;
 	}
 }
 
-void JumpUp(int Player) {
+void JumpUp(int Player,int plessButton) {
 
 	int JumpUpAmount = 8;
 
@@ -1089,67 +1396,133 @@ void JumpUp(int Player) {
 	case PLAYER1:
 		JumpUp1P = JumpUpAmount;
 		JumpUpCount1P = 0;
+		if (plessButton == X_BUTTON) {
+			FirstItem1P = NO_ITEM;
+		}
+		else if (plessButton == Y_BUTTON) {
+			SecondItem1P = NO_ITEM;
+		}
 		break;
 	case PLAYER2:
 		JumpUp2P = JumpUpAmount;
 		JumpUpCount2P = 0;
+		if (plessButton == X_BUTTON) {
+			FirstItem2P = NO_ITEM;
+		}
+		else if (plessButton == Y_BUTTON) {
+			SecondItem2P = NO_ITEM;
+		}
 		break;
 	}
 }
 
-void SpeedUp(int Player) {
+void SpeedUp(int Player,int plessButton) {
 	switch (Player) {
 	case PLAYER1:
 		SpeedChange1P = SPEEDUPVALUE;
 		SpeedChangeCount1P = 0;
 		FettersFlag1P = false;
+		if (plessButton == X_BUTTON) {
+			FirstItem1P = NO_ITEM;
+		}
+		else if (plessButton == Y_BUTTON) {
+			SecondItem1P = NO_ITEM;
+		}
 		break;
 	case PLAYER2:
 		SpeedChange2P = SPEEDUPVALUE;
 		SpeedChangeCount2P = 0;
 		FettersFlag2P = false;
+			if (plessButton == X_BUTTON) {
+			FirstItem2P = NO_ITEM;
+		}
+		else if (plessButton == Y_BUTTON) {
+			SecondItem2P = NO_ITEM;
+		}
 		break;
 	}
 }
 
-void SpeedDown(int Player) {
+void SpeedDown(int Player,int plessButton) {
+	bool isSuccess = soundsManager.Start(_T("asikaseSE"));
 	switch (Player) {
 	case PLAYER1:
 		FettersFlag2P = true;
 		SpeedChange2P = SPEEDDOWNVALUE;
 		SpeedChangeCount2P = 0;
+		if (plessButton == X_BUTTON) {
+			FirstItem1P = NO_ITEM;
+		}
+		else if (plessButton == Y_BUTTON) {
+			SecondItem1P = NO_ITEM;
+		}
 		break;
 	case PLAYER2:
 		FettersFlag1P = true;
 		SpeedChange1P = SPEEDDOWNVALUE;
 		SpeedChangeCount1P = 0;
+		if (plessButton == X_BUTTON) {
+			FirstItem2P = NO_ITEM;
+		}
+		else if (plessButton == Y_BUTTON) {
+			SecondItem2P = NO_ITEM;
+		}
 		break;
 	}
 }
 
-void Beam(int Player) {
+void Beam(int Player,int plessButton) {
+	bool isSuccess = soundsManager.Start(_T("beamSE"));
 	switch (Player) {
 	case PLAYER1:
 		BeamFlag1P = true;
+		if (plessButton == X_BUTTON) {
+			FirstItem1P = NO_ITEM;
+		}
+		else if (plessButton == Y_BUTTON) {
+			SecondItem1P = NO_ITEM;
+		}
+		
 		break;
 	case PLAYER2:
 		BeamFlag2P = true;
+		if (plessButton == X_BUTTON) {
+			FirstItem2P = NO_ITEM;
+		}
+		else if (plessButton == Y_BUTTON) {
+			SecondItem2P = NO_ITEM;
+		}
 		break;
 	}
 }
 
-void Barrier(int Player) {
+void Barrier(int Player,int plessButton) {
+	bool isSuccess = soundsManager.Start(_T("barrierSE"));
 	switch (Player) {
 	case PLAYER1:
 		BarrierFlag1P = true;
+		if (plessButton == X_BUTTON) {
+			FirstItem1P = NO_ITEM;
+		}
+		else if (plessButton == Y_BUTTON) {
+			SecondItem1P = NO_ITEM;
+		}
+		
 		break;
 	case PLAYER2:
 		BarrierFlag2P = true;
+		if (plessButton == X_BUTTON) {
+			FirstItem2P = NO_ITEM;
+		}
+		else if (plessButton == Y_BUTTON) {
+			SecondItem2P = NO_ITEM;
+		}
 		break;
 	}
 }
 
-void FireBall(int Player) {
+void FireBall(int Player,int plessButton) {
+	bool isSuccess = soundsManager.Start(_T("fireBallSE"));
 	switch (Player) {
 	case PLAYER1:
 		FireBallStateFlag1P = true;
@@ -1160,6 +1533,12 @@ void FireBall(int Player) {
 			FireBallStateFlag1P = false;
 		}
 		FireBallFlag1P = true;
+		if (plessButton == X_BUTTON) {
+			FirstItem1P = NO_ITEM;
+		}
+		else if (plessButton == Y_BUTTON) {
+			SecondItem1P = NO_ITEM;
+		}
 		break;
 	case PLAYER2:
 		FireBallStateFlag2P = true;
@@ -1170,48 +1549,107 @@ void FireBall(int Player) {
 			FireBallStateFlag2P = false;
 		}
 		FireBallFlag2P = true;
+		if (plessButton == X_BUTTON) {
+			FirstItem2P = NO_ITEM;
+		}
+		else if (plessButton == Y_BUTTON) {
+			SecondItem2P = NO_ITEM;
+		}
 		break;
 	}
+	
 }
 
-void UseItem(int Player) {
+
+void UseClawRope(int Player, int plessButton) {
+	bool isSuccess = soundsManager.Start(_T("clawRopeSE"));
+	switch (Player) {
+	case PLAYER1:
+		if (clawRopeState1P == NOT_USE) {
+			clawRopeState1P = TARGET_MODE;
+		}
+		else if (clawRopeState1P == TARGET_MODE) {
+			clawRopeState1P = CHECK_MODE;
+			clawPosition1P.x = g_Player.x;
+			clawPosition1P.y = g_Player.y;
+			if (plessButton == X_BUTTON) {
+				FirstItem1P = NO_ITEM;
+			}
+			else if (plessButton == Y_BUTTON) {
+				SecondItem1P = NO_ITEM;
+			}
+		}
+		break;
+	case PLAYER2:
+		if (clawRopeState2P == NOT_USE) {
+			clawRopeState2P = TARGET_MODE;
+		}
+		else if (clawRopeState2P == TARGET_MODE) {
+			clawRopeState2P = CHECK_MODE;
+			clawPosition2P.x = g_Player2P.x;
+			clawPosition2P.y = g_Player2P.y;
+			if (plessButton == X_BUTTON) {
+				FirstItem2P = NO_ITEM;
+			}
+			else if (plessButton == Y_BUTTON) {
+				SecondItem2P = NO_ITEM;
+			}
+		}
+		break;
+	}
+
+}
+
+
+void UseItem(int Player, int plessButton) {
 
 	int ItemNumber = 0;
 
 	switch (Player) {
 	case PLAYER1:
-		ItemNumber = FirstItem1P;
-		FirstItem1P = SecondItem1P;
-		SecondItem1P = NO_ITEM;
+		if (plessButton == X_BUTTON) {
+			ItemNumber = FirstItem1P;
+		}
+		else if (plessButton == Y_BUTTON) {
+			ItemNumber = SecondItem1P;
+		}
 		break;
 	case PLAYER2:
-		ItemNumber = FirstItem2P;
-		FirstItem2P = SecondItem2P;
-		SecondItem2P = NO_ITEM;
+		if (plessButton == X_BUTTON) {
+			ItemNumber = FirstItem2P;
+		}
+		else if (plessButton == Y_BUTTON) {
+			ItemNumber = SecondItem2P;
+		}
 		break;
 	}
 
+
+
 	switch (ItemNumber) {
 	case ITEMBREAK:
-		ItemBreak(Player);
+		ItemBreak(Player,plessButton);
 		break;
 	case JUMPUP:
-		JumpUp(Player);
+		JumpUp(Player,plessButton);
 		break;
 	case SPEEDUP:
-		SpeedUp(Player);
+		SpeedUp(Player,plessButton);
 		break;
 	case SPEEDDOWN:
-		SpeedDown(Player);
+		SpeedDown(Player,plessButton);
+		break;
+	case CLAWROPE:
+		UseClawRope(Player,plessButton);
 		break;
 	case BEAM:
-		Beam(Player);
+		Beam(Player,plessButton);
 		break;
 	case BARRIER:
-		Barrier(Player);
+		Barrier(Player,plessButton);
 		break;
 	case FIREBALL:
-		FireBall(Player);
+		FireBall(Player,plessButton);
 		break;
 	}
 }
@@ -1228,7 +1666,8 @@ void CheckKey() {
 		BYTE diks[256];
 		pKeyDevice->GetDeviceState(sizeof(diks), &diks);
 
-		if (!PlayerStop1P) {
+		if (!PlayerStop1P)
+		{
 
 			//W‚ğ“ü—Í‚µ‚½’¼Œã‚¾‚¯ƒWƒƒƒ“ƒv‚Ìƒtƒ‰ƒO‚ğƒIƒ“‚É‚·‚éˆ—
 			if ((diks[DIK_W] & 0x80 && !prevKey[DIK_W]) || g_Pad1P.a && !prevPad[PadA1P]) {
@@ -1243,7 +1682,7 @@ void CheckKey() {
 					wallJump1PFlag = true;
 				}
 			}
-			
+
 			if (diks[DIK_A] & 0x80 || g_Pad1P.left)
 			{
 				PlayerMode1P = LEFT_DIRECTION;
@@ -1279,7 +1718,7 @@ void CheckKey() {
 				}
 
 				//¶’[‚Ü‚Ås‚Á‚Ä‚È‚­‚ÄA¶‚ÉˆÚ“®‚·‚é‚Æ‚«‚Ìˆ—
-				if (g_Player.x >= 100) {
+				if (g_Player.x >= 300) {
 					if (speedRises1P == true) {
 						g_Player.x -= MOVE_SPEED_UP;
 						prevFrameMovement1P -= MOVE_SPEED_UP;
@@ -1294,7 +1733,7 @@ void CheckKey() {
 					}
 
 				}//¶’[‚Ü‚Ås‚Á‚ÄA‚³‚ç‚É¶‚ÉˆÚ“®‚µ‚æ‚¤‚Æ‚µ‚½‚Æ‚«‚Ìˆ—
-				else if (g_Player.x < 100) {
+				else if (g_Player.x < 300) {
 					if (win == PLAYER1P) {
 						if (speedRises1P == true) {
 							movementStageX -= MOVE_SPEED_UP;
@@ -1417,24 +1856,39 @@ void CheckKey() {
 				}
 			}
 
-			if ((diks[DIK_Q] & 0x80 || g_Pad1P.y) && FirstItem1P) {
+			if ((diks[DIK_Q] & 0x80 || g_Pad1P.y) && SecondItem1P) {
 
 				if (!prevKey[DIK_Q] && !prevPad[PadY1P]) {
-
-					UseItem(PLAYER1);
+					infoButton = Y_BUTTON;
+					UseItem(PLAYER1, infoButton);
 				}
 			}
 
-			//—¼•ûŒü‚ÌˆÚ“®ƒL[‚ğ“¯‚É“ü—Í‚³‚ê‚Ä‚¢‚éA“¯‚É“ü—Í‚³‚ê‚Ä‚¢‚È‚¢AƒAƒjƒ[ƒVƒ‡ƒ“‚µ‚È‚¢
-			if ((diks[DIK_A] && diks[DIK_D]) && (prevPad[PadLEFT1P] && prevPad[PadRIGHT1P])) {
-				PlayerMoveCount1P = 0;
+			if ((diks[DIK_TAB] & 0x80 || g_Pad1P.x) && FirstItem1P) {
+
+				if (!prevKey[DIK_TAB] && !prevPad[PadX1P]) {
+					infoButton = X_BUTTON;
+					UseItem(PLAYER1, infoButton);
+				}
 			}
-			if ((!diks[DIK_A] && !diks[DIK_D]) && (!prevPad[PadLEFT1P] && !prevPad[PadRIGHT1P])) {
-				PlayerMoveCount1P = 0;
+
+			if (clawRopeState1P == TARGET_MODE) {
+				if (diks[DIK_E]) {
+					clawRopeCheckRad1P -= CLAWROPE_INCRESE_RAD;
+				}
+				if (diks[DIK_R]) {
+					clawRopeCheckRad1P += CLAWROPE_INCRESE_RAD;
+				}
 			}
 		}
 
-		if (!PlayerStop2P) {
+
+
+
+
+
+		if (!PlayerStop2P)
+		{
 
 			//UP‚ğ“ü—Í‚µ‚½’¼Œã‚¾‚¯ƒWƒƒƒ“ƒv‚Ìƒtƒ‰ƒO‚ğƒIƒ“‚É‚·‚éˆ—
 			if (diks[DIK_UP] & 0x80 && !prevKey[DIK_UP] || g_Pad2P.a && !prevPad[PadA2P])
@@ -1456,7 +1910,7 @@ void CheckKey() {
 			{
 				PlayerMode2P = LEFT_DIRECTION;
 				//‘O‚ÌƒtƒŒ[ƒ€‚Å‚àLEFT‚ª‰Ÿ‚³‚ê‚Ä‚¢‚½‚Ìˆ—
-				if (prevKey[DIK_LEFT]|| prevPad[PadLEFT2P]) {
+				if (prevKey[DIK_LEFT] || prevPad[PadLEFT2P]) {
 
 					framecount2P++;
 					accelerationcount2PLeft++;
@@ -1487,7 +1941,7 @@ void CheckKey() {
 				}
 
 				//¶’[‚Ü‚Ås‚Á‚Ä‚È‚­‚ÄA¶‚ÉˆÚ“®‚·‚é‚Æ‚«‚Ìˆ—
-				if(g_Player2P.x >= 100) {
+				if (g_Player2P.x >= 300) {
 					if (speedRises2P == true) {
 						prevFrameMovement2P -= MOVE_SPEED_UP;
 						g_Player2P.x -= MOVE_SPEED_UP;
@@ -1501,7 +1955,7 @@ void CheckKey() {
 						g_Player2P.x -= (acceleration2PLeft + MOVE_SPEED + SpeedChange2P);
 					}
 				}//¶’[‚Ü‚Ås‚Á‚ÄA‚³‚ç‚É¶‚ÉˆÚ“®‚µ‚æ‚¤‚Æ‚µ‚½‚Æ‚«‚Ìˆ—
-				else if (g_Player2P.x < 100) {
+				else if (g_Player2P.x < 300) {
 
 					if (win == PLAYER2P) {
 						if (speedRises2P == true) {
@@ -1537,7 +1991,7 @@ void CheckKey() {
 				}
 			}
 
-			if (diks[DIK_RIGHT] & 0x80|| g_Pad2P.right)
+			if (diks[DIK_RIGHT] & 0x80 || g_Pad2P.right)
 			{
 				PlayerMode2P = RIGHT_DIRECTION;
 				//RIGHT‚ª‘OƒtƒŒ[ƒ€‚É‰Ÿ‚³‚ê‚Ä‚¢‚é‚Æ‚«‚Ìˆ—
@@ -1586,7 +2040,7 @@ void CheckKey() {
 						g_Player2P.x += (acceleration2PRight + MOVE_SPEED + SpeedChange2P);
 						prevFrameMovement2P += (acceleration2PRight + MOVE_SPEED + SpeedChange2P);
 					}
-				
+
 				}//‰E’[‚Ü‚Ås‚Á‚ÄA‚³‚ç‚É‰E‚ÉˆÚ“®‚·‚é‚Æ‚«‚Ìˆ—
 				else if (g_Player2P.x >= 1200) {
 					if (win == PLAYER2P) {
@@ -1623,20 +2077,49 @@ void CheckKey() {
 				}
 			}
 
-			if ((diks[DIK_RCONTROL] & 0x80 || g_Pad2P.y) && FirstItem2P) {
-			
-				if (!prevKey[DIK_RCONTROL] && !prevPad[PadY2P]) {
+			if ((diks[DIK_PERIOD] & 0x80 || g_Pad2P.y) && SecondItem2P) {
 
-					UseItem(PLAYER2);
+				if (!prevKey[DIK_PERIOD] && !prevPad[PadY2P]) {
+
+					infoButton = Y_BUTTON;
+					UseItem(PLAYER2, infoButton);
 				}
 			}
-		
-			if ((diks[DIK_LEFT] && diks[DIK_RIGHT])&& (prevPad[PadLEFT2P] && prevPad[PadRIGHT2P])) {
-				PlayerMoveCount2P = 0;
+
+			if ((diks[DIK_COMMA] & 0x80 || g_Pad2P.x) && FirstItem2P) {
+
+				if (!prevKey[DIK_COMMA] && !prevPad[PadX2P]) {
+
+					infoButton = X_BUTTON;
+					UseItem(PLAYER2, infoButton);
+				}
 			}
-			if ((!diks[DIK_LEFT] && !diks[DIK_RIGHT]) && (!prevPad[PadLEFT2P] && !prevPad[PadRIGHT2P])) {
-				PlayerMoveCount2P = 0;
+
+
+			if (clawRopeState2P == TARGET_MODE) {
+				if (diks[DIK_SLASH]) {
+					clawRopeCheckRad2P -= CLAWROPE_INCRESE_RAD;
+				}
+				if (diks[DIK_RSHIFT]) {
+					clawRopeCheckRad2P += CLAWROPE_INCRESE_RAD;
+				}
 			}
+		}
+
+		//—¼•ûŒü‚ÌˆÚ“®ƒL[‚ğ“¯‚É“ü—Í‚³‚ê‚Ä‚¢‚éA“¯‚É“ü—Í‚³‚ê‚Ä‚¢‚È‚¢AƒAƒjƒ[ƒVƒ‡ƒ“‚µ‚È‚¢
+		if ((diks[DIK_A] && diks[DIK_D]) && (prevPad[PadLEFT1P] && prevPad[PadRIGHT1P])) {
+			PlayerMoveCount1P = 0;
+		}
+		if ((!diks[DIK_A] && !diks[DIK_D]) && (!prevPad[PadLEFT1P] && !prevPad[PadRIGHT1P])) {
+			PlayerMoveCount1P = 0;
+		}
+
+		if ((diks[DIK_LEFT] && diks[DIK_RIGHT]) && (prevPad[PadLEFT2P] && prevPad[PadRIGHT2P])) {
+			PlayerMoveCount2P = 0;
+		}
+		if ((!diks[DIK_LEFT] && !diks[DIK_RIGHT]) && (!prevPad[PadLEFT2P] && !prevPad[PadRIGHT2P])) {
+			PlayerMoveCount2P = 0;
+
 		}
 
 		//ƒz[ƒ‹ƒh‚³‚ê‚Ä‚é‚©‚Ç‚¤‚©‚ğŠm”F‚·‚é‚½‚ß‚É‘O‚ÌƒL[“ü—Í‚ğ•Û‘¶‚µ‚Ä‚¢‚é
@@ -1647,7 +2130,9 @@ void CheckKey() {
 		prevKey[DIK_D] = diks[DIK_D];
 		prevKey[DIK_W] = diks[DIK_W];
 		prevKey[DIK_Q] = diks[DIK_Q];
-		prevKey[DIK_RCONTROL] = diks[DIK_RCONTROL];
+		prevKey[DIK_TAB] = diks[DIK_TAB];
+		prevKey[DIK_PERIOD] = diks[DIK_PERIOD];
+		prevKey[DIK_COMMA] = diks[DIK_COMMA];
 		prevPad[PadRIGHT1P] = g_Pad1P.right;
 		prevPad[PadRIGHT2P] = g_Pad2P.right;
 		prevPad[PadLEFT1P] = g_Pad1P.left;
@@ -1656,10 +2141,13 @@ void CheckKey() {
 		prevPad[PadA2P] = g_Pad2P.a;
 		prevPad[PadY1P] = g_Pad1P.y;
 		prevPad[PadY2P] = g_Pad2P.y;
+		prevPad[PadX1P] = g_Pad1P.x;
+		prevPad[PadX2P] = g_Pad2P.x;
 	}
 }
 
-BOOL PlayerGimmickDecision(int count, OBJECT_POSITION* pposition, OBJECT_STATE gstate, OBJECT_STATE Player) {
+
+BOOL PlayerGimmickDecision(int count, OBJECT_POSITION_UNDELETABLE* pposition, OBJECT_STATE gstate, OBJECT_STATE Player) {
 
 	for (int i = 0; i < count; i++) {
 
@@ -1684,7 +2172,7 @@ BOOL PlayerItemDecision(OBJECT_STATE Player,OBJECT_STATE ItemRect) {
 	return false;
 }
 
-BOOL ItemDecision(int count, OBJECT_POSITION* pposition, OBJECT_STATE gstate, OBJECT_STATE Player) {
+BOOL ItemDecision(int count, OBJECT_POSITION_DELETABLE* pposition, OBJECT_STATE gstate, OBJECT_STATE Player) {
 
 	for (int i = 0; i < count; i++) {
 
@@ -1702,7 +2190,7 @@ BOOL ItemDecision(int count, OBJECT_POSITION* pposition, OBJECT_STATE gstate, OB
 	return false;
 }
 
-BOOL ItemDecision2P(int count, OBJECT_POSITION* pposition, OBJECT_STATE gstate, OBJECT_STATE Player) {
+BOOL ItemDecision2P(int count, OBJECT_POSITION_DELETABLE* pposition, OBJECT_STATE gstate, OBJECT_STATE Player) {
 
 	for (int i = 0; i < count; i++) {
 
@@ -1749,7 +2237,8 @@ void CreatePerDecision(void) {
 
 	//ƒAƒCƒeƒ€ƒ{ƒbƒNƒX‚Ìˆ—
 	if (ItemDecision(itemboxcount, itembox, g_Itembox, g_Player)) {
-		
+
+		bool isSuccess = soundsManager.Start(_T("itemGetSE"));
 		if (FirstItem1P && !SecondItem1P) {
 			SecondItem1P = (rand() % (ITEM_MAX - 1)) + 1;
 		}
@@ -1761,6 +2250,7 @@ void CreatePerDecision(void) {
 
 	if (ItemDecision2P(itemboxcount, itembox, g_Itembox, g_Player2P)) {
 
+		bool isSuccess = soundsManager.Start(_T("itemGetSE"));
 		if (FirstItem2P && !SecondItem2P) {
 			SecondItem2P = (rand() % (ITEM_MAX - 1)) + 1;
 		}
@@ -2026,6 +2516,1237 @@ void InitPlayerCollisionPoint(int player1POr2P) {
 	}
 }
 
+//‚©‚¬‚Ã‚ßƒ[ƒv‚Ì“–‚½‚è”»’èƒ|ƒCƒ“ƒg‚Ì‰Šú‰»
+void InitCollisionPointWhenClawRope(int player1POr2P,int clawRopeState) {
+	if (player1POr2P == PLAYER1P) {
+		
+		if (clawRopeState == CHECK_MODE) {
+
+			arrayToCheckRightCollision1P[0] = clawPosition1P.y;
+			arrayToCheckRightCollision1P[1] = clawPosition1P.y + ((claw.scale_y) / 4) * 1;
+			arrayToCheckRightCollision1P[2] = clawPosition1P.y + ((claw.scale_y) / 4) * 2;
+			arrayToCheckRightCollision1P[3] = clawPosition1P.y + ((claw.scale_y) / 4) * 3;
+			arrayToCheckRightCollision1P[4] = clawPosition1P.y + (claw.scale_y);
+			arrayToCheckRightCollision1P[5] = clawPosition1P.x + claw.scale_x;
+			arrayToCheckLeftCollision1P[0] = clawPosition1P.y;
+			arrayToCheckLeftCollision1P[1] = clawPosition1P.y + ((claw.scale_y) / 4) * 1;
+			arrayToCheckLeftCollision1P[2] = clawPosition1P.y + ((claw.scale_y) / 4) * 2;
+			arrayToCheckLeftCollision1P[3] = clawPosition1P.y + ((claw.scale_y) / 4) * 3;
+			arrayToCheckLeftCollision1P[4] = clawPosition1P.y + (claw.scale_y);
+			arrayToCheckLeftCollision1P[5] = clawPosition1P.x;
+			arrayToCheckTopCollision1P[0] = clawPosition1P.x;
+			arrayToCheckTopCollision1P[1] = clawPosition1P.x + ((claw.scale_x) / 4) * 1;
+			arrayToCheckTopCollision1P[2] = clawPosition1P.x + ((claw.scale_x) / 4) * 2;
+			arrayToCheckTopCollision1P[3] = clawPosition1P.x + ((claw.scale_x) / 4) * 3;
+			arrayToCheckTopCollision1P[4] = clawPosition1P.x + (claw.scale_x);
+			arrayToCheckTopCollision1P[5] = clawPosition1P.y;
+			arrayToCheckBottomCollision1P[0] = clawPosition1P.x;
+			arrayToCheckBottomCollision1P[1] = clawPosition1P.x + ((claw.scale_x) / 4) * 1;
+			arrayToCheckBottomCollision1P[2] = clawPosition1P.x + ((claw.scale_x) / 4) * 2;
+			arrayToCheckBottomCollision1P[3] = clawPosition1P.x + ((claw.scale_x) / 4) * 3;
+			arrayToCheckBottomCollision1P[4] = clawPosition1P.x + (claw.scale_x);
+			arrayToCheckBottomCollision1P[5] = clawPosition1P.y + claw.scale_y;
+		}
+		if (clawRopeState == MOVE_MODE) {
+
+			arrayToCheckRightCollision1P[0] = g_Player.y;
+			arrayToCheckRightCollision1P[1] = g_Player.y + ((g_Player.scale_y) / 4) * 1;
+			arrayToCheckRightCollision1P[2] = g_Player.y + ((g_Player.scale_y) / 4) * 2;
+			arrayToCheckRightCollision1P[3] = g_Player.y + ((g_Player.scale_y) / 4) * 3;
+			arrayToCheckRightCollision1P[4] = g_Player.y + (g_Player.scale_y);
+			arrayToCheckRightCollision1P[5] = g_Player.x + g_Player.scale_x;
+			arrayToCheckLeftCollision1P[0] = g_Player.y;
+			arrayToCheckLeftCollision1P[1] = g_Player.y + ((g_Player.scale_y) / 4) * 1;
+			arrayToCheckLeftCollision1P[2] = g_Player.y + ((g_Player.scale_y) / 4) * 2;
+			arrayToCheckLeftCollision1P[3] = g_Player.y + ((g_Player.scale_y) / 4) * 3;
+			arrayToCheckLeftCollision1P[4] = g_Player.y + (g_Player.scale_y);
+			arrayToCheckLeftCollision1P[5] = g_Player.x;
+			arrayToCheckTopCollision1P[0] = g_Player.x;
+			arrayToCheckTopCollision1P[1] = g_Player.x + ((g_Player.scale_x) / 4) * 1;
+			arrayToCheckTopCollision1P[2] = g_Player.x + ((g_Player.scale_x) / 4) * 2;
+			arrayToCheckTopCollision1P[3] = g_Player.x + ((g_Player.scale_x) / 4) * 3;
+			arrayToCheckTopCollision1P[4] = g_Player.x + (g_Player.scale_x);
+			arrayToCheckTopCollision1P[5] = g_Player.y;
+			arrayToCheckBottomCollision1P[0] = g_Player.x;
+			arrayToCheckBottomCollision1P[1] = g_Player.x + ((g_Player.scale_x) / 4) * 1;
+			arrayToCheckBottomCollision1P[2] = g_Player.x + ((g_Player.scale_x) / 4) * 2;
+			arrayToCheckBottomCollision1P[3] = g_Player.x + ((g_Player.scale_x) / 4) * 3;
+			arrayToCheckBottomCollision1P[4] = g_Player.x + (g_Player.scale_x);
+			arrayToCheckBottomCollision1P[5] = g_Player.y + g_Player.scale_y;
+		}
+		if (clawRopeState == SWAP_MODE) {
+
+			arrayToCheckRightCollision1P[0] = g_Player2P.y;
+			arrayToCheckRightCollision1P[1] = g_Player2P.y + ((g_Player2P.scale_y) / 4) * 1;
+			arrayToCheckRightCollision1P[2] = g_Player2P.y + ((g_Player2P.scale_y) / 4) * 2;
+			arrayToCheckRightCollision1P[3] = g_Player2P.y + ((g_Player2P.scale_y) / 4) * 3;
+			arrayToCheckRightCollision1P[4] = g_Player2P.y + (g_Player2P.scale_y);
+			arrayToCheckRightCollision1P[5] = g_Player2P.x + g_Player2P.scale_x;
+			arrayToCheckLeftCollision1P[0] = g_Player2P.y;
+			arrayToCheckLeftCollision1P[1] = g_Player2P.y + ((g_Player2P.scale_y) / 4) * 1;
+			arrayToCheckLeftCollision1P[2] = g_Player2P.y + ((g_Player2P.scale_y) / 4) * 2;
+			arrayToCheckLeftCollision1P[3] = g_Player2P.y + ((g_Player2P.scale_y) / 4) * 3;
+			arrayToCheckLeftCollision1P[4] = g_Player2P.y + (g_Player2P.scale_y);
+			arrayToCheckLeftCollision1P[5] = g_Player2P.x;
+			arrayToCheckTopCollision1P[0] = g_Player2P.x;
+			arrayToCheckTopCollision1P[1] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 1;
+			arrayToCheckTopCollision1P[2] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 2;
+			arrayToCheckTopCollision1P[3] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 3;
+			arrayToCheckTopCollision1P[4] = g_Player2P.x + (g_Player2P.scale_x);
+			arrayToCheckTopCollision1P[5] = g_Player2P.y;
+			arrayToCheckBottomCollision1P[0] = g_Player2P.x;
+			arrayToCheckBottomCollision1P[1] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 1;
+			arrayToCheckBottomCollision1P[2] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 2;
+			arrayToCheckBottomCollision1P[3] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 3;
+			arrayToCheckBottomCollision1P[4] = g_Player2P.x + (g_Player2P.scale_x);
+			arrayToCheckBottomCollision1P[5] = g_Player2P.y + g_Player2P.scale_y;
+		}
+	}
+	else if (player1POr2P == PLAYER2P) {
+		if (clawRopeState == CHECK_MODE) {
+
+			arrayToCheckRightCollision2P[0] = clawPosition2P.y;
+			arrayToCheckRightCollision2P[1] = clawPosition2P.y + ((claw.scale_y) / 4) * 1;
+			arrayToCheckRightCollision2P[2] = clawPosition2P.y + ((claw.scale_y) / 4) * 2;
+			arrayToCheckRightCollision2P[3] = clawPosition2P.y + ((claw.scale_y) / 4) * 3;
+			arrayToCheckRightCollision2P[4] = clawPosition2P.y + (claw.scale_y);
+			arrayToCheckRightCollision2P[5] = clawPosition2P.x + claw.scale_x;
+			arrayToCheckLeftCollision2P[0] = clawPosition2P.y;
+			arrayToCheckLeftCollision2P[1] = clawPosition2P.y + ((claw.scale_y) / 4) * 1;
+			arrayToCheckLeftCollision2P[2] = clawPosition2P.y + ((claw.scale_y) / 4) * 2;
+			arrayToCheckLeftCollision2P[3] = clawPosition2P.y + ((claw.scale_y) / 4) * 3;
+			arrayToCheckLeftCollision2P[4] = clawPosition2P.y + (claw.scale_y);
+			arrayToCheckLeftCollision2P[5] = clawPosition2P.x;
+			arrayToCheckTopCollision2P[0] = clawPosition2P.x;
+			arrayToCheckTopCollision2P[1] = clawPosition2P.x + ((claw.scale_x) / 4) * 1;
+			arrayToCheckTopCollision2P[2] = clawPosition2P.x + ((claw.scale_x) / 4) * 2;
+			arrayToCheckTopCollision2P[3] = clawPosition2P.x + ((claw.scale_x) / 4) * 3;
+			arrayToCheckTopCollision2P[4] = clawPosition2P.x + (claw.scale_x);
+			arrayToCheckTopCollision2P[5] = clawPosition2P.y;
+			arrayToCheckBottomCollision2P[0] = clawPosition2P.x;
+			arrayToCheckBottomCollision2P[1] = clawPosition2P.x + ((claw.scale_x) / 4) * 1;
+			arrayToCheckBottomCollision2P[2] = clawPosition2P.x + ((claw.scale_x) / 4) * 2;
+			arrayToCheckBottomCollision2P[3] = clawPosition2P.x + ((claw.scale_x) / 4) * 3;
+			arrayToCheckBottomCollision2P[4] = clawPosition2P.x + (claw.scale_x);
+			arrayToCheckBottomCollision2P[5] = clawPosition2P.y + claw.scale_y;
+		}
+		if (clawRopeState == MOVE_MODE) {
+			arrayToCheckRightCollision2P[0] = g_Player2P.y;
+			arrayToCheckRightCollision2P[1] = g_Player2P.y + ((g_Player2P.scale_y) / 4) * 1;
+			arrayToCheckRightCollision2P[2] = g_Player2P.y + ((g_Player2P.scale_y) / 4) * 2;
+			arrayToCheckRightCollision2P[3] = g_Player2P.y + ((g_Player2P.scale_y) / 4) * 3;
+			arrayToCheckRightCollision2P[4] = g_Player2P.y + (g_Player2P.scale_y);
+			arrayToCheckRightCollision2P[5] = g_Player2P.x + g_Player2P.scale_x;
+			arrayToCheckLeftCollision2P[0] = g_Player2P.y;
+			arrayToCheckLeftCollision2P[1] = g_Player2P.y + ((g_Player2P.scale_y) / 4) * 1;
+			arrayToCheckLeftCollision2P[2] = g_Player2P.y + ((g_Player2P.scale_y) / 4) * 2;
+			arrayToCheckLeftCollision2P[3] = g_Player2P.y + ((g_Player2P.scale_y) / 4) * 3;
+			arrayToCheckLeftCollision2P[4] = g_Player2P.y + (g_Player2P.scale_y);
+			arrayToCheckLeftCollision2P[5] = g_Player2P.x;
+			arrayToCheckTopCollision2P[0] = g_Player2P.x;
+			arrayToCheckTopCollision2P[1] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 1;
+			arrayToCheckTopCollision2P[2] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 2;
+			arrayToCheckTopCollision2P[3] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 3;
+			arrayToCheckTopCollision2P[4] = g_Player2P.x + (g_Player2P.scale_x);
+			arrayToCheckTopCollision2P[5] = g_Player2P.y;
+			arrayToCheckBottomCollision2P[0] = g_Player2P.x;
+			arrayToCheckBottomCollision2P[1] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 1;
+			arrayToCheckBottomCollision2P[2] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 2;
+			arrayToCheckBottomCollision2P[3] = g_Player2P.x + ((g_Player2P.scale_x) / 4) * 3;
+			arrayToCheckBottomCollision2P[4] = g_Player2P.x + (g_Player2P.scale_x);
+			arrayToCheckBottomCollision2P[5] = g_Player2P.y + g_Player2P.scale_y;
+			
+		}
+		if (clawRopeState == SWAP_MODE) {
+
+			arrayToCheckRightCollision2P[0] = g_Player.y;
+			arrayToCheckRightCollision2P[1] = g_Player.y + ((g_Player.scale_y) / 4) * 1;
+			arrayToCheckRightCollision2P[2] = g_Player.y + ((g_Player.scale_y) / 4) * 2;
+			arrayToCheckRightCollision2P[3] = g_Player.y + ((g_Player.scale_y) / 4) * 3;
+			arrayToCheckRightCollision2P[4] = g_Player.y + (g_Player.scale_y);
+			arrayToCheckRightCollision2P[5] = g_Player.x + g_Player.scale_x;
+			arrayToCheckLeftCollision2P[0] = g_Player.y;
+			arrayToCheckLeftCollision2P[1] = g_Player.y + ((g_Player.scale_y) / 4) * 1;
+			arrayToCheckLeftCollision2P[2] = g_Player.y + ((g_Player.scale_y) / 4) * 2;
+			arrayToCheckLeftCollision2P[3] = g_Player.y + ((g_Player.scale_y) / 4) * 3;
+			arrayToCheckLeftCollision2P[4] = g_Player.y + (g_Player.scale_y);
+			arrayToCheckLeftCollision2P[5] = g_Player.x;
+			arrayToCheckTopCollision2P[0] = g_Player.x;
+			arrayToCheckTopCollision2P[1] = g_Player.x + ((g_Player.scale_x) / 4) * 1;
+			arrayToCheckTopCollision2P[2] = g_Player.x + ((g_Player.scale_x) / 4) * 2;
+			arrayToCheckTopCollision2P[3] = g_Player.x + ((g_Player.scale_x) / 4) * 3;
+			arrayToCheckTopCollision2P[4] = g_Player.x + (g_Player.scale_x);
+			arrayToCheckTopCollision2P[5] = g_Player.y;
+			arrayToCheckBottomCollision2P[0] = g_Player.x;
+			arrayToCheckBottomCollision2P[1] = g_Player.x + ((g_Player.scale_x) / 4) * 1;
+			arrayToCheckBottomCollision2P[2] = g_Player.x + ((g_Player.scale_x) / 4) * 2;
+			arrayToCheckBottomCollision2P[3] = g_Player.x + ((g_Player.scale_x) / 4) * 3;
+			arrayToCheckBottomCollision2P[4] = g_Player.x + (g_Player.scale_x);
+			arrayToCheckBottomCollision2P[5] = g_Player.y + g_Player.scale_y;
+		}
+	}
+}
+
+
+//‚©‚¬‚Ã‚ßƒ[ƒv‚Å“–‚½‚è”»’è‚Å¶‚Ì•Ç‚É“–‚½‚Á‚½‚És‚¤ˆ—‚ğ‚Ü‚Æ‚ß‚½ŠÖ”
+void DoWhenLeftCollideByClawRoap(int player1POr2P,int clawRopeState) {
+	if (player1POr2P == PLAYER1P) {
+		if (clawRopeState == CHECK_MODE) {
+			clawPosition1P.x = (((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+			clawRopeState1P = MOVE_MODE;
+
+		}
+		else if (clawRopeState == MOVE_MODE) {
+			g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+			
+			InitStateSideCollision(itIsPlayer1P);
+			clawRopeState1P = NOT_USE;
+			clawRopeMovement1P.x = 0;
+			clawRopeMovement1P.y = 0;
+
+		}
+		else if (clawRopeState == SWAP_MODE) {
+			g_Player2P.x = (((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+			
+			InitStateSideCollision(itIsPlayer2P);
+			clawRopeState1P = NOT_USE;
+			clawRopeMovement1P.x = 0;
+			clawRopeMovement1P.y = 0;
+		}
+	}
+	else if (player1POr2P == PLAYER2P) {
+		if (clawRopeState == CHECK_MODE) {
+			clawPosition2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+			clawRopeState2P = MOVE_MODE;
+
+		}
+		else if (clawRopeState == MOVE_MODE) {
+			g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+			
+			InitStateSideCollision(itIsPlayer2P);
+			clawRopeState2P = NOT_USE;
+			clawRopeMovement2P.x = 0;
+			clawRopeMovement2P.y = 0;
+
+		}
+		else if (clawRopeState == SWAP_MODE) {
+			g_Player.x = (((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
+
+			InitStateSideCollision(itIsPlayer1P);
+			clawRopeState2P = NOT_USE;
+			clawRopeMovement2P.x = 0;
+			clawRopeMovement2P.y = 0;
+		}
+	}
+}
+
+//‚©‚¬‚Ã‚ßƒ[ƒv‚Å“–‚½‚è”»’è‚Å¶‚Ì•Ç‚É“–‚½‚Á‚½‚És‚¤ˆ—‚ğ‚Ü‚Æ‚ß‚½ŠÖ”
+void DoWhenRighttCollideByClawRoap(int player1POr2P, int clawRopeState) {
+	if (player1POr2P == PLAYER1P) {
+		if (clawRopeState == CHECK_MODE) {
+			clawPosition1P.x = (((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+			clawRopeState1P = MOVE_MODE;
+
+		}
+		else if (clawRopeState == MOVE_MODE) {
+			g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+			InitStateSideCollision(itIsPlayer1P);
+			clawRopeState1P = NOT_USE;
+			clawRopeMovement1P.x = 0;
+			clawRopeMovement1P.y = 0;
+
+		}
+		else if (clawRopeState == SWAP_MODE) {
+			g_Player2P.x = (((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+
+			InitStateSideCollision(itIsPlayer2P);
+			clawRopeState1P = NOT_USE;
+			clawRopeMovement1P.x = 0;
+			clawRopeMovement1P.y = 0;
+		}
+	}
+	else if (player1POr2P == PLAYER2P) {
+		if (clawRopeState == CHECK_MODE) {
+			clawPosition2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+			clawRopeState2P = MOVE_MODE;
+
+		}
+		else if (clawRopeState == MOVE_MODE) {
+			g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+			
+			InitStateSideCollision(itIsPlayer2P);
+			clawRopeState2P = NOT_USE;
+			clawRopeMovement2P.x = 0;
+			clawRopeMovement2P.y = 0;
+
+		}
+		else if (clawRopeState == SWAP_MODE) {
+			g_Player.x = (((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
+			
+			InitStateSideCollision(itIsPlayer1P);
+			clawRopeState2P = NOT_USE;
+			clawRopeMovement2P.x = 0;
+			clawRopeMovement2P.y = 0;
+		}
+	}
+}
+
+//‚©‚¬‚Ã‚ßƒ[ƒv‚ÅˆÚ“®‚µ‚Ä‚¢‚é‚Æ‚«‚Ì“–‚½‚è”»’è(¶‰Ej‚ğs‚¤ŠÖ”
+void JudgeClawRopeCollisionRL(int mapSelectStage, int player1POr2P,int clawRopeState) {
+
+	//‚PP‚Ì
+	if (player1POr2P == PLAYER1P) {
+		//ƒvƒŒƒCƒ„[‚Ì¶‚Ì•ûŒü‚ÉƒuƒƒbƒN‚ª‚ ‚é‚Æ‚«
+		if (movement1PWhenClawRope.x < 0) {
+			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+				if (MapDataSelect == Stagedesert) {//ƒXƒe[ƒW‚ª»”™‚Ì
+					if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						if (clawRopeState == MOVE_MODE) {
+							player1PRub = WALL_LEFT;
+						}
+						else if(clawRopeState == SWAP_MODE) {
+							player2PRub = WALL_LEFT;
+						}
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						if (clawRopeState == MOVE_MODE) {
+							player1PRub = WALL_LEFT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player2PRub = WALL_LEFT;
+						}
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+
+				}
+				else if (MapDataSelect == StageCity) {//ƒXƒe[ƒW‚ªŠX‚Ì
+					if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						if (clawRopeState == MOVE_MODE) {
+							player1PRub = WALL_LEFT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player2PRub = WALL_LEFT;
+						}
+						break;
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						if (clawRopeState == MOVE_MODE) {
+							player1PRub = WALL_LEFT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player2PRub = WALL_LEFT;
+						}
+						break;
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+					
+				}
+				else if (MapDataSelect == StageForest) {//ƒXƒe[ƒW‚ªX‚Ì
+					if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						if (clawRopeState == MOVE_MODE) {
+							player1PRub = WALL_LEFT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player2PRub = WALL_LEFT;
+						}
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						if (clawRopeState == MOVE_MODE) {
+							player1PRub = WALL_LEFT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player2PRub = WALL_LEFT;
+						}
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+					
+				}
+			}
+		}//ƒvƒŒƒCƒ„[‚Ì‰E‚Ì•ûŒü‚ÉƒuƒƒbƒN‚ª‚ ‚é‚Æ‚«
+		else if (movement1PWhenClawRope.x > 0) {
+			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+
+				if (mapSelectStage == Stagedesert) {//ƒXƒe[ƒW‚ª»”™‚Ì
+					if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						if (clawRopeState == MOVE_MODE) {
+							player1PRub = WALL_RIGHT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player2PRub = WALL_RIGHT;
+						}
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						if (clawRopeState == MOVE_MODE) {
+							player1PRub = WALL_RIGHT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player2PRub = WALL_RIGHT;
+						}
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+					
+				}
+				else if (mapSelectStage == StageCity) {//ƒXƒe[ƒW‚ªŠX‚Ì
+					if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						if (clawRopeState == MOVE_MODE) {
+							player1PRub = WALL_RIGHT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player2PRub = WALL_RIGHT;
+						}
+						break;
+
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						if (clawRopeState == MOVE_MODE) {
+							player1PRub = WALL_RIGHT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player2PRub = WALL_RIGHT;
+						}
+						break;
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+				}
+				else if (mapSelectStage == StageForest) {//ƒXƒe[ƒW‚ªX‚Ì
+					if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						if (clawRopeState == MOVE_MODE) {
+							player1PRub = WALL_RIGHT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player2PRub = WALL_RIGHT;
+						}
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						if (clawRopeState == MOVE_MODE) {
+							player1PRub = WALL_RIGHT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player2PRub = WALL_RIGHT;
+						}
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
+						break;
+					}
+				}
+			}
+		}
+	}//‚QP‚Ì
+	else if (player1POr2P == PLAYER2P) {
+		//ƒvƒŒƒCƒ„[‚Ì¶‚Ì•ûŒü‚ÉƒuƒƒbƒN‚ª‚ ‚é‚Æ‚«
+		if (movement2PWhenClawRope.x < 0) {
+
+			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+				if (mapSelectStage == Stagedesert) {//ƒXƒe[ƒW‚ª»”™‚Ì
+					if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						if (clawRopeState == MOVE_MODE) {
+							player2PRub = WALL_LEFT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player1PRub = WALL_LEFT;
+						}
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						if (clawRopeState == MOVE_MODE) {
+							player2PRub = WALL_LEFT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player1PRub = WALL_LEFT;
+						}
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+					
+				}
+				else if (mapSelectStage == StageCity) {//ƒXƒe[ƒW‚ªŠX‚Ì
+					if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						if (clawRopeState == MOVE_MODE) {
+							player2PRub = WALL_LEFT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player1PRub = WALL_LEFT;
+						}
+						break;
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						if (clawRopeState == MOVE_MODE) {
+							player2PRub = WALL_LEFT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player1PRub = WALL_LEFT;
+						}
+						break;
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+
+				}
+				else if (mapSelectStage == StageForest) {//ƒXƒe[ƒW‚ªX‚Ì
+					if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						if (clawRopeState == MOVE_MODE) {
+							player2PRub = WALL_LEFT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player1PRub = WALL_LEFT;
+						}
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						if (clawRopeState == MOVE_MODE) {
+							player2PRub = WALL_LEFT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player1PRub = WALL_LEFT;
+						}
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+
+				}
+			}
+		}//ƒvƒŒƒCƒ„[‚Ì‰E‚Ì•ûŒü‚ÉƒuƒƒbƒN‚ª‚ ‚é‚Æ‚«
+		else if (movement2PWhenClawRope.x > 0) {
+			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+				if (mapSelectStage == Stagedesert) {//ƒXƒe[ƒW‚ª»”™‚Ì
+					if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						if (clawRopeState == MOVE_MODE) {
+							player2PRub = WALL_RIGHT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player1PRub = WALL_RIGHT;
+						}
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						if (clawRopeState == MOVE_MODE) {
+							player2PRub = WALL_RIGHT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player1PRub = WALL_RIGHT;
+						}
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+				}
+				else if (mapSelectStage == StageCity) {//ƒXƒe[ƒW‚ªŠX‚Ì
+					if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						if (clawRopeState == MOVE_MODE) {
+							player2PRub = WALL_RIGHT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player1PRub = WALL_RIGHT;
+						}
+						break;
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						if (clawRopeState == MOVE_MODE) {
+							player2PRub = WALL_RIGHT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player1PRub = WALL_RIGHT;
+						}
+						break;
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+				}
+				else if (mapSelectStage == StageForest) {//ƒXƒe[ƒW‚ªX‚Ì
+					if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						if (clawRopeState == MOVE_MODE) {
+							player2PRub = WALL_RIGHT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player1PRub = WALL_RIGHT;
+						}
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						if (clawRopeState == MOVE_MODE) {
+							player2PRub = WALL_RIGHT;
+						}
+						else if (clawRopeState == SWAP_MODE) {
+							player1PRub = WALL_RIGHT;
+						}
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
+////‚©‚¬‚Ã‚ßƒ[ƒv‚ÅˆÚ“®‚µ‚Ä‚¢‚é‚Æ‚«‚Ì“–‚½‚è”»’è(ã‰ºj‚ğs‚¤ŠÖ”
+//void JudgeClawRopeCollisionTB(int mapSelectStage, int player1POr2P) {
+//	if (player1POr2P == PLAYER1P) {
+//		//ƒvƒŒƒCƒ„[‚Ìã‚Ì•ûŒü‚ÉƒuƒƒbƒN‚ª‚ ‚é‚Æ‚«
+//		if (gravity1P > 0) {
+//			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+//				if (mapSelectStage == Stagedesert) {//ƒXƒe[ƒW‚ª»”™‚Ì
+//					if (MapData01[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer1P);
+//					}
+//					else if (MapData01[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+//						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer1P);
+//					}
+//					else if (MapData01[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+//						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer1P);
+//					}
+//					else if (MapData01[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer1P);
+//					}
+//					else if (MapData01[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer1P);
+//					}
+//					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
+//						if (MapData01[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+//							latestCheckPoint1P = checkPointNum;
+//							break;
+//						}
+//					}
+//				}
+//				else if (mapSelectStage == StageCity) {//ƒXƒe[ƒW‚ªŠX‚Ì
+//					if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer1P);
+//					}
+//					else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+//						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer1P);
+//					}
+//					else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+//						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer1P);
+//					}
+//					else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer1P);
+//					}
+//					else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer1P);
+//					}
+//					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
+//						if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+//							latestCheckPoint1P = checkPointNum;
+//							break;
+//						}
+//					}
+//				}
+//				else if (mapSelectStage == StageForest) {//ƒXƒe[ƒW‚ªX‚Ì
+//					if (MapData03[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer1P);
+//					}
+//					else if (MapData03[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+//						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer1P);
+//					}
+//					else if (MapData03[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+//						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer1P);
+//					}
+//					else if (MapData03[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer1P);
+//					}
+//					else if (MapData03[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer1P);
+//					}
+//					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
+//						if (MapData03[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+//							latestCheckPoint1P = checkPointNum;
+//							break;
+//						}
+//					}
+//				}
+//			}
+//		}//ƒvƒŒƒCƒ„[‚Ì‰º‚Ì•ûŒü‚ÉƒuƒƒbƒN‚ª‚ ‚é‚Æ‚«
+//		else if (gravity1P < 0) {
+//			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+//				if (mapSelectStage == Stagedesert) {//ƒXƒe[ƒW‚ª»”™‚Ì
+//					if (MapData01[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer1P);
+//						speedSlows1P = false;
+//					}
+//					else if (MapData01[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+//						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer1P);
+//						speedSlows1P = false;
+//					}
+//					else if (MapData01[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+//						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer1P);
+//						speedSlows1P = false;
+//					}
+//					else if (MapData01[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer1P);
+//						speedSlows1P = true;
+//					}
+//					else if (MapData01[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer1P);
+//						speedSlows1P = false;
+//						speedRises1P = true;
+//					}
+//					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
+//						if (MapData01[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+//							latestCheckPoint1P = checkPointNum;
+//							break;
+//						}
+//					}
+//				}
+//				else if (mapSelectStage == StageCity) {//ƒXƒe[ƒW‚ªŠX‚Ì
+//					if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer1P);
+//						speedSlows1P = false;
+//					}
+//					else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+//						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer1P);
+//						speedSlows1P = false;
+//					}
+//					else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+//						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer1P);
+//						speedSlows1P = false;
+//					}
+//					else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer1P);
+//						speedSlows1P = true;
+//					}
+//					else if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer1P);
+//						speedSlows1P = false;
+//						speedRises1P = true;
+//					}
+//					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
+//						if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+//							latestCheckPoint1P = checkPointNum;
+//							break;
+//						}
+//					}
+//				}
+//				else if (mapSelectStage == StageForest) {//ƒXƒe[ƒW‚ªX‚Ì
+//					if (MapData03[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer1P);
+//						speedSlows1P = false;
+//					}
+//					else if (MapData03[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+//						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer1P);
+//						speedSlows1P = false;
+//					}
+//					else if (MapData03[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+//						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer1P);
+//						speedSlows1P = false;
+//					}
+//					else if (MapData03[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer1P);
+//						speedSlows1P = true;
+//					}
+//					else if (MapData03[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+//						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer1P);
+//						speedSlows1P = false;
+//						speedRises1P = true;
+//					}
+//					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
+//						if (MapData03[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+//							latestCheckPoint1P = checkPointNum;
+//							break;
+//						}
+//					}
+//				}
+//			}
+//		}
+//
+//	}
+//	else if (player1POr2P == PLAYER2P) {
+//		if (gravity2P > 0) {
+//			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+//				if (mapSelectStage == Stagedesert) {//ƒXƒe[ƒW‚ª»”™‚Ì
+//					if (MapData01[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer2P);
+//					}
+//					else if (MapData01[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+//						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer2P);
+//					}
+//					else if (MapData01[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+//						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer2P);
+//					}
+//					else if (MapData01[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer2P);
+//					}
+//					else if (MapData01[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer2P);
+//					}
+//					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
+//						if (MapData01[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+//							latestCheckPoint2P = checkPointNum;
+//							break;
+//						}
+//					}
+//				}
+//				else if (mapSelectStage == StageCity) {//ƒXƒe[ƒW‚ªŠX‚Ì
+//					if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer2P);
+//					}
+//					else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+//						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer2P);
+//					}
+//					else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+//						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer2P);
+//					}
+//					else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer2P);
+//					}
+//					else if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer2P);
+//					}
+//					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
+//						if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+//							latestCheckPoint2P = checkPointNum;
+//							break;
+//						}
+//					}
+//				}
+//				else if (mapSelectStage == StageForest) {//ƒXƒe[ƒW‚ªX‚Ì
+//					if (MapData03[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer2P);
+//					}
+//					else if (MapData03[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+//						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer2P);
+//					}
+//					else if (MapData03[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+//						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer2P);
+//					}
+//					else if (MapData03[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer2P);
+//					}
+//					else if (MapData03[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
+//						InitStateTopCollision(itIsPlayer2P);
+//					}
+//					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
+//						if (MapData03[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+//							latestCheckPoint2P = checkPointNum;
+//							break;
+//						}
+//					}
+//				}
+//			}
+//		}//ƒvƒŒƒCƒ„[‚Ì‰º‚Ì•ûŒü‚ÉƒuƒƒbƒN‚ª‚ ‚é‚Æ‚«
+//		else if (gravity2P < 0) {
+//			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
+//				if (mapSelectStage == Stagedesert) {//ƒXƒe[ƒW‚ª»”™‚Ì
+//					if (MapData01[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer2P);
+//						speedSlows2P = false;
+//					}
+//					else if (MapData01[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+//						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer2P);
+//						speedSlows2P = false;
+//					}
+//					else if (MapData01[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+//						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer2P);
+//						speedSlows2P = false;
+//					}
+//					else if (MapData01[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer2P);
+//						speedSlows2P = true;
+//					}
+//					else if (MapData01[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer2P);
+//						speedRises2P = true;
+//						speedSlows2P = false;
+//					}
+//					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
+//						if (MapData01[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+//							latestCheckPoint2P = checkPointNum;
+//							break;
+//						}
+//					}
+//				}
+//				else if (mapSelectStage == StageCity) {//ƒXƒe[ƒW‚ªŠX‚Ì
+//					if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer2P);
+//						speedSlows2P = false;
+//					}
+//					else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+//						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer2P);
+//						speedSlows2P = false;
+//					}
+//					else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+//						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer2P);
+//						speedSlows2P = false;
+//					}
+//					else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer2P);
+//						speedSlows2P = true;
+//					}
+//					else if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer2P);
+//						speedRises2P = true;
+//						speedSlows2P = false;
+//					}
+//					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
+//						if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+//							latestCheckPoint2P = checkPointNum;
+//							break;
+//						}
+//					}
+//				}
+//				else if (mapSelectStage == StageForest) {//ƒXƒe[ƒW‚ªX‚Ì
+//					if (MapData03[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer2P);
+//						speedSlows2P = false;
+//					}
+//					else if (MapData03[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+//						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer2P);
+//						speedSlows2P = false;
+//					}
+//					else if (MapData03[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+//						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer2P);
+//						speedSlows2P = false;
+//					}
+//					else if (MapData03[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer2P);
+//						speedSlows2P = true;
+//					}
+//					else if (MapData03[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+//						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
+//						InitStateBottomCollision(itIsPlayer2P);
+//						speedRises2P = true;
+//						speedSlows2P = false;
+//					}
+//					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
+//						if (MapData03[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+//							latestCheckPoint2P = checkPointNum;
+//							break;
+//						}
+//					}
+//				}
+//			}
+//		}
+//
+//	}
+//}
+//
+
+//‚©‚¬‚Ã‚ßƒ[ƒv‚ÌXÀ•Wiƒ`ƒFƒbƒNƒ‚[ƒh‚È‚ç‚©‚¬‚Ã‚ß‚ÌˆÊ’uAƒ€[ƒuƒ‚[ƒh‚È‚çg—pƒvƒŒƒCƒ„[‚ÌˆÊ’uAƒXƒƒbƒvƒ‚[ƒh‚È‚ç”íŠQƒvƒŒƒCƒ„[‚ÌˆÊ’uj‚ğX•ª‚¾‚¯ˆÚ“®‚·‚éŠÖ”
+void MovePosXWhenClawRope(int player1POr2P,int clawRopeState) {
+	if (player1POr2P == PLAYER1P) {
+		if (clawRopeState == CHECK_MODE) {
+			clawPosition1P.x += movement1PWhenClawRope.x;
+			clawRopeMovement1P.x += movement1PWhenClawRope.x;//‚±‚ÌƒtƒŒ[ƒ€‚ÅˆÚ“®‚µ‚½—Ê‚ğ•Û‘¶‚·‚é•Ï”
+		}
+		else if (clawRopeState == MOVE_MODE) {
+			g_Player.x += movement1PWhenClawRope.x;
+		}
+		else if (clawRopeState == SWAP_MODE) {
+			g_Player2P.x += movement1PWhenClawRope.x;
+		}
+		
+	}
+	else if (player1POr2P == PLAYER2P) {
+		if (clawRopeState == CHECK_MODE) {
+			clawPosition2P.x += movement2PWhenClawRope.x;
+			clawRopeMovement2P.x += movement2PWhenClawRope.x;//‚±‚ÌƒtƒŒ[ƒ€‚ÅˆÚ“®‚µ‚½—Ê‚ğ•Û‘¶‚·‚é•Ï”
+		}
+		else if (clawRopeState == MOVE_MODE) {
+			g_Player2P.x += movement2PWhenClawRope.x;
+		}
+		else if (clawRopeState == SWAP_MODE) {
+			g_Player.x += movement2PWhenClawRope.x;
+		}
+		
+	}
+
+}
+
+//‚©‚¬‚Ã‚ßƒ[ƒv‚ÌYÀ•Wiƒ`ƒFƒbƒNƒ‚[ƒh‚È‚ç‚©‚¬‚Ã‚ß‚ÌˆÊ’uAƒ€[ƒuƒ‚[ƒh‚È‚çg—pƒvƒŒƒCƒ„[‚ÌˆÊ’uAƒXƒƒbƒvƒ‚[ƒh‚È‚ç”íŠQƒvƒŒƒCƒ„[‚ÌˆÊ’uj‚ğY•ª‚¾‚¯ˆÚ“®‚·‚éŠÖ”
+void MovePosYWhenClawRope(int player1POr2P, int clawRopeState) {
+	if (player1POr2P == PLAYER1P) {
+		if (clawRopeState == CHECK_MODE) {
+			clawPosition1P.y += movement1PWhenClawRope.y;
+			clawRopeMovement1P.y += movement1PWhenClawRope.y;//‚±‚ÌƒtƒŒ[ƒ€‚ÅˆÚ“®‚µ‚½—Ê‚ğ•Û‘¶‚µA‚±‚ê‚ªˆê’è‚É‚È‚Á‚½‚çƒ~ƒX‚Æ‚¢‚¤”»’f‚·‚é
+		}
+		else if (clawRopeState == MOVE_MODE) {
+			g_Player.y += movement1PWhenClawRope.y;
+		}
+		else if (clawRopeState == SWAP_MODE) {
+			g_Player2P.y += movement1PWhenClawRope.y;
+		}
+	}
+	else if (player1POr2P == PLAYER2P) {
+		if (clawRopeState == CHECK_MODE) {
+			clawPosition2P.y += movement2PWhenClawRope.y;
+			clawRopeMovement2P.y += movement2PWhenClawRope.y;//‚±‚ÌƒtƒŒ[ƒ€‚ÅˆÚ“®‚µ‚½—Ê‚ğ•Û‘¶‚µA‚±‚ê‚ªˆê’è‚É‚È‚Á‚½‚çƒ~ƒX‚Æ‚¢‚¤”»’f‚·‚é
+		}
+		else if (clawRopeState == MOVE_MODE) {
+			g_Player2P.y += movement2PWhenClawRope.y;
+		}
+		else if (clawRopeState == SWAP_MODE) {
+			g_Player.y += movement2PWhenClawRope.y;
+		}
+		
+	}
+
+}
+
+//‚©‚¬‚Ã‚ßó‘Ô‚ÌƒvƒŒƒCƒ„[‚Æƒ}ƒbƒv‚Æ‚Ì“–‚½‚è”»’è‚ğs‚¤ŠÖ”
+void CheckCollisionWhenUsingClawRope() {
+
+	if (clawRopeState1P != NOT_USE) {
+		//ƒvƒŒƒCƒ„[‚P‚Ì”»’è
+		for (int repeatCount = 1; repeatCount <= repeatCount1PWhenUsingClawRope; repeatCount++) {
+			//X‚ğˆÚ“®‚·‚é
+			MovePosXWhenClawRope(itIsPlayer1P, clawRopeState1P);
+			//ARRAY‚ğ‰Šú‰»‚·‚é
+			InitCollisionPointWhenClawRope(itIsPlayer1P, clawRopeState1P);
+			//XÀ•W‚Ì“–‚½‚è”»’è‚ğ‚Æ‚é
+			JudgeClawRopeCollisionRL(MapDataSelect, itIsPlayer1P, clawRopeState1P);
+
+			//Y‚ğ•Û‘¶‚·‚é
+			MovePosYWhenClawRope(itIsPlayer1P, clawRopeState1P);
+			//ARRAY‚ğ‰Šú‰»‚·‚é
+			InitCollisionPointWhenClawRope(itIsPlayer1P, clawRopeState1P);
+			//YÀ•W‚Ì“–‚½‚è”»’è‚ğ‚Æ‚é
+
+		}
+
+		//“®‚¢‚½—Ê‚ªˆê’è—Ê‚ğ’´‚¦‚é‚ÆAƒAƒCƒeƒ€ƒ~ƒX‚Æ”»’f‚³‚ê‚é
+		if (clawRopeState1P == CHECK_MODE) {
+			if ((sqrtf(pow((clawRopeMovement1P.x), 2) + pow((clawRopeMovement1P.y), 2))) >= CLAWROPE_RANGE) {
+				clawRopeState1P = NOT_USE;
+				clawRopeMovement1P.x = 0;
+				clawRopeMovement1P.y = 0;
+			}
+		}
+	}
+
+	//ƒvƒŒƒCƒ„[‚Q‚Ì”»’è
+	for (int repeatCount = 1; repeatCount <= repeatCount2PWhenUsingClawRope; repeatCount++) {
+		MovePosXWhenClawRope(itIsPlayer2P, clawRopeState2P);
+		InitCollisionPointWhenClawRope(itIsPlayer2P, clawRopeState2P);
+		JudgeClawRopeCollisionRL(MapDataSelect, itIsPlayer2P, clawRopeState2P);
+		MovePosYWhenClawRope(itIsPlayer2P, clawRopeState2P);
+		InitCollisionPointWhenClawRope(itIsPlayer2P, clawRopeState2P);
+		//“®‚¢‚½—Ê‚ªˆê’è—Ê‚ğ’´‚¦‚é‚ÆAƒAƒCƒeƒ€ƒ~ƒX‚Æ”»’f‚³‚ê‚é
+		if (clawRopeState2P == CHECK_MODE) {
+			if ((sqrtf(pow((clawRopeMovement2P.x), 2) + pow((clawRopeMovement2P.y), 2))) >= CLAWROPE_RANGE) {
+				clawRopeState2P = NOT_USE;
+				clawRopeMovement2P.x = 0;
+				clawRopeMovement2P.y = 0;
+			}
+		}
+	}
+}
+
 //ƒ}ƒbƒv‘I‘ğ‚É‚æ‚Á‚Äƒ}ƒbƒv‚Æ‚Ì“–‚½‚è”»’è(¶‰Ej‚ğ“K‰‚³‚¹‚éŠÖ”
 void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 
@@ -2035,91 +3756,91 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 		if (prevFrameMovement1P < 0) {
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
 				if (MapDataSelect == Stagedesert) {//ƒXƒe[ƒW‚ª»”™‚Ì
-					if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+					if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] +(int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player1PRub = WALL_LEFT;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player1PRub = WALL_LEFT;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+					else if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
 
 					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
-						if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+						if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] +(int)adjustCollision1P +  (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
 							latestCheckPoint1P = checkPointNum;
 							break;	
 						}
 					}
 				}
 				else if (MapDataSelect == StageCity) {//ƒXƒe[ƒW‚ªŠX‚Ì
-					if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+					if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player1PRub = WALL_LEFT;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player1PRub = WALL_LEFT;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+					else if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
 					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
-						if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+						if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
 							latestCheckPoint1P = checkPointNum;
 							break;
 						}
 					}
 				}
 				else if (MapDataSelect == StageForest) {//ƒXƒe[ƒW‚ªX‚Ì
-					if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+					if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player1PRub = WALL_LEFT;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player1PRub = WALL_LEFT;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+					else if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
 					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
-						if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+						if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
 							latestCheckPoint1P = checkPointNum;
 							break;
 						}
@@ -2131,90 +3852,90 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
 
 				if (mapSelectStage == Stagedesert) {//ƒXƒe[ƒW‚ª»”™‚Ì
-					if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+					if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						player1PRub = WALL_RIGHT;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						player1PRub = WALL_RIGHT;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+					else if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
 					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
-						if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+						if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
 							latestCheckPoint1P = checkPointNum;
 							break;
 						}
 					}
 				}
 				else if (mapSelectStage == StageCity) {//ƒXƒe[ƒW‚ªŠX‚Ì
-					if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+					if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						player1PRub = WALL_RIGHT;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						player1PRub = WALL_RIGHT;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+					else if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
 					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
-						if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+						if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
 							latestCheckPoint1P = checkPointNum;
 							break;
 						}
 					}
 				}
 				else if (mapSelectStage == StageForest) {//ƒXƒe[ƒW‚ªX‚Ì
-					if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+					if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						player1PRub = WALL_RIGHT;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						player1PRub = WALL_RIGHT;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
-					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+					else if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer1P);
 					}
 					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
-						if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+						if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
 							latestCheckPoint1P = checkPointNum;
 							break;
 						}
@@ -2229,90 +3950,90 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 			
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
 				if (mapSelectStage == Stagedesert) {//ƒXƒe[ƒW‚ª»”™‚Ì
-					if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+					if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] +(int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player2PRub = WALL_LEFT;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player2PRub = WALL_LEFT;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+					else if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
 					for (int checkPointNum = FIRST_CHECK_POINT;checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
-						if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+						if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
 							latestCheckPoint2P = checkPointNum;
 							break;
 						}
 					}
 				}
 				else if (mapSelectStage == StageCity) {//ƒXƒe[ƒW‚ªŠX‚Ì
-					if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+					if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player2PRub = WALL_LEFT;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player2PRub = WALL_LEFT;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+					else if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
 					for (int checkPointNum = FIRST_CHECK_POINT;checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
-						if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+						if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
 							latestCheckPoint2P = checkPointNum;
 							break;
 						}
 					}
 				}
 				else if (mapSelectStage == StageForest) {//ƒXƒe[ƒW‚ªX‚Ì
-					if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+					if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player2PRub = WALL_LEFT;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player2PRub = WALL_LEFT;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+					else if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
 					for (int checkPointNum = FIRST_CHECK_POINT;checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
-						if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+						if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
 							latestCheckPoint2P = checkPointNum;
 							break;
 						}
@@ -2323,90 +4044,90 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 		else if (prevFrameMovement2P > 0) {
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
 				if (mapSelectStage == Stagedesert) {//ƒXƒe[ƒW‚ª»”™‚Ì
-					if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+					if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						player2PRub = WALL_RIGHT;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						player2PRub = WALL_RIGHT;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+					else if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
 					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
-						if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+						if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
 							latestCheckPoint2P = checkPointNum;
 							break;
 						}
 					}
 				}
 				else if (mapSelectStage == StageCity) {//ƒXƒe[ƒW‚ªŠX‚Ì
-					if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+					if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						player2PRub = WALL_RIGHT;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						player2PRub = WALL_RIGHT;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+					else if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
 					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
-						if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+						if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
 							latestCheckPoint2P = checkPointNum;
 							break;
 						}
 					}
 				}
 				else if (mapSelectStage == StageForest) {//ƒXƒe[ƒW‚ªX‚Ì
-					if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+					if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						player2PRub = WALL_RIGHT;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
+					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						player2PRub = WALL_RIGHT;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
+					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
+					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == DIRT_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
-					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
+					else if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == ACCELERATED_BLOCK) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						InitStateSideCollision(itIsPlayer2P);
 					}
 					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
-						if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
+						if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == checkPointNum) {
 							latestCheckPoint2P = checkPointNum;
 							break;
 						}
@@ -2432,7 +4153,7 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
 						InitStateTopCollision(itIsPlayer1P);
 					}
-					else if (MapData01[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+					else if (MapData01[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
 						InitStateTopCollision(itIsPlayer1P);
 					}
@@ -2460,7 +4181,7 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
 						InitStateTopCollision(itIsPlayer1P);
 					}
-					else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+					else if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
 						InitStateTopCollision(itIsPlayer1P);
 					}
@@ -2488,7 +4209,7 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
 						InitStateTopCollision(itIsPlayer1P);
 					}
-					else if (MapData03[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
+					else if (MapData03[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_LEFT) {
 						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
 						InitStateTopCollision(itIsPlayer1P);
 					}
