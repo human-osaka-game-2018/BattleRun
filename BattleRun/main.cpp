@@ -25,7 +25,7 @@ LPD3DXFONT g_pFont[FONTMAX];//DXフォント
 //---------------------------------------
 
 RECT debugFont;
-int scene = TEAMLOGO_SCENE;
+int scene = TITLE_SCENE;
 int MapDataSelect;//マップを選ぶのに使うための変数
 int MapData01[MAP_01_HEIGHT][MAP_01_WIDTH];//砂漠
 int MapData02[MAP_02_HEIGHT][MAP_02_WIDTH];//街
@@ -85,7 +85,7 @@ void ReadTexture(void) {
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"Title_BKG_Road.png",
-		&g_pTexture[TITLE_ROAD_TEX]);
+		&g_pTexture[TITLE_RULU_ROAD_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
@@ -99,13 +99,18 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"CharRun.png",
-		&g_pTexture[TITLE_CHAR_RUN_TEX]);
+		"texture/CharRun1P.png",
+		&g_pTexture[TITLE_RULU_CHAR1P_RUN_TEX]);
 
-	//D3DXCreateTextureFromFile(
-	//	g_pD3Device,
-	//	"texture/title_logo.png",
-	//	&g_pTexture[TITLE_LOGO_TEX]);
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/CharRun2P.png",
+		&g_pTexture[TITLE_RULU_CHAR2P_RUN_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/title_logo.png",
+		&g_pTexture[TITLE_LOGO_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
@@ -114,7 +119,7 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/RuleSelectBKG.jpg",
+		"texture/RuleSelectBKG.png",
 		&g_pTexture[RuleSelect_BKG_TEX]);
 
 	D3DXCreateTextureFromFile(
@@ -149,13 +154,38 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/game_BKG.png",
-		&g_pTexture[GAME_BKG_TEX]);
+		"texture/player.png",
+		&g_pTexture[GAME_PLAYER_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/player.png",
-		&g_pTexture[GAME_PLAYER_TEX]);
+		"texture/player2.png",
+		&g_pTexture[GAME_PLAYER2_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/player1Rub.png",
+		&g_pTexture[PLAYER_RUB_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/player2Rub.png",
+		&g_pTexture[PLAYER2_RUB_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/game_BKG_noon.png",
+		&g_pTexture[GAME_BKG_NOON_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/game_BKG_evening.png",
+		&g_pTexture[GAME_BKG_EVENING_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
+		"texture/game_BKG_nigiht.png",
+		&g_pTexture[GAME_BKG_NIGHT_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
@@ -174,33 +204,33 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/sabaku.jpg",
-		&g_pTexture[StageSelect_BKG_SABAKU_TEX]);
+		"texture/noon.png",
+		&g_pTexture[StageSelect_BKG_NOON_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/selectsabaku.png",
-		&g_pTexture[StageSelect_SABAKU_TEX]);
+		"texture/selectNoon.png",
+		&g_pTexture[StageSelect_NOON_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/mori.png",
-		&g_pTexture[StageSelect_BKG_MORI_TEX]);
+		"texture/night.png",
+		&g_pTexture[StageSelect_BKG_NIGHT_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/selectmori.png",
-		&g_pTexture[StageSelect_MORI_TEX]);
+		"texture/SelsectNight.png",
+		&g_pTexture[StageSelect_NIGHT_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/mati.jpg",
-		&g_pTexture[StageSelect_BKG_MATI_TEX]);
+		"texture/evening.png",
+		&g_pTexture[StageSelect_BKG_EVENING_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/selectmati.png",
-		&g_pTexture[StageSelect_MATI_TEX]);
+		"texture/selectEvening.png",
+		&g_pTexture[StageSelect_EVENING_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
@@ -224,12 +254,12 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"Result1PWIN.png",
+		"texture/Result1PWIN.png",
 		&g_pTexture[RESULT_1P_BKG_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"Result2PWIN.png",
+		"texture/Result2PWIN.png",
 		&g_pTexture[RESULT_2P_BKG_TEX]);
 
 	D3DXCreateTextureFromFile(
@@ -279,7 +309,7 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/itembox.png",
+		"texture/item.png",
 		&g_pTexture[ITEMBOX_TEX]);
 
 	D3DXCreateTextureFromFile(
@@ -359,12 +389,12 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/jumpup.jpg",
+		"texture/jumpup.png",
 		&g_pTexture[JUMPUP_ICON_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/speedup.jpg",
+		"texture/speedup.png",
 		&g_pTexture[SPEEDUP_ICON_TEX]);
 
 	D3DXCreateTextureFromFile(

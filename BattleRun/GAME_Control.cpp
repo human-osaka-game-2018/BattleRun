@@ -11,7 +11,7 @@
 #define SYOSOKUDO 20
 #define KASOKUDO 2
 #define MOVEMENT_STAGE_X 15
-#define TRAMPOLINE_SYOSOKUDO 30
+#define TRAMPOLINE_SYOSOKUDO 35
 #define PLAYER_RUN_TIPE2_FRAME (FRAME*1)
 #define PLAYER_RUN_TIPE3_FRAME (FRAME*2)
 #define ACCELERATED_EFFECT_FRAME (FRAME*3)
@@ -63,8 +63,8 @@ static bool speedSlows1P;//スピードがダウンしているかどうかフラグ
 static bool speedSlows2P;//スピードがダウンしているかどうかフラグ
 static bool speedRises1P;//スピードがアップしているかどうかフラグ
 static bool speedRises2P;//スピードがアップしているかどうかフラグ
-static int player1PRub;//プレイヤー1が壁にこすり落ちながら落ちるかどうかフラグ
-static int player2PRub;//プレイヤー2が壁にこすり落ちながら落ちるかどうかフラグ
+int player1PRub;//プレイヤー1が壁にこすり落ちながら落ちるかどうかフラグ
+int player2PRub;//プレイヤー2が壁にこすり落ちながら落ちるかどうかフラグ
 static int accelerationcount1PRight;
 static int accelerationcount1PLeft;
 static int accelerationcount2PRight;
@@ -198,10 +198,10 @@ int ManholeHitCount2P;
 OBJECT_STATE g_Player;
 OBJECT_STATE g_Player2P;
 OBJECT_STATE g_CountDownNum;
-OBJECT_STATE g_FirstItem1P = { 280.f,10.f,50.f,50.f };
-OBJECT_STATE g_SecondItem1P = { 330.f,10.f,50.f,50.f };
-OBJECT_STATE g_FirstItem2P = { 830.f,10.f,50.f,50.f };
-OBJECT_STATE g_SecondItem2P = { 880.f,10.f,50.f,50.f };
+OBJECT_STATE g_FirstItem1P = { 337.f,15.f,40.f,40.f };
+OBJECT_STATE g_SecondItem1P = { 380.f,15.f,40.f,40.f };
+OBJECT_STATE g_FirstItem2P = { 887.f,15.f,40.f,40.f };
+OBJECT_STATE g_SecondItem2P = { 930.f,15.f,40.f,40.f };
 OBJECT_STATE g_Trampoline;
 OBJECT_STATE g_TrampolineLeft;
 OBJECT_STATE g_Manhole;
@@ -408,7 +408,7 @@ void InitState() {
 
 		g_Player = { 75.f,30.f,60.f,70.f };
 		g_Player2P = { 75.f,30.f,60.f,70.f };
-		g_CountDownNum = { 600.f,300.f,200.f,200.f };
+		g_CountDownNum = { 700.f,300.f,200.f,200.f };
 		g_Trampoline = { 0.f,0.f,96.f,64.f };
 		g_TrampolineLeft = { 0.f,0.f,32.f,96.f };
 		g_Manhole = { 0.f,0.f,32.f,64.f };
@@ -439,15 +439,15 @@ void InitState() {
 			checkPoint[hoge].y = 0;
 		}
 		//マップが変わっても適応できる
-		if (MapDataSelect == Stagedesert) {
+		if (MapDataSelect == Stagenoon) {
 			MapSelectedHEIGHT = MAP_01_HEIGHT;
 			MapSelectedWIDTH = MAP_01_WIDTH;
 		}
-		if (MapDataSelect == StageCity) {
+		if (MapDataSelect == Stageevening) {
 			MapSelectedHEIGHT = MAP_02_HEIGHT;
 			MapSelectedWIDTH = MAP_02_WIDTH;
 		}
-		if (MapDataSelect == StageForest) {
+		if (MapDataSelect == Stagenight) {
 			MapSelectedHEIGHT = MAP_03_HEIGHT;
 			MapSelectedWIDTH = MAP_03_WIDTH;
 		}
@@ -455,7 +455,7 @@ void InitState() {
 		for (int j = 0; j < MapSelectedHEIGHT; j++) {
 			for (int i = 0; i < MapSelectedWIDTH; i++) {
 
-				if (MapDataSelect == Stagedesert) {
+				if (MapDataSelect == Stagenoon) {
 					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
 						if (MapData01[j][i] == checkPointNum) {
 							checkPoint[checkPointNum - FIRST_CHECK_POINT].x = FIELD_LEFT + CELL_SIZE * i;
@@ -463,7 +463,7 @@ void InitState() {
 						}
 					}
 				}
-				else if (MapDataSelect == StageCity) {
+				else if (MapDataSelect == Stageevening) {
 					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
 						if (MapData02[j][i] == checkPointNum) {
 							checkPoint[checkPointNum - FIRST_CHECK_POINT].x = FIELD_LEFT + CELL_SIZE * i;
@@ -471,7 +471,7 @@ void InitState() {
 						}
 					}
 				}
-				else if (MapDataSelect == StageForest) {
+				else if (MapDataSelect == Stagenight) {
 					for (int checkPointNum = FIRST_CHECK_POINT; checkPointNum < FINAL_CHECK_POINT; checkPointNum++) {
 						if (MapData03[j][i] == checkPointNum) {
 							checkPoint[checkPointNum - FIRST_CHECK_POINT].x = FIELD_LEFT + CELL_SIZE * i;
@@ -1003,7 +1003,7 @@ void BarrierEffect(bool* BarrierFlag, int* BarrierCount, float* Barriertu) {
 }
 
 //プレイヤーのTUTVをいじる関数
-void PlayerMovement(int PlayerMoveCount,float *Playertutv,bool* FettersFlag,float* Fetterstutv) {
+void PlayerMovement(int PlayerMoveCount,float *Playertutv,bool* FettersFlag,float* Fetterstutv,int PlayerRub) {
 
 	switch (PlayerMoveCount) {
 	case 0:
@@ -1050,6 +1050,10 @@ void PlayerMovement(int PlayerMoveCount,float *Playertutv,bool* FettersFlag,floa
 		*Playertutv = 600.f;
 		*Fetterstutv = 704.f;
 		break;
+	}
+
+	if (PlayerRub) {
+		*Playertutv = 0.f;
 	}
 }
 
@@ -1255,8 +1259,8 @@ void ItemEffectRelease(void) {
 		FettersFlag2P = false;
 	}
 
-	PlayerMovement(PlayerMoveCount1P, &MoveImage, &FettersFlag1P, &Fetterstu1P);
-	PlayerMovement(PlayerMoveCount2P, &MoveImage2P, &FettersFlag2P, &Fetterstu2P);
+	PlayerMovement(PlayerMoveCount1P, &MoveImage, &FettersFlag1P, &Fetterstu1P,player1PRub);
+	PlayerMovement(PlayerMoveCount2P, &MoveImage2P, &FettersFlag2P, &Fetterstu2P,player2PRub);
 
 	BeamEffect(&BeamFlag1P, &Beamcount1P, &Beamtutv1P);
 	BeamEffect(&BeamFlag2P, &Beamcount2P, &Beamtutv2P);
@@ -1280,7 +1284,7 @@ void ItemEffectRelease(void) {
 		FireBall_HEIGHT1P = (FireBallStateY1P + movementStageY) / CELL_SIZE;
 		switch (MapDataSelect)
 		{
-		case Stagedesert:
+		case Stagenoon:
 			if (MapData01[FireBall_HEIGHT1P][FireBall_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
 			{
 				FireBallFlagEfect1P = true;
@@ -1289,7 +1293,7 @@ void ItemEffectRelease(void) {
 				FireBallState1P = 100;
 			}
 			break;
-		case StageCity:
+		case Stageevening:
 			if (MapData02[FireBall_HEIGHT1P][FireBall_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
 			{
 				FireBallFlagEfect1P = true;
@@ -1298,7 +1302,7 @@ void ItemEffectRelease(void) {
 				FireBallState1P = 100;
 			}
 			break;
-		case StageForest:
+		case Stagenight:
 			if (MapData03[FireBall_HEIGHT1P][FireBall_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
 			{
 				FireBallFlagEfect1P = true;
@@ -1318,7 +1322,7 @@ void ItemEffectRelease(void) {
 		FireBall_HEIGHT2P = (FireBallStateY2P + movementStageY) / CELL_SIZE;
 		switch (MapDataSelect)
 		{
-		case Stagedesert:
+		case Stagenoon:
 			if (MapData01[FireBall_HEIGHT2P][FireBall_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
 			{
 				FireBallFlagEfect2P = true;
@@ -1327,7 +1331,7 @@ void ItemEffectRelease(void) {
 				FireBallState2P = 100;
 			}
 			break;
-			case StageCity:
+			case Stageevening:
 			if (MapData02[FireBall_HEIGHT2P][FireBall_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
 			{
 				FireBallFlagEfect2P = true;
@@ -1336,7 +1340,7 @@ void ItemEffectRelease(void) {
 				FireBallState2P = 100;
 			}
 			break;
-		case StageForest:
+		case Stagenight:
 			if (MapData03[FireBall_HEIGHT2P][FireBall_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
 			{
 				FireBallFlagEfect2P = true;
@@ -2223,28 +2227,30 @@ void CreatePerDecision(void) {
 		bool isSuccess = soundsManager.Start(_T("gameTrampoline2"));
 	}
 
-	//トランポリン(右側)の処理
-	if (PlayerGimmickDecision(trampolineleftcount, trampolineleft, g_TrampolineLeft, g_Player)) {
-		time1P = 0;
-		syosokudo1P = TRAMPOLINE_SYOSOKUDO;
-		bool isSuccess = soundsManager.Start(_T("gameTrampoline"));
-	}
-	if (PlayerGimmickDecision(trampolineleftcount, trampolineleft, g_TrampolineLeft, g_Player2P)) {
-		time2P = 0;
-		syosokudo2P = TRAMPOLINE_SYOSOKUDO;
-		bool isSuccess = soundsManager.Start(_T("gameTrampoline2"));
-	}
+	////トランポリン(右側)の処理
+	//if (PlayerGimmickDecision(trampolineleftcount, trampolineleft, g_TrampolineLeft, g_Player)) {
+	//	time1P = 0;
+	//	syosokudo1P = TRAMPOLINE_SYOSOKUDO;
+	//	bool isSuccess = soundsManager.Start(_T("gameTrampoline"));
+	//}
+	//if (PlayerGimmickDecision(trampolineleftcount, trampolineleft, g_TrampolineLeft, g_Player2P)) {
+	//	time2P = 0;
+	//	syosokudo2P = TRAMPOLINE_SYOSOKUDO;
+	//	bool isSuccess = soundsManager.Start(_T("gameTrampoline2"));
+	//}
 
 	//アイテムボックスの処理
 	if (ItemDecision(itemboxcount, itembox, g_Itembox, g_Player)) {
 
 		bool isSuccess = soundsManager.Start(_T("itemGetSE"));
 		if (FirstItem1P && !SecondItem1P) {
-			SecondItem1P = (rand() % (ITEM_MAX - 1)) + 1;
+			//SecondItem1P = (rand() % (ITEM_MAX - 1)) + 1;
+			SecondItem1P = BARRIER;
 		}
 
 		if (!FirstItem1P) {
-			FirstItem1P = (rand() % (ITEM_MAX - 1)) + 1;
+			//FirstItem1P = (rand() % (ITEM_MAX - 1)) + 1;
+			FirstItem1P = BARRIER;
 		}
 	}
 
@@ -2252,11 +2258,13 @@ void CreatePerDecision(void) {
 
 		bool isSuccess = soundsManager.Start(_T("itemGetSE"));
 		if (FirstItem2P && !SecondItem2P) {
-			SecondItem2P = (rand() % (ITEM_MAX - 1)) + 1;
+			//SecondItem2P = (rand() % (ITEM_MAX - 1)) + 1;
+			SecondItem2P = BARRIER;
 		}
 		
 		if (!FirstItem2P) {
-			FirstItem2P = (rand() % (ITEM_MAX - 1)) + 1;
+			//FirstItem2P = (rand() % (ITEM_MAX - 1)) + 1;
+			FirstItem2P = BARRIER;
 		}
 	}
 
@@ -2337,7 +2345,7 @@ void CreatePerDecision(void) {
 //プレイヤーが左の壁をずるずると降りているかどうかチェックする関数
 BOOL CheckPlayerRubLeftMap02(float *arrayToCheckLeftCollision, OBJECT_STATE g_Player, int selectedStage) {
 	for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-		if (selectedStage == Stagedesert) {
+		if (selectedStage == Stagenoon) {
 			if (MapData01[((int)arrayToCheckLeftCollision[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)g_Player.x - 1 + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 				return true;
 			}
@@ -2345,7 +2353,7 @@ BOOL CheckPlayerRubLeftMap02(float *arrayToCheckLeftCollision, OBJECT_STATE g_Pl
 				return true;
 			}
 		}
-		else if (selectedStage == StageCity) {
+		else if (selectedStage == Stageevening) {
 			if (MapData02[((int)arrayToCheckLeftCollision[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)g_Player.x - 1 + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 				return true;
 			}
@@ -2353,7 +2361,7 @@ BOOL CheckPlayerRubLeftMap02(float *arrayToCheckLeftCollision, OBJECT_STATE g_Pl
 				return true;
 			}
 		}
-		else if (selectedStage == StageForest) {
+		else if (selectedStage == Stagenight) {
 			if (MapData03[((int)arrayToCheckLeftCollision[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)g_Player.x - 1 + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 				return true;
 			}
@@ -2368,7 +2376,7 @@ BOOL CheckPlayerRubLeftMap02(float *arrayToCheckLeftCollision, OBJECT_STATE g_Pl
 //プレイヤーが右の壁をずるずると降りているかどうかチェックする関数
 BOOL CheckPlayerRubRightMap02(float *arrayToCheckLeftCollision , OBJECT_STATE g_Player , int selectedStage) {
 	for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-		if (selectedStage == Stagedesert) {
+		if (selectedStage == Stagenoon) {
 			if (MapData01[((int)arrayToCheckLeftCollision[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)g_Player.x + (int)g_Player.scale_x + 1 + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 				return true;
 			}
@@ -2376,7 +2384,7 @@ BOOL CheckPlayerRubRightMap02(float *arrayToCheckLeftCollision , OBJECT_STATE g_
 				return true;
 			}
 		}
-		else if (selectedStage == StageCity) {
+		else if (selectedStage == Stageevening) {
 			if (MapData02[((int)arrayToCheckLeftCollision[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)g_Player.x + (int)g_Player.scale_x + 1 + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 				return true;
 			}
@@ -2384,7 +2392,7 @@ BOOL CheckPlayerRubRightMap02(float *arrayToCheckLeftCollision , OBJECT_STATE g_
 				return true;
 			}
 		}
-		else if (selectedStage == StageForest) {
+		else if (selectedStage == Stagenight) {
 			if (MapData03[((int)arrayToCheckLeftCollision[collisionPoint] + (int)movementStageY) / CELL_SIZE][((int)g_Player.x + (int)g_Player.scale_x + 1 + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 				return true;
 			}
@@ -2799,7 +2807,7 @@ void JudgeClawRopeCollisionRL(int mapSelectStage, int player1POr2P,int clawRopeS
 		//プレイヤーの左の方向にブロックがあるとき
 		if (movement1PWhenClawRope.x < 0) {
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-				if (MapDataSelect == Stagedesert) {//ステージが砂漠の時
+				if (MapDataSelect == Stagenoon) {//ステージが砂漠の時
 					if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
 						if (clawRopeState == MOVE_MODE) {
@@ -2834,7 +2842,7 @@ void JudgeClawRopeCollisionRL(int mapSelectStage, int player1POr2P,int clawRopeS
 					}
 
 				}
-				else if (MapDataSelect == StageCity) {//ステージが街の時
+				else if (MapDataSelect == Stageevening) {//ステージが街の時
 					if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
 						if (clawRopeState == MOVE_MODE) {
@@ -2869,7 +2877,7 @@ void JudgeClawRopeCollisionRL(int mapSelectStage, int player1POr2P,int clawRopeS
 					}
 					
 				}
-				else if (MapDataSelect == StageForest) {//ステージが森の時
+				else if (MapDataSelect == Stagenight) {//ステージが森の時
 					if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						DoWhenLeftCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
 						if (clawRopeState == MOVE_MODE) {
@@ -2909,7 +2917,7 @@ void JudgeClawRopeCollisionRL(int mapSelectStage, int player1POr2P,int clawRopeS
 		else if (movement1PWhenClawRope.x > 0) {
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
 
-				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+				if (mapSelectStage == Stagenoon) {//ステージが砂漠の時
 					if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
 						if (clawRopeState == MOVE_MODE) {
@@ -2944,7 +2952,7 @@ void JudgeClawRopeCollisionRL(int mapSelectStage, int player1POr2P,int clawRopeS
 					}
 					
 				}
-				else if (mapSelectStage == StageCity) {//ステージが街の時
+				else if (mapSelectStage == Stageevening) {//ステージが街の時
 					if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
 						if (clawRopeState == MOVE_MODE) {
@@ -2979,7 +2987,7 @@ void JudgeClawRopeCollisionRL(int mapSelectStage, int player1POr2P,int clawRopeS
 						break;
 					}
 				}
-				else if (mapSelectStage == StageForest) {//ステージが森の時
+				else if (mapSelectStage == Stagenight) {//ステージが森の時
 					if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						DoWhenRighttCollideByClawRoap(itIsPlayer1P, clawRopeState1P);
 						if (clawRopeState == MOVE_MODE) {
@@ -3021,7 +3029,7 @@ void JudgeClawRopeCollisionRL(int mapSelectStage, int player1POr2P,int clawRopeS
 		if (movement2PWhenClawRope.x < 0) {
 
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+				if (mapSelectStage == Stagenoon) {//ステージが砂漠の時
 					if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
 						if (clawRopeState == MOVE_MODE) {
@@ -3056,7 +3064,7 @@ void JudgeClawRopeCollisionRL(int mapSelectStage, int player1POr2P,int clawRopeS
 					}
 					
 				}
-				else if (mapSelectStage == StageCity) {//ステージが街の時
+				else if (mapSelectStage == Stageevening) {//ステージが街の時
 					if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
 						if (clawRopeState == MOVE_MODE) {
@@ -3091,7 +3099,7 @@ void JudgeClawRopeCollisionRL(int mapSelectStage, int player1POr2P,int clawRopeS
 					}
 
 				}
-				else if (mapSelectStage == StageForest) {//ステージが森の時
+				else if (mapSelectStage == Stagenight) {//ステージが森の時
 					if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						DoWhenLeftCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
 						if (clawRopeState == MOVE_MODE) {
@@ -3130,7 +3138,7 @@ void JudgeClawRopeCollisionRL(int mapSelectStage, int player1POr2P,int clawRopeS
 		}//プレイヤーの右の方向にブロックがあるとき
 		else if (movement2PWhenClawRope.x > 0) {
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+				if (mapSelectStage == Stagenoon) {//ステージが砂漠の時
 					if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
 						if (clawRopeState == MOVE_MODE) {
@@ -3164,7 +3172,7 @@ void JudgeClawRopeCollisionRL(int mapSelectStage, int player1POr2P,int clawRopeS
 						break;
 					}
 				}
-				else if (mapSelectStage == StageCity) {//ステージが街の時
+				else if (mapSelectStage == Stageevening) {//ステージが街の時
 					if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
 						if (clawRopeState == MOVE_MODE) {
@@ -3198,7 +3206,7 @@ void JudgeClawRopeCollisionRL(int mapSelectStage, int player1POr2P,int clawRopeS
 						break;
 					}
 				}
-				else if (mapSelectStage == StageForest) {//ステージが森の時
+				else if (mapSelectStage == Stagenight) {//ステージが森の時
 					if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						DoWhenRighttCollideByClawRoap(itIsPlayer2P, clawRopeState2P);
 						if (clawRopeState == MOVE_MODE) {
@@ -3755,7 +3763,7 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 		//プレイヤーの左の方向にブロックがあるとき
 		if (prevFrameMovement1P < 0) {
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-				if (MapDataSelect == Stagedesert) {//ステージが砂漠の時
+				if (MapDataSelect == Stagenoon) {//ステージが砂漠の時
 					if (MapData01[((int)arrayToCheckLeftCollision1P[collisionPoint] +(int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player1PRub = WALL_LEFT;
@@ -3786,7 +3794,7 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (MapDataSelect == StageCity) {//ステージが街の時
+				else if (MapDataSelect == Stageevening) {//ステージが街の時
 					if (MapData02[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player1PRub = WALL_LEFT;
@@ -3816,7 +3824,7 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (MapDataSelect == StageForest) {//ステージが森の時
+				else if (MapDataSelect == Stagenight) {//ステージが森の時
 					if (MapData03[((int)arrayToCheckLeftCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player.x = (((int)arrayToCheckLeftCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player1PRub = WALL_LEFT;
@@ -3851,7 +3859,7 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 		else if (prevFrameMovement1P > 0) {
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
 
-				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+				if (mapSelectStage == Stagenoon) {//ステージが砂漠の時
 					if (MapData01[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						player1PRub = WALL_RIGHT;
@@ -3881,7 +3889,7 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (mapSelectStage == StageCity) {//ステージが街の時
+				else if (mapSelectStage == Stageevening) {//ステージが街の時
 					if (MapData02[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						player1PRub = WALL_RIGHT;
@@ -3911,7 +3919,7 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (mapSelectStage == StageForest) {//ステージが森の時
+				else if (mapSelectStage == Stagenight) {//ステージが森の時
 					if (MapData03[((int)arrayToCheckRightCollision1P[collisionPoint] + (int)adjustCollision1P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player.x = (((int)arrayToCheckRightCollision1P[5] + (int)sabun1P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_x - (int)movementStageX;
 						player1PRub = WALL_RIGHT;
@@ -3949,7 +3957,7 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 		if (prevFrameMovement2P < 0) {
 			
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+				if (mapSelectStage == Stagenoon) {//ステージが砂漠の時
 					if (MapData01[((int)arrayToCheckLeftCollision2P[collisionPoint] +(int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player2PRub = WALL_LEFT;
@@ -3979,7 +3987,7 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (mapSelectStage == StageCity) {//ステージが街の時
+				else if (mapSelectStage == Stageevening) {//ステージが街の時
 					if (MapData02[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player2PRub = WALL_LEFT;
@@ -4009,7 +4017,7 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (mapSelectStage == StageForest) {//ステージが森の時
+				else if (mapSelectStage == Stagenight) {//ステージが森の時
 					if (MapData03[((int)arrayToCheckLeftCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player2P.x = (((int)arrayToCheckLeftCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageX;
 						player2PRub = WALL_LEFT;
@@ -4043,7 +4051,7 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 		}//プレイヤーの右の方向にブロックがあるとき
 		else if (prevFrameMovement2P > 0) {
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+				if (mapSelectStage == Stagenoon) {//ステージが砂漠の時
 					if (MapData01[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						player2PRub = WALL_RIGHT;
@@ -4073,7 +4081,7 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (mapSelectStage == StageCity) {//ステージが街の時
+				else if (mapSelectStage == Stageevening) {//ステージが街の時
 					if (MapData02[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						player2PRub = WALL_RIGHT;
@@ -4103,7 +4111,7 @@ void AdaptPlayerCollisionRLToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (mapSelectStage == StageForest) {//ステージが森の時
+				else if (mapSelectStage == Stagenight) {//ステージが森の時
 					if (MapData03[((int)arrayToCheckRightCollision2P[collisionPoint] + (int)adjustCollision2P + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE] == WALL_BLOCK_RIGHT) {
 						g_Player2P.x = (((int)arrayToCheckRightCollision2P[5] + (int)sabun2P.x + (int)movementStageX) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_x - (int)movementStageX;
 						player2PRub = WALL_RIGHT;
@@ -4144,7 +4152,7 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 		//プレイヤーの上の方向にブロックがあるとき
 		if (gravity1P > 0) {
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+				if (mapSelectStage == Stagenoon) {//ステージが砂漠の時
 					if (MapData01[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
 						InitStateTopCollision(itIsPlayer1P);
@@ -4172,7 +4180,7 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (mapSelectStage == StageCity) {//ステージが街の時
+				else if (mapSelectStage == Stageevening) {//ステージが街の時
 					if (MapData02[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
 						InitStateTopCollision(itIsPlayer1P);
@@ -4200,7 +4208,7 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (mapSelectStage == StageForest) {//ステージが森の時
+				else if (mapSelectStage == Stagenight) {//ステージが森の時
 					if (MapData03[((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player.y = (((int)arrayToCheckTopCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
 						InitStateTopCollision(itIsPlayer1P);
@@ -4232,7 +4240,7 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 		}//プレイヤーの下の方向にブロックがあるとき
 		else if (gravity1P < 0) {
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+				if (mapSelectStage == Stagenoon) {//ステージが砂漠の時
 					if (MapData01[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
 						InitStateBottomCollision(itIsPlayer1P);
@@ -4266,7 +4274,7 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (mapSelectStage == StageCity) {//ステージが街の時
+				else if (mapSelectStage == Stageevening) {//ステージが街の時
 					if (MapData02[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
 						InitStateBottomCollision(itIsPlayer1P);
@@ -4300,7 +4308,7 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (mapSelectStage == StageForest) {//ステージが森の時
+				else if (mapSelectStage == Stagenight) {//ステージが森の時
 					if (MapData03[((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision1P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player.y = (((int)arrayToCheckBottomCollision1P[5] + (int)sabun1P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player.scale_y - (int)movementStageY;
 						InitStateBottomCollision(itIsPlayer1P);
@@ -4340,7 +4348,7 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 	else if (player1POr2P == PLAYER2P) {
 		if (gravity2P > 0) {
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+				if (mapSelectStage == Stagenoon) {//ステージが砂漠の時
 					if (MapData01[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
 						InitStateTopCollision(itIsPlayer2P);
@@ -4368,7 +4376,7 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (mapSelectStage == StageCity) {//ステージが街の時
+				else if (mapSelectStage == Stageevening) {//ステージが街の時
 					if (MapData02[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
 						InitStateTopCollision(itIsPlayer2P);
@@ -4396,7 +4404,7 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (mapSelectStage == StageForest) {//ステージが森の時
+				else if (mapSelectStage == Stagenight) {//ステージが森の時
 					if (MapData03[((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckTopCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player2P.y = (((int)arrayToCheckTopCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE + CELL_SIZE - (int)movementStageY;
 						InitStateTopCollision(itIsPlayer2P);
@@ -4428,7 +4436,7 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 		}//プレイヤーの下の方向にブロックがあるとき
 		else if (gravity2P < 0) {
 			for (int collisionPoint = 0; collisionPoint < 5; collisionPoint++) {
-				if (mapSelectStage == Stagedesert) {//ステージが砂漠の時
+				if (mapSelectStage == Stagenoon) {//ステージが砂漠の時
 					if (MapData01[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
 						InitStateBottomCollision(itIsPlayer2P);
@@ -4462,7 +4470,7 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (mapSelectStage == StageCity) {//ステージが街の時
+				else if (mapSelectStage == Stageevening) {//ステージが街の時
 					if (MapData02[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
 						InitStateBottomCollision(itIsPlayer2P);
@@ -4496,7 +4504,7 @@ void AdaptPlayerCollisionTBToMap(int mapSelectStage, int player1POr2P) {
 						}
 					}
 				}
-				else if (mapSelectStage == StageForest) {//ステージが森の時
+				else if (mapSelectStage == Stagenight) {//ステージが森の時
 					if (MapData03[((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE][((int)arrayToCheckBottomCollision2P[collisionPoint] + (int)movementStageX) / CELL_SIZE] == GROUND_BLOCK) {
 						g_Player2P.y = (((int)arrayToCheckBottomCollision2P[5] + (int)sabun2P.y + (int)movementStageY) / CELL_SIZE) * CELL_SIZE - 1 - g_Player2P.scale_y - (int)movementStageY;
 						InitStateBottomCollision(itIsPlayer2P);
@@ -4674,7 +4682,7 @@ void FinishGameOperation() {
 					ResultWinner = Result1PWIN;
 					winCount1P = 0;
 					winCount2P = 0;
-					StageSelect = stageSelectdesert;
+					StageSelect = stageSelectnoon;
 					RuleSelect = RuleSelectRule;
 					scene = RESULT_SCENE;
 				}
@@ -4683,13 +4691,13 @@ void FinishGameOperation() {
 					ResultWinner = Result2PWIN;
 					winCount1P = 0;
 					winCount2P = 0;
-					StageSelect = stageSelectdesert;
+					StageSelect = stageSelectnoon;
 					RuleSelect = RuleSelectRule;
 					scene = RESULT_SCENE;
 				}
 				if (winCount1P == 1 || winCount2P == 1)
 				{
-					StageSelect = stageSelectdesert;
+					StageSelect = stageSelectnoon;
 					RuleSelect = RuleSelectRule;
 					scene = STAGESELECT_SCENE;
 				}

@@ -108,6 +108,8 @@ extern float MoveImage;//プレイヤー1のTU,TVをいじるための変数
 extern float MoveImage2P;//プレイヤー２のTU,TVをいじるための変数
 extern int PlayerMode1P;//プレイヤー１が左右どちらを向いているかの変数
 extern int PlayerMode2P;//プレイヤー２が左右どちらを向いているかの変数
+extern int player1PRub;
+extern int player2PRub;
 extern float MoveImage;
 extern float MoveImage2;
 extern float Lefttu1P;

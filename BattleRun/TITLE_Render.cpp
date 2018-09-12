@@ -1,20 +1,9 @@
 #include"main.h"
 #include"TITLE_Control.h"
 #include"TITLE_Render.h"
-bool GimmickDamage = true;
-
-bool jflag = false;
 
 TITLE_PLAYER_STATE g_Player = { 200,650,120,190 };
-
-float tu1 = 0.06;
-float tv1 = 0;
-float tu2 = 0.12;
-float tv2 = 0;
-float tu3 = 0.12;
-float tv3 = 0.08;
-float tu4 = 0.06;
-float tv4 = 0.08;
+TITLE_PLAYER_STATE g_Player2P = { 130,650,120,190 };
 
 int Title1BKGX1 = 0;
 int	Title1BKGX2 = 800;
@@ -31,18 +20,17 @@ int Title3BKGX2 = 2400;
 int Title3BKGX3 = 2400;
 int Title3BKGX4 = 1600;
 
-int TitleGIMMICKX1 = 4000;
-int TitleGIMMICKX2 = 4120;
-int TitleGIMMICKX3 = 4120;
-int TitleGIMMICKX4 = 4000;
-
 int TitleScrollSpeed = 20;
 void TitleRender(void)
 {
-	//if (jflag == true)
-	//{
-	//
-	//}
+	static float tu1 = 0.06;
+	static float tv1 = 0;
+	static float tu2 = 0.12;
+	static float tv2 = 0;
+	static float tu3 = 0.12;
+	static float tv3 = 0.08;
+	static float tu4 = 0.06;
+	static float tv4 = 0.08;
 	static int RunCount = 0;
 	static int RunCountLoop = 0;
 	RunCount++;
@@ -64,7 +52,13 @@ void TitleRender(void)
 		RunCountLoop = 0;
 	}
 
-
+	CUSTOMVERTEX vertexTitleBKGLogo[4]
+	{
+		{ -100,   -100, 1.f,1.f, titleBottonsColor1, 0.f, 0.f },
+	{ 1600,  -100, 1.f,1.f, titleBottonsColor2, 1.f, 0.f },
+	{ 1600, 850, 1.f,1.f, titleBottonsColor3, 1.f, 1.f },
+	{ -100,  850, 1.f,1.f, titleBottonsColor4, 0.f, 1.f }
+	};
 	CUSTOMVERTEX vertexTitleBKGRoad[4]
 	{
 		{ 0,   0, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
@@ -93,21 +87,19 @@ void TitleRender(void)
 	{ Title3BKGX3,   900, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
 	{ Title3BKGX4,   900, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
-	if (GimmickDamage == true)
-	{
-		Title1BKGX1 -= TitleScrollSpeed;
-		Title1BKGX2 -= TitleScrollSpeed;
-		Title1BKGX3 -= TitleScrollSpeed;
-		Title1BKGX4 -= TitleScrollSpeed;
-		Title2BKGX1 -= TitleScrollSpeed;
-		Title2BKGX2 -= TitleScrollSpeed;
-		Title2BKGX3 -= TitleScrollSpeed;
-		Title2BKGX4 -= TitleScrollSpeed;
-		Title3BKGX1 -= TitleScrollSpeed;
-		Title3BKGX2 -= TitleScrollSpeed;
-		Title3BKGX3 -= TitleScrollSpeed;
-		Title3BKGX4 -= TitleScrollSpeed;
-	}
+
+	Title1BKGX1 -= TitleScrollSpeed;
+	Title1BKGX2 -= TitleScrollSpeed;
+	Title1BKGX3 -= TitleScrollSpeed;
+	Title1BKGX4 -= TitleScrollSpeed;
+	Title2BKGX1 -= TitleScrollSpeed;
+	Title2BKGX2 -= TitleScrollSpeed;
+	Title2BKGX3 -= TitleScrollSpeed;
+	Title2BKGX4 -= TitleScrollSpeed;
+	Title3BKGX1 -= TitleScrollSpeed;
+	Title3BKGX2 -= TitleScrollSpeed;
+	Title3BKGX3 -= TitleScrollSpeed;
+	Title3BKGX4 -= TitleScrollSpeed;
 
 	if (Title1BKGX2 <= 0)
 	{
@@ -131,53 +123,36 @@ void TitleRender(void)
 		Title3BKGX4 = 1600;
 	}
 
-	//CUSTOMVERTEX vertexTitleGimmick[4]
-	//{
-	//	{ TitleGIMMICKX1,     750, 1.f,1.f, 0xFFFFFFFF, 0, 0 },
-	//{ TitleGIMMICKX2,     750, 1.f,1.f, 0xFFFFFFFF, 1, 0 },
-	//{ TitleGIMMICKX3,     840, 1.f,1.f, 0xFFFFFFFF, 1, 1 },
-	//{ TitleGIMMICKX4,     840, 1.f,1.f, 0xFFFFFFFF, 0, 1 }
-	//};
-	//TitleGIMMICKX1 -= TitleScrollSpeed;
-	//TitleGIMMICKX2 -= TitleScrollSpeed;
-	//TitleGIMMICKX3 -= TitleScrollSpeed;
-	//TitleGIMMICKX4 -= TitleScrollSpeed;
-	//if (TitleGIMMICKX2 <= 0)
-	//{
-	//	TitleGIMMICKX1 = 4000;
-	//	TitleGIMMICKX2 = 4120;
-	//	TitleGIMMICKX3 = 4120;
-	//	TitleGIMMICKX4 = 4000;
-	//}
-	//
-	//if (TitleGIMMICKX1 < 450)
-	//{
-	//	jflag = true;
-	//	if (TitleGIMMICKX1 < 240)
-	//	{
-	//		//GimmickDamage = false;
-	//	}
-	//}
 	CUSTOMVERTEX vertexTitleChar[4]
 	{
-		{ g_Player.x,     g_Player.y, 1.f,1.f, 0xFFFFFFFF, tu1, tv1 },
+	{ g_Player.x,     g_Player.y, 1.f,1.f, 0xFFFFFFFF, tu1, tv1 },
 	{ g_Player.x + g_Player.scale_x,     g_Player.y, 1.f,1.f, 0xFFFFFFFF, tu2, tv2 },
 	{ g_Player.x + g_Player.scale_x,     g_Player.y + g_Player.scale_y, 1.f,1.f, 0xFFFFFFFF, tu3, tv3 },
 	{ g_Player.x,     g_Player.y + g_Player.scale_y, 1.f,1.f, 0xFFFFFFFF, tu4, tv4 }
 	};
-	CUSTOMVERTEX vertexTitleCharDamage[4]
+
+	CUSTOMVERTEX vertexTitleChar1P[4]
 	{
-		{ 200,     650, 1.f,1.f, 0xFFFFFFFF, 0, 0 },
-	{ 320,     650, 1.f,1.f, 0xFFFFFFFF, 1, 0 },
-	{ 320,     840, 1.f,1.f, 0xFFFFFFFF, 1, 1 },
-	{ 200,     840, 1.f,1.f, 0xFFFFFFFF, 0, 1 }
+	{ g_Player.x,     g_Player.y, 1.f,1.f, 0xFFFFFFFF, tu1, tv1 },
+	{ g_Player.x + g_Player.scale_x,     g_Player.y, 1.f,1.f, 0xFFFFFFFF, tu2, tv2 },
+	{ g_Player.x + g_Player.scale_x,     g_Player.y + g_Player.scale_y, 1.f,1.f, 0xFFFFFFFF, tu3, tv3 },
+	{ g_Player.x,     g_Player.y + g_Player.scale_y, 1.f,1.f, 0xFFFFFFFF, tu4, tv4 }
 	};
+
+	CUSTOMVERTEX vertexTitleChar2P[4]
+	{
+	{ g_Player2P.x,     g_Player2P.y, 1.f,1.f, 0xFFFFFFFF, tu1, tv1 },
+	{ g_Player2P.x + g_Player2P.scale_x,     g_Player2P.y, 1.f,1.f, 0xFFFFFFFF, tu2, tv2 },
+	{ g_Player2P.x + g_Player2P.scale_x,     g_Player2P.y + g_Player2P.scale_y, 1.f,1.f, 0xFFFFFFFF, tu3, tv3 },
+	{ g_Player2P.x,     g_Player2P.y + g_Player2P.scale_y, 1.f,1.f, 0xFFFFFFFF, tu4, tv4 }
+	};
+
 	CUSTOMVERTEX vertexTitleBotton[4]
 	{
-		{ 400.f,    550.f, 1.f,1.f, titleBottonsColor1,  0.f, 0.f },
-	{ 1000.f,   550.f, 1.f,1.f, titleBottonsColor2,  1.f, 0.f },
-	{ 1000.f,   700.f, 1.f,1.f, titleBottonsColor3,  1.f, 1.f },
-	{ 400.f,    700.f, 1.f,1.f, titleBottonsColor4,  0.f, 1.f }
+		{ 450.f,    550.f, 1.f,1.f, titleBottonsColor1,  0.f, 0.f },
+	{ 1050.f,   550.f, 1.f,1.f, titleBottonsColor2,  1.f, 0.f },
+	{ 1050.f,   700.f, 1.f,1.f, titleBottonsColor3,  1.f, 1.f },
+	{ 450.f,    700.f, 1.f,1.f, titleBottonsColor4,  0.f, 1.f }
 	};
 
 
@@ -198,32 +173,20 @@ void TitleRender(void)
 	g_pD3Device->SetTexture(0, g_pTexture[TITLE_BKG_TEX]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleBKG3, sizeof(CUSTOMVERTEX));
 
-	//if (GimmickDamage == true)//‘–‚Á‚Ä‚¢‚éó‘Ô
-	//{
-	g_pD3Device->SetTexture(0, g_pTexture[TITLE_CHAR_RUN_TEX]);
-	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleChar, sizeof(CUSTOMVERTEX));
-	//}
-	//if (GimmickDamage == false) //ž™‚É“–‚½‚Á‚½ó‘Ô
-	//{
-	//	g_pD3Device->SetTexture(0, g_pTexture[TITLE_CHAR_GIMMICK_TEX]);
-	//	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleCharDamage, sizeof(CUSTOMVERTEX));
-	//	static int count = 0;
-	//	count++;
-	//	if (count == 20)
-	//	{
-	//		GimmickDamage = true;
-	//		count = 0;
-	//	}
-	//}
+
+	g_pD3Device->SetTexture(0, g_pTexture[TITLE_RULU_CHAR1P_RUN_TEX]);
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleChar1P, sizeof(CUSTOMVERTEX));
+
+	g_pD3Device->SetTexture(0, g_pTexture[TITLE_RULU_CHAR2P_RUN_TEX]);
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleChar2P, sizeof(CUSTOMVERTEX));
 
 	g_pD3Device->SetTexture(0, g_pTexture[TITLE_BOTTON_TEX]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleBotton, sizeof(CUSTOMVERTEX));
 
-	//g_pD3Device->SetTexture(0, g_pTexture[TITLE_GIMMICK_TEX]);
-	//g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleGimmick, sizeof(CUSTOMVERTEX));
+	g_pD3Device->SetTexture(0, g_pTexture[TITLE_LOGO_TEX]);
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleBKGLogo, sizeof(CUSTOMVERTEX));
 
-
-	g_pD3Device->SetTexture(0, g_pTexture[TITLE_ROAD_TEX]);
+	g_pD3Device->SetTexture(0, g_pTexture[TITLE_RULU_ROAD_TEX]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexTitleBKGRoad, sizeof(CUSTOMVERTEX));
 	//•`‰æ‚ÌI—¹
 	g_pD3Device->EndScene();

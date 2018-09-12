@@ -29,8 +29,8 @@
 
 #define TITLE 	TEXT("BATTLE RUN")
 #define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
-#define DISPLAY_WIDTH 1920//ウィンドウの縦幅
-#define DISPLAY_HIGHT 1080//ウィンドウの横幅
+#define DISPLAY_WIDTH 1600//ウィンドウの縦幅
+#define DISPLAY_HIGHT 900//ウィンドウの横幅
 #define SAFE_RELEASE(p) {if(p){(p)->Release(); (p)=NULL;}}
 
 #define FRAME 30 //一秒間何フレームか
@@ -72,8 +72,9 @@ enum TEXTURE//テクスチャの選別に使う
 	TEAMLOGO_TEX,
 	TITLE_BKG_TEX,
 	TITLE_LOGO_TEX,
-	TITLE_ROAD_TEX,
-	TITLE_CHAR_RUN_TEX,
+	TITLE_RULU_ROAD_TEX,
+	TITLE_RULU_CHAR1P_RUN_TEX,
+	TITLE_RULU_CHAR2P_RUN_TEX,
 	TITLE_GIMMICK_TEX,
 	TITLE_CHAR_GIMMICK_TEX,
 	TITLE_BOTTON_TEX,
@@ -85,17 +86,22 @@ enum TEXTURE//テクスチャの選別に使う
 	ItemDscription1_TEX,
 	ItemDscription2_TEX,
 	StageSelect_BKG_TEX,
-	StageSelect_BKG_SABAKU_TEX,
-	StageSelect_SABAKU_TEX,
-	StageSelect_BKG_MATI_TEX,
-	StageSelect_MATI_TEX,
-	StageSelect_BKG_MORI_TEX,
-	StageSelect_MORI_TEX,
+	StageSelect_BKG_NOON_TEX,
+	StageSelect_NOON_TEX,
+	StageSelect_BKG_EVENING_TEX,
+	StageSelect_EVENING_TEX,
+	StageSelect_BKG_NIGHT_TEX,
+	StageSelect_NIGHT_TEX,
 	StageSelect_BKG_RANDOM_TEX,
 	StageSelect_RANDOM_TEX,
 	StageSelectFrame_TEX,
-	GAME_BKG_TEX,
+	GAME_BKG_NOON_TEX,
+	GAME_BKG_EVENING_TEX,
+	GAME_BKG_NIGHT_TEX,
 	GAME_PLAYER_TEX,
+	GAME_PLAYER2_TEX,
+	PLAYER_RUB_TEX,
+	PLAYER2_RUB_TEX,
 	GAME_PLAYER1P_STATE_SPACE_TEX,
 	GAME_PLAYER2P_STATE_SPACE_TEX,
 	GAME_RANK_ONE_TEX,
@@ -158,8 +164,7 @@ enum BLOCKTYPE//CSVのブロックの番号
 	ITEMBOX_BLOCK,//アイテムボックス
 	GOAL_BLOCK,//ゴール判定を行うブロック
 	DIRT_BLOCK,//動くスピードが遅くなる床ブロック
-	ACCELERATED_BLOCK,//加速する床ブロック
-	TRAMPOLINE_LEFT_BLOCK
+	ACCELERATED_BLOCK//加速する床ブロック
 };
 
 enum FONT
@@ -212,17 +217,17 @@ enum//勝敗
 
 enum
 {
-	stageSelectdesert,//砂漠
-	stageSelectCity,//街
-	stageSelectForest,//森
+	stageSelectnoon,//砂漠
+	stageSelectevening,//街
+	stageSelectnight,//森
 	stageSelectRandom,//ランダム
 };
 
 enum
 {
-	Stagedesert,
-	StageCity,
-	StageForest,
+	Stagenoon,
+	Stageevening,
+	Stagenight,
 };
 
 typedef struct {

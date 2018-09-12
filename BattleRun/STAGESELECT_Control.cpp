@@ -2,7 +2,7 @@
 #include"STAGESELECT_Render.h"
 #include"main.h"
 
-int StageSelect = stageSelectdesert;
+int StageSelect = stageSelectnoon;
 int StageRandomCount = 0;
 bool StageRandomLoop = false;
 bool StageRandomSelected = false;
@@ -25,11 +25,11 @@ void StageselectControl()
 			{
 				switch (StageSelect)
 				{
-				case stageSelectCity:
-					StageSelect = stageSelectdesert;
+				case stageSelectevening:
+					StageSelect = stageSelectnoon;
 					break;
-				case stageSelectForest:
-					StageSelect = stageSelectCity;
+				case stageSelectnight:
+					StageSelect = stageSelectevening;
 					break;
 				}
 			}
@@ -40,11 +40,11 @@ void StageselectControl()
 			{
 				switch (StageSelect)
 				{
-				case stageSelectCity:
-					StageSelect = stageSelectForest;
+				case stageSelectevening:
+					StageSelect = stageSelectnight;
 					break;
-				case stageSelectdesert:
-					StageSelect = stageSelectCity;
+				case stageSelectnoon:
+					StageSelect = stageSelectevening;
 					break;
 				}
 			}
@@ -54,7 +54,7 @@ void StageselectControl()
 			switch (StageSelect)
 			{
 			case stageSelectRandom:
-				StageSelect = stageSelectCity;
+				StageSelect = stageSelectevening;
 				break;
 			}
 		}
@@ -62,35 +62,39 @@ void StageselectControl()
 		{
 			switch (StageSelect)
 			{
-			case stageSelectdesert:
+			case stageSelectnoon:
 				StageSelect = stageSelectRandom;
 				break;
-			case stageSelectCity:
+			case stageSelectevening:
 				StageSelect = stageSelectRandom;
 				break;
-			case stageSelectForest:
+			case stageSelectnight:
 				StageSelect = stageSelectRandom;
 				break;
 			}
 		}
+		
 		if (diks[DIK_RETURN] & 0x80 || g_Pad1P.a || g_Pad2P.a)
 		{
 			if (!prevKey[DIK_RETURN] && !prevPad[PadA1P] && !prevPad[PadA2P])
 			{
-				switch (StageSelect)
+				if (StageRandomLoop != true)
 				{
-				case stageSelectdesert:
-					MapDataSelect = Stagedesert;
-					scene = GAME_SCENE;
-					break;
-				case stageSelectCity:
-					MapDataSelect = StageCity;
-					scene = GAME_SCENE;
-					break;
-				case stageSelectForest:
-					MapDataSelect = StageForest;
-					scene = GAME_SCENE;
-					break;
+					switch (StageSelect)
+					{
+					case stageSelectnoon:
+						MapDataSelect = Stagenoon;
+						scene = GAME_SCENE;
+						break;
+					case stageSelectevening:
+						MapDataSelect = Stageevening;
+						scene = GAME_SCENE;
+						break;
+					case stageSelectnight:
+						MapDataSelect = Stagenight;
+						scene = GAME_SCENE;
+						break;
+					}
 				}
 				if (StageSelect == stageSelectRandom)
 				{
@@ -121,15 +125,15 @@ void StageselectControl()
 				RandomSelectCount++;
 				if (RandomSelectCount == 60)
 				{
-					StageSelect = Stagedesert;
+					StageSelect = Stagenoon;
 				}
 				if (RandomSelectCount == 120)
 				{
-					StageSelect = StageCity;
+					StageSelect = Stageevening;
 				}
 				if (RandomSelectCount == 180)
 				{
-					StageSelect = StageForest;
+					StageSelect = Stagenight;
 				}
 				if (RandomSelectCount == 180)
 				{
@@ -140,19 +144,19 @@ void StageselectControl()
 			{
 				StageRandomLoop = false;
 				StageRandomCount = 0;
-				if (StageSelect == Stagedesert)
+				if (StageSelect == Stagenoon)
 				{
-					MapDataSelect = Stagedesert;
+					MapDataSelect = Stagenoon;
 					StageRandomSelected = true;
 				}
-				if (StageSelect == StageCity)
+				if (StageSelect == Stageevening)
 				{
-					MapDataSelect = StageCity;
+					MapDataSelect = Stageevening;
 					StageRandomSelected = true;
 				}
-				if (StageSelect == StageForest)
+				if (StageSelect == Stagenight)
 				{
-					MapDataSelect = StageForest;
+					MapDataSelect = Stagenight;
 					StageRandomSelected = true;
 				}
 			}

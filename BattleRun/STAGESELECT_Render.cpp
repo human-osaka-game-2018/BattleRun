@@ -18,21 +18,21 @@ void StageselectRender()
 	{ 860.f,750.f,	  1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
 	{ 660.f,750.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
-	CUSTOMVERTEX   stageSelectSabaku[4]
+	CUSTOMVERTEX   stageSelectNoon[4]
 	{
 		{ 260.f,300.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
 	{ 460.f,300.f,	  1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
 	{ 460.f,500.f,	  1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
 	{ 260.f,500.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
-	CUSTOMVERTEX   stageSelectMati[4]
+	CUSTOMVERTEX   stageSelectEvening[4]
 	{
 		{ 660.f,   300.f,   1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
 	{ 860.f,   300.f,   1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
 	{ 860.f,   500.f,	  1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
 	{ 660.f,   500.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
-	CUSTOMVERTEX   stageSelectMori[4]
+	CUSTOMVERTEX   stageSelectNight[4]
 	{
 		{ 1060.f,300.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
 	{ 1260.f,300.f,	  1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
@@ -44,19 +44,19 @@ void StageselectRender()
 
 	//•`‰æ‚ÌŠJŽn
 	g_pD3Device->BeginScene();
-	if (StageSelect == stageSelectdesert)
+	if (StageSelect == stageSelectnoon)
 	{
-		g_pD3Device->SetTexture(0, g_pTexture[StageSelect_BKG_SABAKU_TEX]);
+		g_pD3Device->SetTexture(0, g_pTexture[StageSelect_BKG_NOON_TEX]);
 		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectBKG, sizeof(CUSTOMVERTEX));
 	}
-	if (StageSelect == stageSelectCity)
+	if (StageSelect == stageSelectevening)
 	{
-		g_pD3Device->SetTexture(0, g_pTexture[StageSelect_BKG_MATI_TEX]);
+		g_pD3Device->SetTexture(0, g_pTexture[StageSelect_BKG_EVENING_TEX]);
 		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectBKG, sizeof(CUSTOMVERTEX));
 	}
-	if (StageSelect == stageSelectForest)
+	if (StageSelect == stageSelectnight)
 	{
-		g_pD3Device->SetTexture(0, g_pTexture[StageSelect_BKG_MORI_TEX]);
+		g_pD3Device->SetTexture(0, g_pTexture[StageSelect_BKG_NIGHT_TEX]);
 		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectBKG, sizeof(CUSTOMVERTEX));
 	}
 	if (StageSelect == stageSelectRandom)
@@ -65,39 +65,39 @@ void StageselectRender()
 		g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectBKG, sizeof(CUSTOMVERTEX));
 	}
 
-	g_pD3Device->SetTexture(0, g_pTexture[StageSelect_SABAKU_TEX]);
-	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectSabaku, sizeof(CUSTOMVERTEX));
-	g_pD3Device->SetTexture(0, g_pTexture[StageSelect_MATI_TEX]);
-	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectMati, sizeof(CUSTOMVERTEX));
-	g_pD3Device->SetTexture(0, g_pTexture[StageSelect_MORI_TEX]);
-	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectMori, sizeof(CUSTOMVERTEX));
+	g_pD3Device->SetTexture(0, g_pTexture[StageSelect_NOON_TEX]);
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectNoon, sizeof(CUSTOMVERTEX));
+	g_pD3Device->SetTexture(0, g_pTexture[StageSelect_EVENING_TEX]);
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectEvening, sizeof(CUSTOMVERTEX));
+	g_pD3Device->SetTexture(0, g_pTexture[StageSelect_NIGHT_TEX]);
+	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectNight, sizeof(CUSTOMVERTEX));
 	g_pD3Device->SetTexture(0, g_pTexture[StageSelect_RANDOM_TEX]);
 	g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectrandom, sizeof(CUSTOMVERTEX));
 
 	static int count = 0;
 	count++;
-	if (StageSelect == stageSelectdesert)
+	if (StageSelect == stageSelectnoon)
 	{
 		if (count <= FLASH_TIME)
 		{
 			g_pD3Device->SetTexture(0, g_pTexture[StageSelectFrame_TEX]);
-			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectSabaku, sizeof(CUSTOMVERTEX));
+			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectNoon, sizeof(CUSTOMVERTEX));
 		}
 	}
-	if (StageSelect == stageSelectCity)
+	if (StageSelect == stageSelectevening)
 	{
 		if (count <= FLASH_TIME)
 		{
 			g_pD3Device->SetTexture(0, g_pTexture[StageSelectFrame_TEX]);
-			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectMati, sizeof(CUSTOMVERTEX));
+			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectEvening, sizeof(CUSTOMVERTEX));
 		}
 	}
-	if (StageSelect == stageSelectForest)
+	if (StageSelect == stageSelectnight)
 	{
 		if (count <= FLASH_TIME)
 		{
 			g_pD3Device->SetTexture(0, g_pTexture[StageSelectFrame_TEX]);
-			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectMori, sizeof(CUSTOMVERTEX));
+			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, stageSelectNight, sizeof(CUSTOMVERTEX));
 		}
 	}
 	if (StageSelect == stageSelectRandom)
