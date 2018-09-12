@@ -691,12 +691,30 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		D3DADAPTER_DEFAULT,
 		&g_D3DdisplayMode);
 
+	//ZeroMemory(&g_D3dPresentParameters,
+	//	sizeof(D3DPRESENT_PARAMETERS));
+	//g_D3dPresentParameters.BackBufferFormat = g_D3DdisplayMode.Format;
+	//g_D3dPresentParameters.BackBufferCount = 1;
+	//g_D3dPresentParameters.SwapEffect = D3DSWAPEFFECT_DISCARD;
+	//g_D3dPresentParameters.Windowed = TRUE;
+
+	//フルスクリーンの設定
 	ZeroMemory(&g_D3dPresentParameters,
 		sizeof(D3DPRESENT_PARAMETERS));
+	g_D3dPresentParameters.BackBufferWidth = DISPLAY_WIDTH;
+	g_D3dPresentParameters.BackBufferHeight = DISPLAY_HIGHT;
 	g_D3dPresentParameters.BackBufferFormat = g_D3DdisplayMode.Format;
 	g_D3dPresentParameters.BackBufferCount = 1;
+	g_D3dPresentParameters.MultiSampleType = D3DMULTISAMPLE_NONE;
+	g_D3dPresentParameters.MultiSampleQuality = 0;
+	g_D3dPresentParameters.hDeviceWindow = hWnd;
 	g_D3dPresentParameters.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	g_D3dPresentParameters.Windowed = TRUE;
+	g_D3dPresentParameters.Windowed = FALSE;
+	g_D3dPresentParameters.EnableAutoDepthStencil = FALSE;
+	g_D3dPresentParameters.AutoDepthStencilFormat = D3DFMT_A1R5G5B5;
+	g_D3dPresentParameters.Flags = 0;
+	g_D3dPresentParameters.FullScreen_RefreshRateInHz = 0;
+	g_D3dPresentParameters.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 
 	//デバイスを作る
 	g_pDirect3D->CreateDevice(
@@ -705,6 +723,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		hWnd,
 		D3DCREATE_SOFTWARE_VERTEXPROCESSING,
 		&g_D3dPresentParameters, &g_pD3Device);
+
+	//ビューポートの設定
+	D3DVIEWPORT9 vp;
+	vp.X = 0;
+	vp.Y = 0;
+	vp.Width = g_D3dPresentParameters.BackBufferWidth;
+	vp.Height = g_D3dPresentParameters.BackBufferHeight;
+	vp.MinZ = 0.0f;
+	vp.MaxZ = 1.0f;
+	HRESULT hr = g_pD3Device->SetViewport(&vp);
+	if (FAILED(hr)) {
+		return 2;
+	}
 
 	//フォントの設定
 	D3DXCreateFont(

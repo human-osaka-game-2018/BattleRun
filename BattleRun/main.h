@@ -1,5 +1,15 @@
 #ifndef MAIN_
 
+
+#ifdef  _DEBUG
+#pragma comment(lib, "../Debug_x86/Debug_x86/Lib/SoundLibDebug.lib")
+#endif // ! _DEBUG
+
+#ifndef _DEBUG
+#pragma comment(lib, "../Debug_x86/Debug_x86/Lib/SoundLibRelease.lib")
+#endif // _DEBUG
+
+
 #include <windows.h>
 #include <d3dx9.h>
 #include <dinput.h>
@@ -14,7 +24,7 @@
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "d3d9.lib")
 #pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "SoundLib.lib")
+
 #pragma comment(lib, "XInput.lib")
 
 #define TITLE 	TEXT("BATTLE RUN")
@@ -261,5 +271,5 @@ extern int scene;//ƒV[ƒ“Ø‚è‘Ö‚¦‚Ì‚½‚ß‚Ì•Ï”
 extern SoundLib::SoundsManager soundsManager;
 
 void GetPadState();
-#endif // !MAIN_
+#endif
 

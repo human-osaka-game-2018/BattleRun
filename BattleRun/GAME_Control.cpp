@@ -4635,7 +4635,7 @@ void JudgePlayerRanking() {
 void PlayerExists() {
 
 	if (win == PLAYER1P) {
-		if (g_Player2P.x + g_Player2P.scale_x < 0 || g_Player2P.x > 1550 || g_Player2P.y + g_Player2P.scale_y < 0 || g_Player2P.y > 850) {
+		if (g_Player2P.x + g_Player2P.scale_x < 0 || g_Player2P.x > DISPLAY_WIDTH || g_Player2P.y + g_Player2P.scale_y < 0 || g_Player2P.y > DISPLAY_HIGHT) {
 			winCount1P++;
 			gameState = FINISH;
 			bool isSuccess = soundsManager.Start(_T("clappingSE"));
@@ -4644,7 +4644,7 @@ void PlayerExists() {
 		}
 	}
 	else if (win == PLAYER2P) {
-		if (g_Player.x + g_Player.scale_x < 0 || g_Player.x > 1550 || g_Player.y + g_Player.scale_y < 0 || g_Player.y > 850) {
+		if (g_Player.x + g_Player.scale_x < 0 || g_Player.x > DISPLAY_WIDTH || g_Player.y + g_Player.scale_y < 0 || g_Player.y > DISPLAY_HIGHT) {
 			winCount2P++;
 			gameState = FINISH;
 			bool isSuccess = soundsManager.Start(_T("clappingSE"));
