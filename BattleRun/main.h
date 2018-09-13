@@ -166,7 +166,7 @@ enum BLOCKTYPE//CSVのブロックの番号
 	DIRT_BLOCK,//動くスピードが遅くなる床ブロック
 	ACCELERATED_BLOCK,//加速する床ブロック
 	TRAMPOLINE_LEFT_BLOCK,//左向きのトランポリン
-	START_POINT_BLOCK//プレイヤーのスタートポイントのブロック（透明）
+	START_POINT_BLOCK = 13//プレイヤーのスタートポイントのブロック（透明）
 };
 
 enum FONT

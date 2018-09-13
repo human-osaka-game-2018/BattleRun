@@ -586,7 +586,6 @@ void InitStartPos(int mapSelected, OBJECT_POSITION_UNDELETABLE *startPos)
 
 		for (int height = 0; height < MAP_01_HEIGHT; height++) {
 			for (int width = 0; width < MAP_01_WIDTH; width++) {
-
 				if (MapData01[height][width] == START_POINT_BLOCK) {
 					startPos->x = width * CELL_SIZE;
 					startPos->y = height * CELL_SIZE;
@@ -600,7 +599,6 @@ void InitStartPos(int mapSelected, OBJECT_POSITION_UNDELETABLE *startPos)
 
 		for (int height = 0; height < MAP_02_HEIGHT; height++) {
 			for (int width = 0; width < MAP_02_WIDTH; width++) {
-
 				if (MapData02[height][width] == START_POINT_BLOCK) {
 					startPos->x = width * CELL_SIZE;
 					startPos->y = height * CELL_SIZE;
@@ -1345,7 +1343,7 @@ void ItemEffectRelease(void) {
 		switch (MapDataSelect)
 		{
 		case Stagenoon:
-			if (MapData01[FireBall_HEIGHT1P][FireBall_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
+			if ((MapData01[FireBall_HEIGHT1P][FireBall_WIDTH1P] == 1) || (MapData01[FireBall_HEIGHT1P][FireBall_WIDTH1P] == 2) || (MapData01[FireBall_HEIGHT1P][FireBall_WIDTH1P] == 3))//ファイアーボールがどこかに当たる
 			{
 				FireBallFlagEfect1P = true;
 				FireBallFlag1P = false;
@@ -1354,7 +1352,7 @@ void ItemEffectRelease(void) {
 			}
 			break;
 		case Stageevening:
-			if (MapData02[FireBall_HEIGHT1P][FireBall_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
+			if ((MapData02[FireBall_HEIGHT1P][FireBall_WIDTH1P] == 1) || (MapData02[FireBall_HEIGHT1P][FireBall_WIDTH1P] == 2) || (MapData02[FireBall_HEIGHT1P][FireBall_WIDTH1P] == 3))//ファイアーボールがどこかに当たる
 			{
 				FireBallFlagEfect1P = true;
 				FireBallFlag1P = false;
@@ -1363,7 +1361,7 @@ void ItemEffectRelease(void) {
 			}
 			break;
 		case Stagenight:
-			if (MapData03[FireBall_HEIGHT1P][FireBall_WIDTH1P] != 0)//ファイアーボールがどこかに当たる
+			if ((MapData03[FireBall_HEIGHT1P][FireBall_WIDTH1P] == 1) || (MapData03[FireBall_HEIGHT1P][FireBall_WIDTH1P] == 2) || (MapData03[FireBall_HEIGHT1P][FireBall_WIDTH1P] == 3))//ファイアーボールがどこかに当たる
 			{
 				FireBallFlagEfect1P = true;
 				FireBallFlag1P = false;
@@ -1383,7 +1381,7 @@ void ItemEffectRelease(void) {
 		switch (MapDataSelect)
 		{
 		case Stagenoon:
-			if (MapData01[FireBall_HEIGHT2P][FireBall_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
+			if ((MapData01[FireBall_HEIGHT2P][FireBall_WIDTH2P] == 1) || (MapData01[FireBall_HEIGHT2P][FireBall_WIDTH2P] == 2) || (MapData01[FireBall_HEIGHT2P][FireBall_WIDTH2P] == 3))//ファイアーボールがどこかに当たる
 			{
 				FireBallFlagEfect2P = true;
 				FireBallFlag2P = false;
@@ -1392,7 +1390,7 @@ void ItemEffectRelease(void) {
 			}
 			break;
 			case Stageevening:
-			if (MapData02[FireBall_HEIGHT2P][FireBall_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
+				if ((MapData02[FireBall_HEIGHT2P][FireBall_WIDTH2P] == 1) || (MapData02[FireBall_HEIGHT2P][FireBall_WIDTH2P] == 2) || (MapData02[FireBall_HEIGHT2P][FireBall_WIDTH2P] == 3))//ファイアーボールがどこかに当たる
 			{
 				FireBallFlagEfect2P = true;
 				FireBallFlag2P = false;
@@ -1401,7 +1399,7 @@ void ItemEffectRelease(void) {
 			}
 			break;
 		case Stagenight:
-			if (MapData03[FireBall_HEIGHT2P][FireBall_WIDTH2P] != 0)//ファイアーボールがどこかに当たる
+			if ((MapData01[FireBall_HEIGHT2P][FireBall_WIDTH2P] == 3) || (MapData03[FireBall_HEIGHT2P][FireBall_WIDTH2P] == 2) || (MapData03[FireBall_HEIGHT2P][FireBall_WIDTH2P] == 3))//ファイアーボールがどこかに当たる
 			{
 				FireBallFlagEfect2P = true;
 				FireBallFlag2P = false;
@@ -1692,26 +1690,26 @@ void UseItem(int Player, int plessButton) {
 
 	switch (ItemNumber) {
 	case ITEMBREAK:
-		ItemBreak(Player,plessButton);
-		break;
+		//ItemBreak(Player,plessButton);
+		//break;
 	case JUMPUP:
-		JumpUp(Player,plessButton);
-		break;
+		//JumpUp(Player,plessButton);
+		//break;
 	case SPEEDUP:
-		SpeedUp(Player,plessButton);
-		break;
+		//SpeedUp(Player,plessButton);
+		//break;
 	case SPEEDDOWN:
-		SpeedDown(Player,plessButton);
-		break;
+		//SpeedDown(Player,plessButton);
+		//break;
 	case CLAWROPE:
-		UseClawRope(Player,plessButton);
-		break;
+		//UseClawRope(Player,plessButton);
+		//break;
 	case BEAM:
-		Beam(Player,plessButton);
-		break;
+		//Beam(Player,plessButton);
+		//break;
 	case BARRIER:
-		Barrier(Player,plessButton);
-		break;
+		//Barrier(Player,plessButton);
+		//break;
 	case FIREBALL:
 		FireBall(Player,plessButton);
 		break;
@@ -2279,11 +2277,13 @@ void CreatePerDecision(void) {
 	if (PlayerGimmickDecision(trampolinecount, trampoline, g_Trampoline, g_Player)) {
 		time1P = 0;
 		syosokudo1P = TRAMPOLINE_SYOSOKUDO;
+		Jcount = 0;
 		bool isSuccess = soundsManager.Start(_T("gameTrampoline"));
 	}
 	if (PlayerGimmickDecision(trampolinecount, trampoline, g_Trampoline, g_Player2P)) {
 		time2P = 0;
 		syosokudo2P = TRAMPOLINE_SYOSOKUDO;
+		Jcount2P = 0;
 		bool isSuccess = soundsManager.Start(_T("gameTrampoline2"));
 	}
 
@@ -2304,13 +2304,27 @@ void CreatePerDecision(void) {
 
 		bool isSuccess = soundsManager.Start(_T("itemGetSE"));
 		if (FirstItem1P && !SecondItem1P) {
-			//SecondItem1P = (rand() % (ITEM_MAX - 1)) + 1;
-			SecondItem1P = BARRIER;
+			while (true)
+			{
+				SecondItem1P = (rand() % (ITEM_MAX - 1)) + 1;
+				if (FirstItem1P  == SecondItem1P)
+				{
+					continue;
+				}
+				break;
+			}
 		}
 
 		if (!FirstItem1P) {
-			//FirstItem1P = (rand() % (ITEM_MAX - 1)) + 1;
-			FirstItem1P = BARRIER;
+			while (true)
+			{
+				FirstItem1P = (rand() % (ITEM_MAX - 1)) + 1;
+				if (SecondItem1P == FirstItem1P)
+				{
+					continue;
+				}
+				break;
+			}
 		}
 	}
 
@@ -2318,13 +2332,27 @@ void CreatePerDecision(void) {
 
 		bool isSuccess = soundsManager.Start(_T("itemGetSE"));
 		if (FirstItem2P && !SecondItem2P) {
-			//SecondItem2P = (rand() % (ITEM_MAX - 1)) + 1;
-			SecondItem2P = BARRIER;
+			while (true)
+			{
+				SecondItem2P = (rand() % (ITEM_MAX - 1)) + 1;
+				if (FirstItem2P == SecondItem2P)
+				{
+					continue;
+				}
+				break;
+			}
 		}
 		
 		if (!FirstItem2P) {
-			//FirstItem2P = (rand() % (ITEM_MAX - 1)) + 1;
-			FirstItem2P = BARRIER;
+			while (true)
+			{
+				FirstItem2P = (rand() % (ITEM_MAX - 1)) + 1;
+				if (SecondItem2P == FirstItem2P)
+				{
+					continue;
+				}
+				break;
+			}
 		}
 	}
 
