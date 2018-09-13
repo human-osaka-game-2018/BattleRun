@@ -2,7 +2,7 @@
 #include"RULE_Render.h"
 #include"main.h"
 
-int RuleSelect = RuleSelectRule;
+int RuleSelect = RuleSelectGame;
 int RuleDscription;
 int page = 1;
 
@@ -21,11 +21,11 @@ void RuleControl()
 		{
 			if (diks[DIK_DOWN] & 0x80 || g_Pad1P.down || g_Pad2P.down)
 			{
-				if (RuleSelect == RuleSelectItem)
+				if (RuleSelect == RuleSelectGame)
 				{
-					RuleSelect = RuleSelectGame;
+					RuleSelect = RuleSelectRule;
 				}
-				if (RuleSelect == RuleSelectRule)
+				else if (RuleSelect == RuleSelectRule)
 				{
 					RuleSelect = RuleSelectItem;
 				}
@@ -39,9 +39,9 @@ void RuleControl()
 				{
 					RuleSelect = RuleSelectRule;
 				}
-				if (RuleSelect == RuleSelectGame)
+				else if (RuleSelect == RuleSelectRule)
 				{
-					RuleSelect = RuleSelectItem;
+					RuleSelect = RuleSelectGame;
 				}
 			}
 		}
@@ -54,11 +54,11 @@ void RuleControl()
 				{
 					scene = RULE_RULE_SCENE;
 				}
-				if (RuleSelect == RuleSelectItem)
+				else if (RuleSelect == RuleSelectItem)
 				{
 					scene = RULE_ITEM_SCENE;
 				}
-				if (RuleSelect == RuleSelectGame)
+				else if (RuleSelect == RuleSelectGame)
 				{
 					scene = STAGESELECT_SCENE;
 				}

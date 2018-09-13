@@ -200,10 +200,10 @@ int ManholeHitCount2P;
 OBJECT_STATE g_Player;
 OBJECT_STATE g_Player2P;
 OBJECT_STATE g_CountDownNum;
-OBJECT_STATE g_FirstItem1P = { 337.f,15.f,40.f,40.f };
-OBJECT_STATE g_SecondItem1P = { 380.f,15.f,40.f,40.f };
-OBJECT_STATE g_FirstItem2P = { 887.f,15.f,40.f,40.f };
-OBJECT_STATE g_SecondItem2P = { 930.f,15.f,40.f,40.f };
+OBJECT_STATE g_FirstItem1P = { 453.f,15.f,40.f,40.f };
+OBJECT_STATE g_SecondItem1P = { 512.f,15.f,40.f,40.f };
+OBJECT_STATE g_FirstItem2P = { 1251.f,15.f,40.f,40.f };
+OBJECT_STATE g_SecondItem2P = { 1315.f,15.f,40.f,40.f };
 OBJECT_STATE g_Trampoline;
 OBJECT_STATE g_TrampolineLeft;
 OBJECT_STATE g_Manhole;
@@ -409,9 +409,9 @@ void InitState() {
 
 		srand((unsigned int)time(NULL));
 
-		g_Player = { 780.f,400.f,60.f,70.f };
-		g_Player2P = { 780.f,400.f,60.f,70.f };
-		g_CountDownNum = { 600.f,300.f,200.f,200.f };
+		g_Player = { 780.f,700.f,60.f,70.f };
+		g_Player2P = { 780.f,700.f,60.f,70.f };
+		g_CountDownNum = { 700.f,300.f,200.f,200.f };
 		g_Trampoline = { 0.f,0.f,96.f,64.f };
 		g_TrampolineLeft = { 0.f,0.f,32.f,96.f };
 		g_Manhole = { 0.f,0.f,32.f,64.f };
@@ -565,7 +565,7 @@ void CountDown() {
 				countDownNum = 4;
 				countDownARGB = 0xFFFFFFFF;
 				bool isSuccess = soundsManager.Start(_T("counDownGoSE"));
-				g_CountDownNum = { 550.f,250.f,400.f,400.f };
+				g_CountDownNum = { 500.f,250.f,600.f,400.f };
 				gameStart = true;
 			}
 			if (countDownFrame >= FRAME * 4 + (FRAME / 2)) {
@@ -627,8 +627,8 @@ void InitStartPos(int mapSelected, OBJECT_POSITION_UNDELETABLE *startPos)
 //プレイヤーをCSVで読み取った位置にセットするために、ステージをずらす関数
 void SetPlayerWhenStart(float *movementStageX, float *movementStageY, OBJECT_POSITION_UNDELETABLE startPos)
 {
-	*movementStageX = 780 - startPos.x;
-	*movementStageY = 400 - startPos.y;
+	*movementStageX = startPos.x - 780;
+	*movementStageY = startPos.y - 700;
 }
 
 //ジャンプの処理を行う関数
@@ -1337,6 +1337,7 @@ void ItemEffectRelease(void) {
 
 	if (FireBallFlag1P == true)//ファイアーボール使用FLAG
 	{
+		g_Fire1P.x;
 		FireBallStateXDecision1P = (FireBallStateX1P - FireBallState1P);
 		FireBall_WIDTH1P = (FireBallStateXDecision1P + movementStageX) / CELL_SIZE;
 		FireBall_HEIGHT1P = (FireBallStateY1P + movementStageY) / CELL_SIZE;
@@ -1690,26 +1691,26 @@ void UseItem(int Player, int plessButton) {
 
 	switch (ItemNumber) {
 	case ITEMBREAK:
-		//ItemBreak(Player,plessButton);
-		//break;
+		ItemBreak(Player,plessButton);
+		break;
 	case JUMPUP:
-		//JumpUp(Player,plessButton);
-		//break;
+		JumpUp(Player,plessButton);
+		break;
 	case SPEEDUP:
-		//SpeedUp(Player,plessButton);
-		//break;
+		SpeedUp(Player,plessButton);
+		break;
 	case SPEEDDOWN:
-		//SpeedDown(Player,plessButton);
-		//break;
+		SpeedDown(Player,plessButton);
+		break;
 	case CLAWROPE:
-		//UseClawRope(Player,plessButton);
-		//break;
+		UseClawRope(Player,plessButton);
+		break;
 	case BEAM:
-		//Beam(Player,plessButton);
-		//break;
+		Beam(Player,plessButton);
+		break;
 	case BARRIER:
-		//Barrier(Player,plessButton);
-		//break;
+		Barrier(Player,plessButton);
+		break;
 	case FIREBALL:
 		FireBall(Player,plessButton);
 		break;
@@ -2311,6 +2312,9 @@ void CreatePerDecision(void) {
 				{
 					continue;
 				}
+				if (SecondItem1P == CLAWROPE) {
+					continue;
+				}
 				break;
 			}
 		}
@@ -2323,11 +2327,13 @@ void CreatePerDecision(void) {
 				{
 					continue;
 				}
+				if (FirstItem1P == CLAWROPE) {
+					continue;
+				}
 				break;
 			}
 		}
 	}
-
 	if (ItemDecision2P(itemboxcount, itembox, g_Itembox, g_Player2P)) {
 
 		bool isSuccess = soundsManager.Start(_T("itemGetSE"));
@@ -2337,6 +2343,9 @@ void CreatePerDecision(void) {
 				SecondItem2P = (rand() % (ITEM_MAX - 1)) + 1;
 				if (FirstItem2P == SecondItem2P)
 				{
+					continue;
+				}
+				if (SecondItem2P == CLAWROPE) {
 					continue;
 				}
 				break;
@@ -2349,6 +2358,9 @@ void CreatePerDecision(void) {
 				FirstItem2P = (rand() % (ITEM_MAX - 1)) + 1;
 				if (SecondItem2P == FirstItem2P)
 				{
+					continue;
+				}
+				if (FirstItem2P == CLAWROPE) {
 					continue;
 				}
 				break;
@@ -2782,7 +2794,6 @@ void InitCollisionPointWhenClawRope(int player1POr2P,int clawRopeState) {
 		}
 	}
 }
-
 
 //かぎづめロープで当たり判定で左の壁に当たった時に行う処理をまとめた関数
 void DoWhenLeftCollideByClawRoap(int player1POr2P,int clawRopeState) {
@@ -4786,7 +4797,7 @@ void FinishGameOperation() {
 				if (winCount1P == 1 || winCount2P == 1)
 				{
 					StageSelect = stageSelectnoon;
-					RuleSelect = RuleSelectRule;
+					RuleSelect = RuleSelectGame;
 					scene = STAGESELECT_SCENE;
 				}
 			}

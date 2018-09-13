@@ -174,23 +174,23 @@ void GameRender(void)
 		{ 0.f,           DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
-	CUSTOMVERTEX vertexPlayer1PStateSpace[4]
+	CUSTOMVERTEX vertexPlayer1PStateSpace[4]//1Pの枠
 	{
 		{ 50.f,  10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 450.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 450.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 600.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 600.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
 		{ 50.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
-	CUSTOMVERTEX vertexPlayer2PStateSpace[4]
+	CUSTOMVERTEX vertexPlayer2PStateSpace[4]//２Pの枠
 	{
-		{ 600.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 1000.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 1000.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 600.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 850.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 1400.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 1400.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 850.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
-	CUSTOMVERTEX  vertexPlayer1P[4]
+	CUSTOMVERTEX  vertexPlayer1P[4]//プレイヤの座標
 	{
 		{ g_Player.x,                                       g_Player.y, 1.f, 1.f, Player1ARGB, (MoveImage + Lefttu1P) / 1024.f, 0.f },
 		{ g_Player.x + g_Player.scale_x,                    g_Player.y, 1.f, 1.f, Player1ARGB, (MoveImage + Righttu1P) / 1024.f, 0.f },
@@ -198,7 +198,7 @@ void GameRender(void)
 		{ g_Player.x,                    g_Player.y + g_Player.scale_y, 1.f, 1.f, Player1ARGB, (MoveImage + Lefttu1P) / 1024.f, 70.f / 1024.f }
 	};
 
-	CUSTOMVERTEX  vertexPlayer2P[4]
+	CUSTOMVERTEX  vertexPlayer2P[4]//プレイヤの座標
 	{
 		{ g_Player2P.x,                      g_Player2P.y,                      1.f, 1.f, Player2ARGB, (MoveImage2P + Lefttu2P) / 1024.f, 0.f },
 		{ g_Player2P.x + g_Player2P.scale_x, g_Player2P.y,                      1.f, 1.f, Player2ARGB, (MoveImage2P + Righttu2P) / 1024.f, 0.f },
@@ -214,20 +214,20 @@ void GameRender(void)
 		{ 0.f, 0.f, 1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
-	CUSTOMVERTEX vertexPlayer1PRankingSpace[4]
+	CUSTOMVERTEX vertexPlayer1PRankingSpace[4]//王冠の位置
 	{
-		{ 480.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 580.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 580.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 480.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 630.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 730.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 730.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 630.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
-	CUSTOMVERTEX vertexPlayer2PRankingSpace[4]
+	CUSTOMVERTEX vertexPlayer2PRankingSpace[4]//王冠の位置
 	{
-		{ 1030.f,  10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 1120.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 1120.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 1030.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 1430.f,  10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 1530.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 1530.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 1430.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX FIRSTITEM1P[4]
@@ -330,34 +330,34 @@ void GameRender(void)
 
 	CUSTOMVERTEX win1PCountFlag1[4]//1P(赤)の1勝目
 	{
-		{ 160.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 230.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 230.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 160.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 230.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 300.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 300.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 230.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 	
 	CUSTOMVERTEX win1PCountFlag2[4]//1P(赤)の2勝目
 	{
-		{ 220.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 290.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 290.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 220.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 310.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 380.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 380.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 310.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 	
 	CUSTOMVERTEX win2PCountFlag1[4]//2P(青)の1勝目
 	{
-		{ 710.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 780.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 780.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 710.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 1010.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 1080.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 1080.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 1010.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 	
 	CUSTOMVERTEX win2PCountFlag2[4]//2P(青)の2勝目
 	{
-		{ 770.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 840.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 840.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 770.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 1090.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 1160.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 1160.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 1090.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 	
 	CUSTOMVERTEX vertexClawRopeTarget1P[4]

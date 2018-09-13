@@ -2,8 +2,8 @@
 #include"TITLE_Control.h"
 #include"TITLE_Render.h"
 
-TITLE_PLAYER_STATE g_Player = { 200,650,120,190 };
-TITLE_PLAYER_STATE g_Player2P = { 130,650,120,190 };
+TITLE_PLAYER_STATE g_Player = { 200,655,120,190 };
+TITLE_PLAYER_STATE g_Player2P = { 130,655,120,190 };
 
 int Title1BKGX1 = 0;
 int	Title1BKGX2 = 800;
@@ -149,10 +149,10 @@ void TitleRender(void)
 
 	CUSTOMVERTEX vertexTitleBotton[4]
 	{
-		{ 450.f,    550.f, 1.f,1.f, titleBottonsColor1,  0.f, 0.f },
-	{ 1050.f,   550.f, 1.f,1.f, titleBottonsColor2,  1.f, 0.f },
-	{ 1050.f,   700.f, 1.f,1.f, titleBottonsColor3,  1.f, 1.f },
-	{ 450.f,    700.f, 1.f,1.f, titleBottonsColor4,  0.f, 1.f }
+		{ 500.f,    550.f, 1.f,1.f, titleBottonsColor1,  0.f, 0.f },
+	{ 1100.f,   550.f, 1.f,1.f, titleBottonsColor2,  1.f, 0.f },
+	{ 1100.f,   700.f, 1.f,1.f, titleBottonsColor3,  1.f, 1.f },
+	{ 500.f,    700.f, 1.f,1.f, titleBottonsColor4,  0.f, 1.f }
 	};
 
 

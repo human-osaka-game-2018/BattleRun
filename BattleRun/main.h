@@ -3,9 +3,8 @@
 
 #ifdef  _DEBUG
 #pragma comment(lib, "../Debug_x86/Debug_x86/Lib/SoundLibDebug.lib")
-#endif // ! _DEBUG
 
-#ifndef _DEBUG
+#else
 #pragma comment(lib, "../Debug_x86/Debug_x86/Lib/SoundLibRelease.lib")
 #endif // _DEBUG
 
@@ -44,7 +43,7 @@
 #define FIELD_LEFT 0 //マップ
 #define FIELD_TOP  0 //
 #define FIRST_CHECK_POINT 50//csvでのチェックポイントの始まりの番号
-#define FINAL_CHECK_POINT 100//csvでのチェックポイントの最後の番号
+#define FINAL_CHECK_POINT 300//csvでのチェックポイントの最後の番号
 
 enum SCENE//シーンの遷移に使う
 {

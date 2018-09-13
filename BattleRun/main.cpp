@@ -79,22 +79,22 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"TitleBKG1.png",
+		"texture/TitleBKG1.png",
 		&g_pTexture[TITLE_BKG_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"Title_BKG_Road.png",
+		"texture/Title_BKG_Road.png",
 		&g_pTexture[TITLE_RULU_ROAD_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"とげ.png",
+		"texture/とげ.png",
 		&g_pTexture[TITLE_GIMMICK_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"キャラダメージ.png",
+		"texture/キャラダメージ.png",
 		&g_pTexture[TITLE_CHAR_GIMMICK_TEX]);
 
 	D3DXCreateTextureFromFile(
@@ -234,12 +234,12 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"random.png",
+		"texture/random.png",
 		&g_pTexture[StageSelect_BKG_RANDOM_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"selectrandom.png",
+		"texture/selectrandom.png",
 		&g_pTexture[StageSelect_RANDOM_TEX]);
 
 	D3DXCreateTextureFromFile(
@@ -249,7 +249,7 @@ void ReadTexture(void) {
 		
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"WinCountFlag.png",
+		"texture/WinCountFlag.png",
 		&g_pTexture[GAME_WINCOUNT_FLAG_TEX]);
 
 	D3DXCreateTextureFromFile(
@@ -389,12 +389,12 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/jumpup.png",
+		"texture/jumpUp.png",
 		&g_pTexture[JUMPUP_ICON_TEX]);
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/speedup.png",
+		"texture/speedUp.png",
 		&g_pTexture[SPEEDUP_ICON_TEX]);
 
 	D3DXCreateTextureFromFile(
@@ -416,8 +416,8 @@ void ReadTexture(void) {
 		g_pD3Device,
 		"texture/beamicon.png",
 		&g_pTexture[BEAM_ICON_TEX]);
-		
-		D3DXCreateTextureFromFile(
+
+	D3DXCreateTextureFromFile(
 		g_pD3Device,
 		"texture/barrier.png",
 		&g_pTexture[BARRIER_ICON_TEX]);
@@ -449,6 +449,11 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
+		"texture/item_noItem.png",
+		&g_pTexture[ITEM_NO_ITEM_TEX]);
+
+	D3DXCreateTextureFromFile(
+		g_pD3Device,
 		"texture/target.png",
 		&g_pTexture[TARGET_TEX]);
 
@@ -465,12 +470,12 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"FIREBOOl_ICON.png",
+		"texture/FIREBOOl_ICON.png",
 		&g_pTexture[FIREBOOl_ICON_TEX]);
 	
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"ItemIntegration.png",
+		"texture/ItemIntegration.png",
 		&g_pTexture[ITEMINTEGRATION_TEX]);
 }
 
@@ -739,7 +744,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	g_D3dPresentParameters.MultiSampleQuality = 0;
 	g_D3dPresentParameters.hDeviceWindow = hWnd;
 	g_D3dPresentParameters.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	g_D3dPresentParameters.Windowed = TRUE;
+	g_D3dPresentParameters.Windowed = FALSE;
 	g_D3dPresentParameters.EnableAutoDepthStencil = FALSE;
 	g_D3dPresentParameters.AutoDepthStencilFormat = D3DFMT_A1R5G5B5;
 	g_D3dPresentParameters.Flags = 0;

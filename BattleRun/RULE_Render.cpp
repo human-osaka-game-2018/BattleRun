@@ -2,8 +2,8 @@
 #include"RULE_Render.h"
 #include"main.h"
 
-RULU_PLAYER_STATE g_Player = { 200,650,120,190 };
-RULU_PLAYER_STATE g_Player2P = { 130,650,120,190 };
+RULU_PLAYER_STATE g_Player = { 200,655,120,190 };
+RULU_PLAYER_STATE g_Player2P = { 130,655,120,190 };
 
 CUSTOMVERTEX  ruleSelectBKG[4]
 {
@@ -51,21 +51,21 @@ void RuleRender()
 	{ 1300.f, 820.f,1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
 	{ 300.f,    820.f,1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
-	CUSTOMVERTEX   ruleSelectRule[4]
+	CUSTOMVERTEX   ruleSelectGame[4]
 	{
 		{ 300.f,120.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
 	{ 500.f,120.f,	  1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
 	{ 500.f,320.f,	  1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
 	{ 300.f,320.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
-	CUSTOMVERTEX   ruleSelectItem[4]
+	CUSTOMVERTEX   ruleSelectRule[4]
 	{
 		{ 300.f,350.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
 	{ 500.f,350.f,	  1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
 	{ 500.f,550.f,	  1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
 	{ 300.f,550.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
-	CUSTOMVERTEX   ruleSelectGame[4]
+	CUSTOMVERTEX   ruleSelectItem[4]
 	{
 		{ 300.f,600.f,	  1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
 	{ 500.f,600.f,	  1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
@@ -90,8 +90,8 @@ void RuleRender()
 	{
 		{ 0,   0, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
 	{ 1600,   0, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-	{ 1600,   850, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-	{ 0,   850, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+	{ 1600,   900, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+	{ 0,   900, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 	CUSTOMVERTEX vertexRuluChar1P[4]
 	{
