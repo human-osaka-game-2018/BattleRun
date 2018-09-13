@@ -47,6 +47,8 @@ void CalculateTargetPosition();//かぎづめロープで稼働させる関数
 void CalculateRopeRad();//かぎづめロープのラジアンを計算する関数
 void CalculateClawRopePosition();//かぎづめロープの位置を
 void CheckCollisionWhenUsingClawRope();//かぎづめロープの時に当たり判定を行う関数
+void InitStartPos(int mapSelected, OBJECT_POSITION_UNDELETABLE *startPos);//プレイヤーがスタートする位置をCSVから読み取る関数
+void SetPlayerWhenStart(float *movementStageX, float *movementStageY, OBJECT_POSITION_UNDELETABLE startPos);//プレイヤーをCSVで読み取った位置にセットするために、ステージをずらす関数
 
 	/*グローバル変数*/
 static int wallJump1PCount;//壁ジャンプしてからのフレームを数える変数
@@ -234,6 +236,7 @@ ROTATE_VERTEX claw1P;
 ROTATE_VERTEX claw2P;
 ROTATE_VERTEX rope1P;
 ROTATE_VERTEX rope2P;
+OBJECT_POSITION_UNDELETABLE startPos;
 
 
 	/*制御処理*/
@@ -406,9 +409,9 @@ void InitState() {
 
 		srand((unsigned int)time(NULL));
 
-		g_Player = { 75.f,30.f,60.f,70.f };
-		g_Player2P = { 75.f,30.f,60.f,70.f };
-		g_CountDownNum = { 700.f,300.f,200.f,200.f };
+		g_Player = { 780.f,400.f,60.f,70.f };
+		g_Player2P = { 780.f,400.f,60.f,70.f };
+		g_CountDownNum = { 600.f,300.f,200.f,200.f };
 		g_Trampoline = { 0.f,0.f,96.f,64.f };
 		g_TrampolineLeft = { 0.f,0.f,32.f,96.f };
 		g_Manhole = { 0.f,0.f,32.f,64.f };
@@ -432,11 +435,14 @@ void InitState() {
 		movement2PWhenClawRope = { 0,0 };//１フレームにかぎづめロープでどんなけY座標進んだかを保存する変数
 
 
+		//マップによってスタート位置を変更する
+		InitStartPos(MapDataSelect, &startPos);
+		SetPlayerWhenStart(&movementStageX, &movementStageY,  startPos);
 
 		//チェックポイントの位置を保存する配列をいったん０で初期化する
-		for (int hoge = 0; hoge < (FINAL_CHECK_POINT - FIRST_CHECK_POINT); hoge++) {
-			checkPoint[hoge].x = 0;
-			checkPoint[hoge].y = 0;
+		for (int checkPointNum = 0; checkPointNum < (FINAL_CHECK_POINT - FIRST_CHECK_POINT); checkPointNum++) {
+			checkPoint[checkPointNum].x = 0;
+			checkPoint[checkPointNum].y = 0;
 		}
 		//マップが変わっても適応できる
 		if (MapDataSelect == Stagenoon) {
@@ -571,6 +577,60 @@ void CountDown() {
 			countDownFlag = false;
 		}
 	}
+}
+
+//プレイヤーがスタートする位置をCSVから読み取る関数
+void InitStartPos(int mapSelected, OBJECT_POSITION_UNDELETABLE *startPos)
+{
+	if (mapSelected == stageSelectnoon) {
+
+		for (int height = 0; height < MAP_01_HEIGHT; height++) {
+			for (int width = 0; width < MAP_01_WIDTH; width++) {
+
+				if (MapData01[height][width] == START_POINT_BLOCK) {
+					startPos->x = width * CELL_SIZE;
+					startPos->y = height * CELL_SIZE;
+					return;
+				}
+
+			}
+		}
+	}
+	else if (mapSelected == stageSelectevening) {
+
+		for (int height = 0; height < MAP_02_HEIGHT; height++) {
+			for (int width = 0; width < MAP_02_WIDTH; width++) {
+
+				if (MapData02[height][width] == START_POINT_BLOCK) {
+					startPos->x = width * CELL_SIZE;
+					startPos->y = height * CELL_SIZE;
+					return;
+				}
+
+			}
+		}
+	}
+	else if (mapSelected == stageSelectnight) {
+
+		for (int height = 0; height < MAP_03_HEIGHT; height++) {
+			for (int width = 0; width < MAP_03_WIDTH; width++) {
+
+				if (MapData03[height][width] == START_POINT_BLOCK) {
+					startPos->x = width * CELL_SIZE;
+					startPos->y = height * CELL_SIZE;
+					return;
+				}
+
+			}
+		}
+	}
+}
+
+//プレイヤーをCSVで読み取った位置にセットするために、ステージをずらす関数
+void SetPlayerWhenStart(float *movementStageX, float *movementStageY, OBJECT_POSITION_UNDELETABLE startPos)
+{
+	*movementStageX = 780 - startPos.x;
+	*movementStageY = 400 - startPos.y;
 }
 
 //ジャンプの処理を行う関数

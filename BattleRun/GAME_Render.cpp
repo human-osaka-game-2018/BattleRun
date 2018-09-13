@@ -612,6 +612,8 @@ void GameRender(void)
 				CELL[3].y = top + CELL_SIZE;
 				goalCount++;
 				break;
+			default:
+				continue;
 			}
 			g_pD3Device->SetTexture(0, g_pTexture[TextureID]);
 			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, CELL, sizeof(CUSTOMVERTEX));

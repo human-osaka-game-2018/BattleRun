@@ -164,7 +164,9 @@ enum BLOCKTYPE//CSVのブロックの番号
 	ITEMBOX_BLOCK,//アイテムボックス
 	GOAL_BLOCK,//ゴール判定を行うブロック
 	DIRT_BLOCK,//動くスピードが遅くなる床ブロック
-	ACCELERATED_BLOCK//加速する床ブロック
+	ACCELERATED_BLOCK,//加速する床ブロック
+	TRAMPOLINE_LEFT_BLOCK,//左向きのトランポリン
+	START_POINT_BLOCK//プレイヤーのスタートポイントのブロック（透明）
 };
 
 enum FONT

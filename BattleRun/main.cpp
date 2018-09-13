@@ -739,7 +739,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	g_D3dPresentParameters.MultiSampleQuality = 0;
 	g_D3dPresentParameters.hDeviceWindow = hWnd;
 	g_D3dPresentParameters.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	g_D3dPresentParameters.Windowed = FALSE;
+	g_D3dPresentParameters.Windowed = TRUE;
 	g_D3dPresentParameters.EnableAutoDepthStencil = FALSE;
 	g_D3dPresentParameters.AutoDepthStencilFormat = D3DFMT_A1R5G5B5;
 	g_D3dPresentParameters.Flags = 0;
