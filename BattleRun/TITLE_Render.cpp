@@ -54,10 +54,10 @@ void TitleRender(void)
 
 	CUSTOMVERTEX vertexTitleBKGLogo[4]
 	{
-		{ -100,   -100, 1.f,1.f, titleBottonsColor1, 0.f, 0.f },
-	{ 1600,  -100, 1.f,1.f, titleBottonsColor2, 1.f, 0.f },
-	{ 1600, 850, 1.f,1.f, titleBottonsColor3, 1.f, 1.f },
-	{ -100,  850, 1.f,1.f, titleBottonsColor4, 0.f, 1.f }
+		{ 0,                           0, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{DISPLAY_WIDTH,                0, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{DISPLAY_WIDTH,    DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 0,               DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 	CUSTOMVERTEX vertexTitleBKGRoad[4]
 	{

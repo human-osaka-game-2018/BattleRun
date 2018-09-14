@@ -15,33 +15,52 @@ void TitleControl() {
 
 	static int frameCount = 0;
 	frameCount++;
+
+	if (frameCount <= 25) {
+		titleBottonsColor1 = 0xFFFFFFFF;
+		titleBottonsColor2 = 0xFFFFFFFF;
+		titleBottonsColor3 = 0xFFFFFFFF;
+		titleBottonsColor4 = 0xFFFFFFFF;
+	}
+	else if (frameCount > 25) {
+		titleBottonsColor1 -= 0x16000000;
+		titleBottonsColor2 -= 0x16000000;
+		titleBottonsColor3 -= 0x16000000;
+		titleBottonsColor4 -= 0x16000000;
+	}
+	if (frameCount == 40) {
+		frameCount = 0;
+	}
+
+	/*static int frameCount = 0;
+	frameCount++;
 	if (frameCount >= 0 && frameCount < 5) {
-		titleBottonsColor1 = 0xFFFF0000;
-		titleBottonsColor2 = 0xFFFF6600;
-		titleBottonsColor3 = 0xFFFF9900;
-		titleBottonsColor4 = 0xFFFFFF00;
+		titleBottonsColor1 = 0xFFFF3333;
+		titleBottonsColor2 = 0xFFFF6633;
+		titleBottonsColor3 = 0xFFFF9933;
+		titleBottonsColor4 = 0xFFFFCC33;
 	}
 	if (frameCount >= 5 && frameCount < 10) {
-		titleBottonsColor2 = 0xFFFF0000;
-		titleBottonsColor3 = 0xFFFF6600;
-		titleBottonsColor4 = 0xFFFF9900;
-		titleBottonsColor1 = 0xFFFFFF00;
+		titleBottonsColor2 = 0xFFFF3333;
+		titleBottonsColor3 = 0xFFFF6633;
+		titleBottonsColor4 = 0xFFFF9933;
+		titleBottonsColor1 = 0xFFFFCC33;
 	}
 	if (frameCount >= 10 && frameCount < 15) {
-		titleBottonsColor3 = 0xFFFF0000;
-		titleBottonsColor4 = 0xFFFF6600;
-		titleBottonsColor1 = 0xFFFF9900;
-		titleBottonsColor2 = 0xFFFFFF00;
+		titleBottonsColor3 = 0xFFFF3333;
+		titleBottonsColor4 = 0xFFFF6633;
+		titleBottonsColor1 = 0xFFFF9933;
+		titleBottonsColor2 = 0xFFFFCC33;
 	}
 	if (frameCount >= 15 && frameCount < 20) {
-		titleBottonsColor4 = 0xFFFF0000;
-		titleBottonsColor1 = 0xFFFF6600;
-		titleBottonsColor2 = 0xFFFF9900;
-		titleBottonsColor3 = 0xFFFFFF00;
+		titleBottonsColor4 = 0xFFFF3333;
+		titleBottonsColor1 = 0xFFFF6633;
+		titleBottonsColor2 = 0xFFFF9933;
+		titleBottonsColor3 = 0xFFFFCC33;
 	}
 	if (frameCount == 20) {
 		frameCount = 0;
-	}
+	}*/
 
 	HRESULT hr = pKeyDevice->Acquire();
 	if ((hr == DI_OK) || (hr == S_FALSE))

@@ -114,7 +114,7 @@ void ReadTexture(void) {
 
 	D3DXCreateTextureFromFile(
 		g_pD3Device,
-		"texture/title_botton.png",
+		"texture/title_botton3.png",
 		&g_pTexture[TITLE_BOTTON_TEX]);
 
 	D3DXCreateTextureFromFile(

@@ -178,16 +178,16 @@ void GameRender(void)
 	{
 		{ 50.f,  10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
 		{ 600.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 600.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 50.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 600.f, 100.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 50.f,  100.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX vertexPlayer2PStateSpace[4]//‚QP‚Ì˜g
 	{
 		{ 850.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
 		{ 1400.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 1400.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 850.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 1400.f, 100.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 850.f, 100.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX  vertexPlayer1P[4]//ƒvƒŒƒCƒ„‚ÌÀ•W
@@ -218,16 +218,16 @@ void GameRender(void)
 	{
 		{ 630.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
 		{ 730.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 730.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 630.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 730.f, 100.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 630.f, 100.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX vertexPlayer2PRankingSpace[4]//‰¤Š¥‚ÌˆÊ’u
 	{
-		{ 1430.f,  10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 1430.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
 		{ 1530.f, 10.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 1530.f, 60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 1430.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 1530.f, 100.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 1430.f, 100.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	CUSTOMVERTEX FIRSTITEM1P[4]
@@ -330,34 +330,34 @@ void GameRender(void)
 
 	CUSTOMVERTEX win1PCountFlag1[4]//1P(Ô)‚Ì1Ÿ–Ú
 	{
-		{ 230.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 300.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 300.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 230.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 230.f,  30.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 300.f,  30.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 300.f,  90.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 230.f,  90.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 	
 	CUSTOMVERTEX win1PCountFlag2[4]//1P(Ô)‚Ì2Ÿ–Ú
 	{
-		{ 310.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 380.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 380.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 310.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 310.f,  30.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 380.f,  30.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 380.f,  90.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 310.f,  90.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 	
 	CUSTOMVERTEX win2PCountFlag1[4]//2P(Â)‚Ì1Ÿ–Ú
 	{
-		{ 1010.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 1080.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 1080.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 1010.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 1010.f,  30.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 1080.f,  30.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 1080.f,  90.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 1010.f,  90.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 	
 	CUSTOMVERTEX win2PCountFlag2[4]//2P(Â)‚Ì2Ÿ–Ú
 	{
-		{ 1090.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 1160.f,  20.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 1160.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 1090.f,  60.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ 1090.f,  30.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
+		{ 1160.f,  30.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ 1160.f,  90.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 1090.f,  90.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 	
 	CUSTOMVERTEX vertexClawRopeTarget1P[4]
@@ -819,10 +819,10 @@ void GameRender(void)
 		if (win == PLAYER1P) {
 			CUSTOMVERTEX  vertexWinPlayer1P[4]
 			{
-				{ 200.f,  100.f, 1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f }, 
-				{ 1200.f, 100.f, 1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f }, 
-				{ 1200.f, 700.f, 1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
-				{ 200.f,  700.f, 1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
+				{ 300.f,  150.f, 1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f }, 
+				{ 1300.f, 150.f, 1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f }, 
+				{ 1300.f, 750.f, 1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
+				{ 300.f,  750.f, 1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
 			};
 			g_pD3Device->SetTexture(0, g_pTexture[WIN_1P_TEX]);
 			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexWinPlayer1P, sizeof(CUSTOMVERTEX));
@@ -830,10 +830,10 @@ void GameRender(void)
 		else if (win == PLAYER2P) {
 			CUSTOMVERTEX  vertexWinPlayer2P[4]
 			{
-				{ 200.f,  100.f, 1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f }, 
-				{ 1200.f, 100.f, 1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f }, 
-				{ 1200.f, 700.f, 1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
-				{ 200.f,  700.f, 1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
+				{ 300.f,  150.f, 1.f, 1.f, 0xFFFFFFFF, 0.f, 0.f }, 
+				{ 1300.f, 150.f, 1.f, 1.f, 0xFFFFFFFF, 1.f, 0.f }, 
+				{ 1300.f, 750.f, 1.f, 1.f, 0xFFFFFFFF, 1.f, 1.f },
+				{ 300.f,  750.f, 1.f, 1.f, 0xFFFFFFFF, 0.f, 1.f }
 			};
 			g_pD3Device->SetTexture(0, g_pTexture[WIN_2P_TEX]);
 			g_pD3Device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertexWinPlayer2P, sizeof(CUSTOMVERTEX));

@@ -10,9 +10,9 @@ void ResultRender(void)
 	CUSTOMVERTEX vertexResultBKG[4]
 	{
 		{ 0.f,                      0.f, 1.f,1.f, 0xFFFFFFFF, 0.f, 0.f },
-		{ 1600,            0.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
-		{ 1600,  900, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
-		{ 0.f,            900, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
+		{ DISPLAY_WIDTH,            0.f, 1.f,1.f, 0xFFFFFFFF, 1.f, 0.f },
+		{ DISPLAY_WIDTH,  DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 1.f, 1.f },
+		{ 0.f,            DISPLAY_HIGHT, 1.f,1.f, 0xFFFFFFFF, 0.f, 1.f }
 	};
 
 	/*CUSTOMVERTEX vertexResult[4]
@@ -31,6 +31,7 @@ void ResultRender(void)
 
 	//•`‰æ‚ÌŠJŽn
 	g_pD3Device->BeginScene();
+
 	if (ResultWinner == Result1PWIN)//‚PP‚ÌŸ‚¿
 	{
 		g_pD3Device->SetTexture(0, g_pTexture[RESULT_1P_BKG_TEX]);
